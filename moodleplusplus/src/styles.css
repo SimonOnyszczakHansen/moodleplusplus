@@ -1,1 +1,57 @@
-/* You can add global styles to this file, and also import other style files */
+/* This should contain global styling for the application*/
+
+:root {
+	/* Main colors */
+	--color-primary: #2563eb;
+	--color-secondary: #64748b;
+
+	/* Backgrounds */
+	--color-background: #f8fafc;
+	--color-surface: #ffffff;
+	--color-sidebar: #0f172a;
+
+	/* Text */
+	--color-text: #0f172a;
+	--color-text-secondary: #475569;
+	--color-text-muted: #64748b;
+	--color-text-light: #ffffff;
+
+	/* Borders */
+	--color-border: #e2e8f0;
+
+	/* Status colors */
+	--color-success: #16a34a;
+	--color-warning: #d97706;
+	--color-danger: #dc2626;
+	--color-info: #0284c7;
+
+	/* Other */
+	--color-disabled: #94a3b8;
+	--color-hover: #1d4ed8;
+	--color-focus: #60a5fa;
+
+	--font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: var(--font-family);
+	background: var(--color-background);
+  	color: var(--color-text);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
