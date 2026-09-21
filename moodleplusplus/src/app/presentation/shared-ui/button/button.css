@@ -26,8 +26,17 @@ button.secondary {
   color: var(--color-text-light);
 }
 
+button.danger {
+  background: var(--color-danger);
+  color: var(--color-text-light);
+}
+
 button.secondary:hover:not(:disabled) {
   background: var(--color-secondary-hover);
+}
+
+button.danger:hover:not(:disabled) {
+  background: var(--color-danger-hover);
 }
 
 button:focus-visible {
