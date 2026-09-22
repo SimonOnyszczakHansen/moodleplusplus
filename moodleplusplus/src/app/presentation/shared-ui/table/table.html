@@ -1,0 +1,54 @@
+<div class="table-container" role="region" tabindex="0">
+	<table>
+		<!-- Column headings -->
+		<thead>
+			<tr>
+				@for (column of columns(); track column.key) {
+				<th scope="col">{{ column.label }}</th>
+				}
+
+				@if (actions().length) {
+				<th scope="col">Actions</th>
+				}
+			</tr>
+		</thead>
+
+		<!-- One row per item, with one cell per configured column -->
+		<tbody>
+			@for (row of rows(); track row) {
+			<tr>
+				@for (column of columns(); track column.key) {
+				<td>
+					@if (templateFor(column.key); as cellTemplate) {
+					<ng-container [ngTemplateOutlet]="cellTemplate" [ngTemplateOutletContext]="{ $implicit: row }" />
+					} @else {
+					{{ row[column.key] ?? '—' }}
+					}
+				</td>
+				}
+
+				<!-- Optional action buttons for this row -->
+				@if (actions().length) {
+				<td>
+					<div class="row-actions">
+						@for (action of actions(); track action.id) {
+						<app-button [variant]="action.variant ?? 'primary'"
+							(click)="actionClick.emit({ action: action.id, row: row })">
+							{{ action.label }}
+						</app-button>
+						}
+					</div>
+				</td>
+				}
+			</tr>
+			} @empty {
+			<!-- Span every column when there are no rows -->
+			<tr>
+				<td class="empty-message" [attr.colspan]="columns().length + (actions().length ? 1 : 0) || 1">
+					{{ emptyMessage() }}
+				</td>
+			</tr>
+			}
+		</tbody>
+	</table>
+</div>

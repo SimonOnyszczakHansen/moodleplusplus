@@ -1,0 +1,12 @@
+<dialog #dialog [attr.aria-label]="title()" (cancel)="onCancel($event)" (close)="onNativeClose()">
+	<header>
+		<h2>{{ title() }}</h2>
+		<button type="button" class="close-button" aria-label="Close modal" (click)="close()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</header>
+
+	<div class="content">
+		<ng-content />
+	</div>
+</dialog>

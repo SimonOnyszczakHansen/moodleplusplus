@@ -8,6 +8,6 @@ import { booleanAttribute, Component, input } from '@angular/core';
 })
 export class Button {
   readonly type = input<'button' | 'submit' | 'reset'>('button');
-  readonly variant = input<'primary' | 'secondary'>('primary');
+  readonly variant = input<'primary' | 'secondary' | 'danger'>('primary');
   readonly disabled = input(false, { transform: booleanAttribute });
 }
