@@ -1,0 +1,46 @@
+.consent-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: #f5f7fb;
+}
+
+.consent-card {
+  width: min(100%, 480px);
+  padding: 24px;
+}
+
+mat-card-header {
+  margin-bottom: 16px;
+}
+
+mat-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.consent-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.error-banner {
+  background: #fde2e2;
+  border: 1px solid #f5b5b5;
+  color: #8b1e1e;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}

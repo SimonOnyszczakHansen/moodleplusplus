@@ -5,10 +5,10 @@
             <mat-card-content>
                <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
                 <mat-form-field appearance="outline" class="full-width-input"> 
-                    <mat-label>Username or Email</mat-label>
+                    <mat-label>Email</mat-label>
                     <input matInput formControlName="email">
                     <mat-error *ngIf="email?.invalid && email?.touched">
-                        <span *ngIf="email?.errors?.['required']">Username/Email is required.</span>
+                        <span *ngIf="email?.errors?.['required']">Email is required.</span>
                     </mat-error>
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="full-width-input"> 

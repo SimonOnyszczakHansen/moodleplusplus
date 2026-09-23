@@ -23,7 +23,7 @@ export class Login {
     private router: Router,
   ) {
     this.loginForm = this.fb.group({
-      email: [''],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
@@ -31,6 +31,7 @@ export class Login {
   get email() {
     return this.loginForm.get('email');
   }
+
   get password() {
     return this.loginForm.get('password');
   }
@@ -40,15 +41,21 @@ export class Login {
       this.loginForm.markAllAsTouched();
       return;
     }
+
     this.errorMessage = null;
+
     this.authService.login(this.loginForm.value).subscribe({
-      next: (response: any) => {
-        console.log('Login successful', response);
-        this.router.navigate(['/dashboard']);
+      next: () => {
+        const destination = this.authService.hasAcceptedConsent ? '/dashboard' : '/consent';
+        this.router.navigate([destination]);
       },
-      error: (err: { status: number; error: { message: string } }) => {
-        if (err.status === 401) this.errorMessage = 'Incorrect email or password.';
-        else this.errorMessage = err.error?.message || 'A server error occurred.';
+      error: (err: { status: number; error?: { message?: string } }) => {
+        if (err.status === 401) {
+          this.errorMessage = 'Forkert email eller kodeord.';
+          return;
+        }
+
+        this.errorMessage = err.error?.message || 'Der opstod en serverfejl.';
       },
     });
   }
