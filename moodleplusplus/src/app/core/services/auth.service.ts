@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
 import { ConsentRequest, ConsentResponse, LoginResponse, User } from '../models/user.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,6 @@ export class AuthService {
   private readonly TOKEN_KEY = 'accessToken';
   private readonly USER_KEY = 'currentUser';
   private readonly CONSENT_KEY = 'consentAccepted';
-  private readonly API_URL = '/auth';
 
   private userSubject = new BehaviorSubject<User | null>(this.readStoredUser());
   user$: Observable<User | null> = this.userSubject.asObservable();
@@ -36,7 +36,7 @@ export class AuthService {
     }
     // Remove above later
 
-    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
+    return this.http.post<LoginResponse>(`${environment.apiHost}/auth/login`, credentials).pipe(
       map((response) => {
         const token = response.jwt ?? response.accessToken ?? '';
         const user: User = {
@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.API_URL}/logout`, {}).pipe(
+    return this.http.post<void>(`${environment.apiHost}/auth/logout`, {}).pipe(
       tap(() => this.clearSession()),
       tap(() => this.userSubject.next(null)),
     );
