@@ -5,7 +5,6 @@ import { IDashboard } from './models/dashboard.model';
 import { DashboardService } from './services/dashboard';
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../core/models/user.interface';
-import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,9 +12,7 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements OnInit{
-	userRole?: User['role'];
-	dashboard?: IDashboard;
+
 export class Dashboard implements OnInit {
   userRole?: string;
   dashboard?: IDashboard;

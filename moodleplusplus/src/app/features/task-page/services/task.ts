@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { ICreateTaskRequest, ISubmission, ITask, ITaskAssignmentDetail, ITaskAssignmentSummary, IFeedbackEntry, ReviewStatus, } from '../models/task.model';
 
 @Injectable({ providedIn: 'root' })
 export class Task {
-	private readonly base = `${environment.apiUrl}/api/v1`;
+	private readonly base = `${environment.apiHost}`;
 
 	constructor(private http: HttpClient) { }
 
