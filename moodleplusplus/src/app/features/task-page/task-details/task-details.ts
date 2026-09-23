@@ -2,10 +2,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { of } from 'rxjs';
 import { Task as TaskService } from '../services/task';
+import { AuthService } from '../../../core/services/auth.service';
 import { ITaskAssignmentDetail } from '../models/task.model';
-import { MOCK_TASK_ASSIGNMENT_DETAILS } from '../models/task-details.mock';
 import { StatusBadge } from '../../../shared/status-badge/status-badge';
 import { Button } from '../../../shared/button/button';
 
@@ -18,6 +17,7 @@ import { Button } from '../../../shared/button/button';
 export class TaskDetails implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly taskService = inject(TaskService);
+    private readonly authService = inject(AuthService);
 
     assignment: ITaskAssignmentDetail | null = null;
     error = false;
@@ -35,7 +35,11 @@ export class TaskDetails implements OnInit {
     }
 
     get canSubmit(): boolean {
-        return this.assignment?.status === 'ikke afleveret';
+        return this.assignment?.status === 'Ikke afleveret';
+    }
+
+    get submissionFileUrl(): string {
+        return this.taskService.getSubmissionFileUrl(this.assignmentId);
     }
 
     onFileSelected(event: Event): void {
@@ -61,21 +65,24 @@ export class TaskDetails implements OnInit {
     }
 
     private load(): void {
-        this.error = false;
-        of(MOCK_TASK_ASSIGNMENT_DETAILS[this.assignmentId]).subscribe({
+        this.taskService.getAssignment(this.assignmentId).subscribe({
             next: (assignment) => {
-                this.assignment = assignment ?? null;
-                this.error = !assignment;
+                this.assignment = { ...assignment, submission: null, feedback: [], objectives: [] };
+                this.error = false;
+        
+                this.taskService.getSubmission(this.assignmentId).subscribe({
+                    next: (submission) => { if (this.assignment) this.assignment.submission = submission; },
+                });
+        
+                const studentId = this.authService.currentUser?.id;
+                if (studentId) {
+                    this.taskService.getFeedback(String(studentId), assignment.taskId).subscribe({
+                        next: (feedback) => { if (this.assignment) this.assignment.feedback = feedback; },
+                    });
+                }
+                // No confirmed endpoint yet for fetching this assignment's objectives from the student side - ask backend.
             },
+            error: () => { this.error = true; },
         });
-
-        // this.taskService.getAssignment(this.assignmentId).subscribe({
-        //     next: (assignment) => {
-        //         this.assignment = assignment;
-        //     },
-        //     error: () => {
-        //         this.error = true;
-        //     },
-        // });
     }
 }
