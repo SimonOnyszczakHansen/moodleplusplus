@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
-import { ConsentRequest, ConsentResponse, LoginResponse, User } from '../models/user.interface';
+import { LoginResponse, User } from '../models/user.interface';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -65,27 +65,6 @@ export class AuthService {
     );
   }
 
-  acceptConsent(payload: ConsentRequest): Observable<ConsentResponse> {
-    // If using the local dev token, short-circuit and persist consent locally
-    if (localStorage.getItem(this.TOKEN_KEY) === 'local-dev-token') {
-      const resp: ConsentResponse = {
-        type: payload.type,
-        version: payload.version,
-        acceptedAt: new Date().toISOString(),
-        accepted: payload.accepted,
-      };
-      localStorage.setItem(this.CONSENT_KEY, String(payload.accepted));
-      return of(resp);
-    }
-    // Remove above later
-
-    return this.http.patch<ConsentResponse>('/consent', payload).pipe(
-      tap((response) => {
-        localStorage.setItem(this.CONSENT_KEY, String(response.accepted ?? payload.accepted));
-      }),
-    );
-  }
-
   get currentUser(): User | null {
     return this.userSubject.value;
   }
@@ -94,9 +73,9 @@ export class AuthService {
     return localStorage.getItem(this.CONSENT_KEY) === 'true';
   }
 
-	markConsentAccepted(): void {
-		localStorage.setItem(this.CONSENT_KEY, 'true');
-	}
+  markConsentAccepted(): void {
+    localStorage.setItem(this.CONSENT_KEY, 'true');
+  }
 
   get isAuthenticated(): boolean {
     return !!localStorage.getItem(this.TOKEN_KEY) || !!this.userSubject.value;

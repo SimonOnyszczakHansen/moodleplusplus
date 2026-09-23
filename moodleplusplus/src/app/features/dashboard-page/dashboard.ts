@@ -11,18 +11,20 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements OnInit{
-	userRole?: string;
-	dashboard?: IDashboard;
+export class Dashboard implements OnInit {
+  userRole?: string;
+  dashboard?: IDashboard;
 
-	constructor(private dashboardService: DashboardService, private auth: AuthService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private auth: AuthService,
+  ) {}
 
-	ngOnInit(): void {
-		this.userRole = this.auth.currentUser?.role;
+  ngOnInit(): void {
+    this.userRole = this.auth.currentUser?.role;
 
-		this.dashboardService.getDashboardData().subscribe(data => {
-			this.dashboard = data;
-		});
-	}
-
+    this.dashboardService.getDashboardData().subscribe((data) => {
+      this.dashboard = data;
+    });
+  }
 }

@@ -15,16 +15,3 @@ export interface User {
   name: string;
   role: string;
 }
-
-export interface ConsentRequest {
-  type: string;
-  version: string;
-  accepted: boolean;
-}
-
-export interface ConsentResponse {
-  type?: string;
-  version?: string;
-  acceptedAt?: string;
-  accepted?: boolean;
-}
