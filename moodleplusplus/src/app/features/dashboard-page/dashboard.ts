@@ -1,9 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { StudentContent } from './components/student-content/student-content';
+import { TeacherContent } from './components/teacher-content/teacher-content';
+import { IDashboard } from './models/dashboard.model';
+import { DashboardService } from './services/dashboard';
+import { AuthService } from '../../core/services/auth';
+import { UserRole } from '../../core/models/user';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [StudentContent, TeacherContent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard {}
+export class Dashboard implements OnInit{
+	userRole?: UserRole;
+	dashboard?: IDashboard;
+
+	constructor(private dashboardService: DashboardService, private auth: AuthService) {}
+
+	ngOnInit(): void {
+		this.userRole = this.auth.currentUser?.role;
+
+		this.dashboardService.getDashboardData().subscribe(data => {
+			this.dashboard = data;
+		});
+	}
+
+}

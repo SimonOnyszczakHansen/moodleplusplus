@@ -1,1 +1,10 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+	<h1>Velkommen, {{ dashboard?.username }} </h1>
+
+	@if (userRole === 'Student') {
+	<app-student-content></app-student-content>
+	}
+	@if (userRole === 'Teacher') {
+	<app-teacher-content></app-teacher-content>
+	}
+</div>

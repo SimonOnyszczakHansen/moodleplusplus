@@ -1,2 +1,21 @@
 
-<router-outlet />
+<div class="app-shell">
+  <aside class="sidebar" *ngIf="showNavigation">
+    <div class="brand">Moodle++</div>
+
+    <nav class="nav-menu" aria-label="Main navigation">
+      <a routerLink="/dashboard">Dashboard</a>
+      <a routerLink="/dashboard">Fag</a>
+      <a routerLink="/dashboard">Grupper</a>
+      <a routerLink="/dashboard">Opgaver</a>
+      <a routerLink="/dashboard">Quizzer</a>
+      <button type="button" class="logout-button" (click)="logout()">Log ud</button>
+    </nav>
+
+    <div class="user-chip">{{ currentUserName }}<span>{{ currentUserRole }}</span></div>
+  </aside>
+
+  <main class="content-area">
+    <router-outlet />
+  </main>
+</div>
