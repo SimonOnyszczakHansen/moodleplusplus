@@ -1,0 +1,38 @@
+.consent-page {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	padding: 2rem;
+}
+
+.consent-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.25rem;
+	max-width: 28rem;
+	width: 100%;
+	padding: 2rem;
+	text-align: center;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: 1rem;
+	box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+.consent-container h1 {
+	margin: 0;
+	font-size: 1.5rem;
+	color: var(--color-text);
+}
+
+.consent-container p {
+	margin: 0;
+	color: var(--color-text-secondary);
+}
+
+.consent-actions {
+	display: flex;
+	gap: 1rem;
+}

@@ -1,0 +1,41 @@
+<div class="consent-page">
+	<div class="consent-container" *ngIf="!tosAccepted">
+		<h2>Servicevilkår</h2>
+		<p>Moodle++ er en undervisningsplatform, der anvendes til blandt andet opgaver, quizzer, feedback, elevgrupper og visning af faglig progression.<br><br>
+
+Brugeren skal anvende systemet i forbindelse med de funktioner og undervisningsaktiviteter, som vedkommende har adgang til.<br><br>
+
+Loginoplysninger er personlige og må ikke deles med andre. Brugeren er ansvarlig for at beskytte sine loginoplysninger og skal informere en ansvarlig person, hvis der er mistanke om misbrug af kontoen.<br><br>
+
+Indhold, der uploades eller indtastes i systemet, skal være relevant for undervisningen og må ikke indeholde ulovligt, skadeligt eller upassende materiale.<br><br>
+
+Systemets adgangskontrol afhænger af brugerens rolle. Brugeren må ikke forsøge at få adgang til funktioner eller oplysninger, som vedkommende ikke har tilladelse til at se.<br><br>
+
+Moodle++ kan blive opdateret eller ændret som en del af drift og videreudvikling. Det kan betyde, at funktioner midlertidigt er utilgængelige.<br><br></p>
+		<div class="consent-actions">
+			<app-button variant="secondary" (click)="onDecline()">Afvis</app-button>
+			<app-button variant="primary" (click)="onAcceptTOS()">Accepter</app-button>
+		</div>
+	</div>
+
+	<div class="consent-container" *ngIf="tosAccepted">
+		<h2>Privatlivspolitik</h2>
+		<p>Moodle++ behandler personoplysninger for at kunne levere platformens funktioner til elever, undervisere og administratorer.<br><br>
+
+De oplysninger, der kan behandles, omfatter blandt andet navn, loginoplysninger, rolle, afleveringer, quizresultater, feedback, progression og aktivitet i systemet.<br><br>
+
+Oplysningerne bruges til at administrere brugerens konto, vise relevante læringsaktiviteter, registrere afleveringer og quizresultater samt beregne og dokumentere faglig progression.<br><br>
+
+Adgang til oplysninger begrænses efter brugerens rolle. Elever kan som udgangspunkt kun se egne oplysninger, mens undervisere kun kan tilgå oplysninger, der er relevante for deres undervisning. Administratorer anvender systemet til brugeradministration.<br><br>
+
+Personoplysninger opbevares kun så længe, det er nødvendigt for systemets formål og gældende krav. Hvis en bruger slettes, håndteres personoplysninger efter systemets regler for anonymisering og sletning.<br><br>
+
+Moodle++ anvender tekniske sikkerhedsforanstaltninger til at beskytte data mod uautoriseret adgang, ændring eller tab.<br><br>
+</p>
+
+		<div class="consent-actions">
+			<app-button variant="secondary" (click)="onDecline()">Afvis</app-button>
+			<app-button variant="primary" (click)="onAcceptPP()">Accepter</app-button>
+		</div>
+	</div>
+</div>

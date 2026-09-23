@@ -94,6 +94,10 @@ export class AuthService {
     return localStorage.getItem(this.CONSENT_KEY) === 'true';
   }
 
+	markConsentAccepted(): void {
+		localStorage.setItem(this.CONSENT_KEY, 'true');
+	}
+
   get isAuthenticated(): boolean {
     return !!localStorage.getItem(this.TOKEN_KEY) || !!this.userSubject.value;
   }
