@@ -1,0 +1,31 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 100px;
+}
+
+.login-card {
+  border: 2px solid grey;
+  max-width: 400px;
+  width: 100%;
+  padding: 24px;
+}
+
+/* Make the Angular Material form fields stretch to fill the card's width */
+.full-width-input {
+  width: 100%;
+}
+
+/* Center the User Login title (used on mat-card-header) */
+.header-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+/* Center the content inside the card actions (where the Login button is) */
+.actions-center {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 16px;
+}
