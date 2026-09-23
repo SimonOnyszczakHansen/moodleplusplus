@@ -1,0 +1,86 @@
+import { ITaskAssignmentDetail } from './task.model';
+
+export const MOCK_TASK_ASSIGNMENT_DETAILS: Record<string, ITaskAssignmentDetail> = {
+    a1: {
+        assignmentId: 'a1',
+        taskId: 't1',
+        title: 'Web API',
+        deadline: '2026-10-01T23:59:00',
+        status: 'ikke afleveret',
+        description: 'Byg et REST API der understøtter CRUD-operationer for bøger.',
+        goals: [
+            { id: 'g1', description: 'Kan designe et REST API' },
+            { id: 'g2', description: 'Kan anvende Entity Framework' },
+        ],
+        submission: null,
+        feedback: [],
+    },
+    a2: {
+        assignmentId: 'a2',
+        taskId: 't2',
+        title: 'Database Design',
+        deadline: '2026-09-20T23:59:00',
+        status: 'afleveret',
+        description: 'Design en normaliseret database til en webshop.',
+        goals: [{ id: 'g3', description: 'Kan normalisere en database' }],
+        submission: {
+            comment: 'Vedhæfter ER-diagram og SQL-scripts.',
+            fileName: 'database-design.zip',
+            fileUrl: '#',
+            submittedAt: '2026-09-18T14:30:00',
+        },
+        feedback: [],
+    },
+    a3: {
+        assignmentId: 'a3',
+        taskId: 't3',
+        title: 'Unit Testing',
+        deadline: '2026-09-10T23:59:00',
+        status: 'godkendt',
+        description: 'Skriv unit tests for en eksisterende service-klasse.',
+        goals: [{ id: 'g4', description: 'Kan skrive unit tests med xUnit' }],
+        submission: {
+            comment: 'Alle tests er grønne.',
+            fileName: 'unit-tests.zip',
+            fileUrl: '#',
+            submittedAt: '2026-09-08T10:00:00',
+        },
+        feedback: [
+            { text: 'Flot arbejde, god testdækning.', createdAt: '2026-09-09T09:00:00', teacherName: 'Anna Jensen' },
+        ],
+    },
+    a4: {
+        assignmentId: 'a4',
+        taskId: 't4',
+        title: 'Design Patterns',
+        deadline: '2026-09-05T23:59:00',
+        status: 'afvist',
+        description: 'Implementer tre forskellige design patterns i et konsolprogram.',
+        goals: [{ id: 'g5', description: 'Kan anvende design patterns' }],
+        submission: {
+            comment: 'Har brugt Singleton, Factory og Observer.',
+            fileName: 'design-patterns.zip',
+            fileUrl: '#',
+            submittedAt: '2026-09-03T16:00:00',
+        },
+        feedback: [
+            { text: 'Factory-mønsteret er ikke implementeret korrekt, prøv igen.', createdAt: '2026-09-04T11:00:00', teacherName: 'Anna Jensen' },
+        ],
+    },
+    a5: {
+        assignmentId: 'a5',
+        taskId: 't5',
+        title: 'Gruppeprojekt: E-commerce',
+        deadline: '2026-10-15T23:59:00',
+        status: 'ikke afleveret',
+        description: 'Byg en simpel webshop i grupper på 3-4 elever.',
+        goals: [
+            { id: 'g6', description: 'Kan arbejde i et team om et større projekt' },
+            { id: 'g7', description: 'Kan integrere en betalingsløsning' },
+        ],
+        submission: null,
+        feedback: [],
+        groupId: 'g1',
+        groupName: 'Gruppe 3',
+    },
+};

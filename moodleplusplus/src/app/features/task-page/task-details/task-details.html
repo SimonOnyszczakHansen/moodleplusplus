@@ -1,0 +1,80 @@
+ @if (error || !assignment) {
+<p>Kunne ikke hente opgaven.</p>
+} @else {
+<div class="task-details-container">
+    <a routerLink="/tasks" class="back-link">← Mine Opgaver</a>
+    <h1>{{ assignment.title }}</h1>
+    <p class="description">{{ assignment.description }}</p>
+
+    <div class="panels">
+        <div class="status-card">
+            <h2>Afleveringsstatus</h2>
+            <dl>
+                <dt>Deadline</dt>
+                <dd>{{ assignment.deadline | date: 'dd/MM/yyyy' }}</dd>
+
+                <dt>Status</dt>
+                <dd><app-status-badge [label]="assignment.status" [variant]="assignment.status" /></dd>
+
+                @if (assignment.groupName) {
+                <dt>Gruppe</dt>
+                <dd>{{ assignment.groupName }}</dd>
+                }
+
+                <dt>Aflevering</dt>
+                <dd>
+                    @if (assignment.submission?.fileName) {
+                    <a [href]="assignment.submission?.fileUrl" target="_blank">{{ assignment.submission?.fileName }}</a>
+                    } @else {
+                    Ingen fil afleveret
+                    }
+                </dd>
+
+                <dt>Feedback</dt>
+                <dd>
+                    @if (assignment.feedback.length) {
+                    <ul>
+                        @for (entry of assignment.feedback; track entry.createdAt) {
+                        <li>{{ entry.text }} — {{ entry.teacherName }} ({{ entry.createdAt | date: 'dd/MM/yyyy' }})</li>
+                        }
+                    </ul>
+                    } @else {
+                    Ingen feedback endnu
+                    }
+                </dd>
+            </dl>
+
+            @if (canSubmit) {
+            <form (ngSubmit)="onSubmit()">
+                <label for="comment">Kommentar</label>
+                <textarea id="comment" name="comment" [(ngModel)]="comment" required></textarea>
+
+                <label for="file">Fil (ZIP)</label>
+                <input id="file" type="file" accept=".zip" (change)="onFileSelected($event)" />
+
+                <app-button type="submit" [disabled]="submitting">Aflever</app-button>
+
+                @if (submitError) {
+                <p class="submit-error">Aflevering fejlede. Prøv igen.</p>
+                }
+            </form>
+            } @else {
+            <p class="already-submitted">Denne opgave er allerede afleveret.</p>
+            }
+        </div>
+
+        <div class="goals-card">
+            <h2>Målpinde</h2>
+            @if (assignment.goals.length) {
+            <ul>
+                @for (goal of assignment.goals; track goal.id) {
+                <li>{{ goal.description }}</li>
+                }
+            </ul>
+            } @else {
+            <p>Ingen målpinde tilknyttet.</p>
+            }
+        </div>
+    </div>
+</div>
+}
