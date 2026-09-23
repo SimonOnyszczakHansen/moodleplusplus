@@ -5,6 +5,7 @@ import { IDashboard } from './models/dashboard.model';
 import { DashboardService } from './services/dashboard';
 import { AuthService } from '../../core/services/auth.service';
 import { User } from '../../core/models/user.interface';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,15 +16,20 @@ import { User } from '../../core/models/user.interface';
 export class Dashboard implements OnInit{
 	userRole?: User['role'];
 	dashboard?: IDashboard;
+export class Dashboard implements OnInit {
+  userRole?: string;
+  dashboard?: IDashboard;
 
-	constructor(private dashboardService: DashboardService, private auth: AuthService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private auth: AuthService,
+  ) {}
 
-	ngOnInit(): void {
-		this.userRole = this.auth.currentUser?.role;
+  ngOnInit(): void {
+    this.userRole = this.auth.currentUser?.role;
 
-		this.dashboardService.getDashboardData().subscribe(data => {
-			this.dashboard = data;
-		});
-	}
-
+    this.dashboardService.getDashboardData().subscribe((data) => {
+      this.dashboard = data;
+    });
+  }
 }

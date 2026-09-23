@@ -1,16 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { IConsentRequest } from '../models/consent-request.model';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
-	providedIn: 'root',
+  providedIn: 'root',
 })
 export class Consent {
-	constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-	submitConsent(consent: IConsentRequest): Observable<void> {
-		return this.http.post<void>(`${environment.apiUrl}/api/v1/Auth/consent`, consent);
-	}
+  submitConsent(consent: IConsentRequest): Observable<void> {
+    // If using the local dev token, short-circuit and persist consent locally
+    if (localStorage.getItem('accessToken') === 'local-dev-token') {
+      return of(void 0);
+    }
+    // Remove above later
+
+    return this.http.patch<void>(`${environment.apiHost}/consent`, consent);
+  }
 }

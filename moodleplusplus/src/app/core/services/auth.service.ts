@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
-import { ConsentRequest, ConsentResponse, LoginResponse, User } from '../models/user.interface';
+import { LoginResponse, User } from '../models/user.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,6 @@ export class AuthService {
   private readonly TOKEN_KEY = 'accessToken';
   private readonly USER_KEY = 'currentUser';
   private readonly CONSENT_KEY = 'consentAccepted';
-  private readonly API_URL = '/auth';
 
   private userSubject = new BehaviorSubject<User | null>(this.readStoredUser());
   user$: Observable<User | null> = this.userSubject.asObservable();
@@ -36,7 +36,7 @@ export class AuthService {
     }
     // Remove above later
 
-    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
+    return this.http.post<LoginResponse>(`${environment.apiHost}/auth/login`, credentials).pipe(
       map((response) => {
         const token = response.jwt ?? response.accessToken ?? '';
         const user: User = {
@@ -59,30 +59,9 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.API_URL}/logout`, {}).pipe(
+    return this.http.post<void>(`${environment.apiHost}/auth/logout`, {}).pipe(
       tap(() => this.clearSession()),
       tap(() => this.userSubject.next(null)),
-    );
-  }
-
-  acceptConsent(payload: ConsentRequest): Observable<ConsentResponse> {
-    // If using the local dev token, short-circuit and persist consent locally
-    if (localStorage.getItem(this.TOKEN_KEY) === 'local-dev-token') {
-      const resp: ConsentResponse = {
-        type: payload.type,
-        version: payload.version,
-        acceptedAt: new Date().toISOString(),
-        accepted: payload.accepted,
-      };
-      localStorage.setItem(this.CONSENT_KEY, String(payload.accepted));
-      return of(resp);
-    }
-    // Remove above later
-
-    return this.http.patch<ConsentResponse>('/consent', payload).pipe(
-      tap((response) => {
-        localStorage.setItem(this.CONSENT_KEY, String(response.accepted ?? payload.accepted));
-      }),
     );
   }
 
@@ -94,9 +73,9 @@ export class AuthService {
     return localStorage.getItem(this.CONSENT_KEY) === 'true';
   }
 
-	markConsentAccepted(): void {
-		localStorage.setItem(this.CONSENT_KEY, 'true');
-	}
+  markConsentAccepted(): void {
+    localStorage.setItem(this.CONSENT_KEY, 'true');
+  }
 
   get isAuthenticated(): boolean {
     return !!localStorage.getItem(this.TOKEN_KEY) || !!this.userSubject.value;
