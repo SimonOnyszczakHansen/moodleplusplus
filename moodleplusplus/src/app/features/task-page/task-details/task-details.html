@@ -23,8 +23,8 @@
 
                 <dt>Aflevering</dt>
                 <dd>
-                    @if (assignment.submission?.fileName) {
-                    <a [href]="assignment.submission?.fileUrl" target="_blank">{{ assignment.submission?.fileName }}</a>
+                    @if (assignment.submission?.file) {
+                    <a [href]="submissionFileUrl" target="_blank">{{ assignment.submission?.file?.fileName }}</a>
                     } @else {
                     Ingen fil afleveret
                     }
@@ -65,10 +65,10 @@
 
         <div class="goals-card">
             <h2>Målpinde</h2>
-            @if (assignment.goals.length) {
+            @if (assignment.objectives.length) {
             <ul>
-                @for (goal of assignment.goals; track goal.id) {
-                <li>{{ goal.description }}</li>
+                @for (objective of assignment.objectives; track objective.objectiveId) {
+                <li>{{ objective.content }}</li>
                 }
             </ul>
             } @else {

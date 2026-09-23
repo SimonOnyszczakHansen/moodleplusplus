@@ -1,4 +1,6 @@
-export interface IEducationGoal {
-    id: string;
-    description: string;
+// Matches backend TaskObjectiveDto(ObjectiveId, SubjectId, Content).
+export interface IObjective {
+    objectiveId: string;
+    subjectId: string;
+    content: string;
 }

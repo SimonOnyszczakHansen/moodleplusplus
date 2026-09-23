@@ -1,8 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { of } from 'rxjs';
-import { MOCK_STUDENT_ASSIGNMENTS } from '../../models/student-task.mock';
 import { Task as TaskService } from '../../services/task';
 import { ITaskAssignmentSummary } from '../../models/task.model';
 import { Table, TableAction, TableActionEvent, TableCellTemplate, TableColumn } from '../../../../shared/table/table';
@@ -33,18 +31,12 @@ export class StudentTask implements OnInit {
 	rows: StudentTaskRow[] = [];
 
 	ngOnInit(): void {
-		of(MOCK_STUDENT_ASSIGNMENTS).subscribe({
+		this.taskService.getMyAssignments().subscribe({
 			next: (assignments) => {
 				this.rows = assignments.map((assignment, index) => ({ ...assignment, index: index + 1 }));
-			},
+			}
+
 		});
-
-		// this.taskService.getMyAssignments().subscribe({
-		// 	next: (assignments) => {
-		// 		this.rows = assignments.map((assignment, index) => ({ ...assignment, index: index + 1 }));
-		// 	}
-
-		// });
 	}
 
 	onActionClick(event: TableActionEvent<StudentTaskRow>): void {

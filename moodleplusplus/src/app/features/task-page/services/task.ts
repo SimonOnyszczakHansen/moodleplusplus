@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ICreateTaskRequest, ITask, ITaskAssignmentDetail, ITaskAssignmentSummary, TaskStatus, } from '../models/task.model';
+import { ICreateTaskRequest, ISubmission, ITask, ITaskAssignmentDetail, ITaskAssignmentSummary, IFeedbackEntry, ReviewStatus, } from '../models/task.model';
 
 @Injectable({ providedIn: 'root' })
 export class Task {
@@ -57,8 +57,20 @@ export class Task {
 		return this.http.post<void>(`${this.base}/task-assignments/${assignmentId}/submission`, formData);
 	}
 
-	reviewSubmission(assignmentId: string, status: Extract<TaskStatus, 'godkendt' | 'afvist'>): Observable<void> {
+	getSubmission(assignmentId: string): Observable<ISubmission> {
+		return this.http.get<ISubmission>(`${this.base}/task-assignments/${assignmentId}/submission`);
+	}
+
+	getSubmissionFileUrl(assignmentId: string): string {
+		return `${this.base}/task-assignments/${assignmentId}/submission/file`;
+	}
+
+	reviewSubmission(assignmentId: string, status: ReviewStatus): Observable<void> {
 		return this.http.patch<void>(`${this.base}/task-assignments/${assignmentId}/submission/status`, { status });
+	}
+
+	getFeedback(studentId: string, taskId: string): Observable<IFeedbackEntry[]> {
+		return this.http.get<IFeedbackEntry[]>(`${this.base}/students/${studentId}/tasks/${taskId}/feedback`);
 	}
 
 	addFeedback(studentId: string, taskId: string, text: string): Observable<void> {

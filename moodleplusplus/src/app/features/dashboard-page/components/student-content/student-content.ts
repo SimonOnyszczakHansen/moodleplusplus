@@ -33,7 +33,7 @@ export class StudentContent implements OnInit {
 
 	get pendingTasks(): ITask[] {
 		return this.tasks
-			.filter(t => t.status === 'ikke afleveret' || t.status === 'afvist')
+			.filter(t => t.status === 'Ikke afleveret' || t.status === 'Ikke godkendt')
 			.filter(t => new Date(t.deadline) >= new Date())
 			.slice(0, 8);
 	}
@@ -63,7 +63,7 @@ export class StudentContent implements OnInit {
 			: 0;
 
 		const taskRatio = subjectTasks.length
-			? subjectTasks.filter(t => t.status === 'godkendt').length / subjectTasks.length
+			? subjectTasks.filter(t => t.status === 'Godkendt').length / subjectTasks.length
 			: 0;
 
 		return Math.round(((quizRatio + taskRatio) / 2) * 100);
