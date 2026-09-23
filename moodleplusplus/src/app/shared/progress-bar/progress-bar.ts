@@ -8,7 +8,7 @@ import { Component, computed, input } from '@angular/core';
 })
 export class ProgressBar {
   readonly value = input(0);
-  readonly label = input('Progress');
+  readonly label = input('Progression');
 
   readonly percentage = computed(() => {
     const value = this.value();
