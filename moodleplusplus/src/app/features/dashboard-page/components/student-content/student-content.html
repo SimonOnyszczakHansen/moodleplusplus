@@ -1,31 +1,20 @@
 <div class="student-content">
-	<div class="subjects-container">
-		<h2 id="header">Mine Fag</h2>
-		<a (click)="viewAllSubjects()" class="view-all">Se alle &#8594;</a>
-		<div class="subject-cards">
-			<div *ngFor="let subject of subjects">
-				<app-card title="{{subject.name}}">
-					<div class="card-content">
-						<app-progress-bar [value]="getSubjectProgress(subject.id)"></app-progress-bar>
-						<div class="button-container">
-							<app-button variant="primary" (click)="viewSubject(subject.id)">Se Fag</app-button>
-						</div>
-					</div>
-				</app-card>
-			</div>
-		</div>
-	</div>
-	<div class="deadlines-container">
-		<a (click)="viewAllTasks()" class="view-all">Se alle &#8594;</a>
-		<h2 id="header">Kommende Afleveringer</h2>
-		<div class="deadline-cards">
-			<div *ngFor="let task of pendingTasks" class="deadline-card">
-				<div class="deadline-info">
-					<p class="deadline-title">{{ task.title }}</p>
-					<p class="deadline-subject">{{ getSubjectName(task.subjectId) }}</p>
-				</div>
-				<span class="deadline-date">{{ task.deadline | date:'dd-MM-yyyy' }}</span>
-			</div>
-		</div>
-	</div>
+  <div class="subjects-container">
+    <h2 id="header">Mine Fag</h2>
+    <a (click)="viewAllSubjects()" class="view-all">Se alle &#8594;</a>
+    <app-student-subjects></app-student-subjects>
+  </div>
+  <div class="deadlines-container">
+    <a (click)="viewAllTasks()" class="view-all">Se alle &#8594;</a>
+    <h2 id="header">Kommende Afleveringer</h2>
+    <div class="deadline-cards">
+      <div *ngFor="let task of pendingTasks" class="deadline-card">
+        <div class="deadline-info">
+          <p class="deadline-title">{{ task.title }}</p>
+          <!-- <p class="deadline-subject">{{ getSubjectName(task.subjectId) }}</p> -->
+        </div>
+        <span class="deadline-date">{{ task.deadline | date: 'dd-MM-yyyy' }}</span>
+      </div>
+    </div>
+  </div>
 </div>

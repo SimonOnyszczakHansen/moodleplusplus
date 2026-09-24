@@ -2,17 +2,7 @@
 	<div class="subjects-container">
 		<h2 id="header">Mine Fag</h2>
 		<a (click)="viewAllSubjects()" class="view-all">Se alle &#8594;</a>
-		<div class="subject-cards">
-			<div *ngFor="let subject of subjects">
-				<app-card title="{{subject.name}}">
-					<div class="card-content">
-						<div class="button-container">
-							<app-button variant="primary" (click)="viewSubject(subject.id)">Se Fag</app-button>
-						</div>
-					</div>
-				</app-card>
-			</div>
-		</div>
+		<app-teacher-subjects />
 	</div>
 	<div class="deadlines-container">
 		<a (click)="viewAllTasks()" class="view-all">Se alle &#8594;</a>
@@ -21,7 +11,7 @@
 			<div *ngFor="let task of upcomingTasks" class="deadline-card">
 				<div class="deadline-info">
 					<p class="deadline-title">{{ task.title }}</p>
-					<p class="deadline-subject">{{ getSubjectName(task.subjectId) }}</p>
+					<!-- <p class="deadline-subject">{{ getSubjectName(task.subjectId) }}</p> -->
 				</div>
 				<span class="deadline-date">{{ task.deadline | date:'dd-MM-yyyy' }}</span>
 			</div>

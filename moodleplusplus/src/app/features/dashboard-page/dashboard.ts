@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StudentContent } from './components/student-content/student-content';
 import { TeacherContent } from './components/teacher-content/teacher-content';
-import { IDashboard } from './models/dashboard.model';
-import { DashboardService } from './services/dashboard';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -13,18 +11,12 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class Dashboard implements OnInit {
   userRole?: string;
-  dashboard?: IDashboard;
+  userName?: string;
 
-  constructor(
-    private dashboardService: DashboardService,
-    private auth: AuthService,
-  ) {}
+  constructor(private auth: AuthService) {}
 
   ngOnInit(): void {
     this.userRole = this.auth.currentUser?.role;
-
-    this.dashboardService.getDashboardData().subscribe((data) => {
-      this.dashboard = data;
-    });
+    this.userName = this.auth.currentUser?.name;
   }
 }
