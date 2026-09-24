@@ -29,7 +29,8 @@
 	--color-disabled: #94a3b8;
 	--color-hover: #1d4ed8;
 	--color-focus: #60a5fa;
-	--color-secondary-hover: #526277; 
+	--color-secondary-hover: #526277;
+	--color-turquoise: #2dafdf;
 	--font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -45,7 +46,7 @@ body {
 
 body {
 	font-family: var(--font-family);
-	background: var(--color-background);
+	background: var(--color-background) url('/background.jpeg') center / cover no-repeat fixed;
   	color: var(--color-text);
 }
 
