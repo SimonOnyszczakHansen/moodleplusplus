@@ -1,0 +1,21 @@
+<p>dropdown works!</p>
+<label>
+  @if (label()) {
+    <span>{{ label() }}</span>
+  }
+  <select
+    #field
+    [name]="name()"
+    [disabled]="disabled()"
+    [required]="required()"
+    [value]="value()"
+    (change)="value.set(field.value)"
+  >
+    @if (placeholder()) {
+      <option value="" disabled [selected]="!value()">{{ placeholder() }}</option>
+    }
+    @for (option of options(); track option.value) {
+      <option [value]="option.value">{{ option.label }}</option>
+    }
+  </select>
+</label>
