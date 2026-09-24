@@ -1,7 +1,8 @@
 
 <div class="app-shell">
   <aside class="sidebar" *ngIf="showNavigation">
-    <div class="brand">Moodle++</div>
+    <div class="brand">Moodle<span class="p1">+</span><span class="p2">+</span></div>
+    <span class="role-tag">{{ currentUserRole }}</span>
 
     <nav class="nav-menu" aria-label="Main navigation">
       <a routerLink="/dashboard">Dashboard</a>
@@ -9,10 +10,11 @@
       <a routerLink="/dashboard">Grupper</a>
       <a routerLink="/dashboard">Opgaver</a>
       <a routerLink="/dashboard">Quizzer</a>
+	  <span class="spacer"></span>
       <button type="button" class="logout-button" (click)="logout()">Log ud</button>
     </nav>
 
-    <div class="user-chip">{{ currentUserName }}<span>{{ currentUserRole }}</span></div>
+    <div class="user-chip">{{ currentUserName }}</div>
   </aside>
 
   <main class="content-area">
