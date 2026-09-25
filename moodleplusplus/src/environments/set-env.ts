@@ -8,7 +8,11 @@ const setEnv = () => {
   const appVersion = require('../../package.json').version;
   require('dotenv').config({
     path: 'src/environments/.env',
+    override: false,
   });
+  if (!process.env['API_HOST']) {
+    throw new Error('API_HOST environment variable is required');
+  }
   // `environment.ts` file structure
   const envConfigFile = `export const environment = {
   apiHost: '${process.env['API_HOST']}',
