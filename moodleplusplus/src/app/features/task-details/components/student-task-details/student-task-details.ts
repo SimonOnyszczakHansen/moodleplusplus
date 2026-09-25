@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,13 +19,14 @@ export class StudentTaskDetails implements OnInit {
     private readonly taskService = inject(TaskService);
     private readonly authService = inject(AuthService);
 
-    assignment: ITaskAssignmentDetail | null = null;
-    error = false;
+    assignment = signal<ITaskAssignmentDetail | null>(null);
+    error = signal(false);
 
     comment = '';
     selectedFile: File | null = null;
-    submitting = false;
-    submitError = false;
+    submitting = signal(false);
+    submitError = signal(false);
+    attemptedEmptySubmit = signal(false);
 
     private id = '';
 
@@ -35,7 +36,11 @@ export class StudentTaskDetails implements OnInit {
     }
 
     get canSubmit(): boolean {
-        return this.assignment?.status === 'Ikke afleveret';
+        return this.assignment()?.status === 'Ikke afleveret';
+    }
+
+    get hasNothingToSubmit(): boolean {
+        return !this.comment.trim() && !this.selectedFile;
     }
 
     get submissionFileUrl(): string {
@@ -48,42 +53,54 @@ export class StudentTaskDetails implements OnInit {
     }
 
     onSubmit(): void {
-        this.submitting = true;
-        this.submitError = false;
+        if (this.hasNothingToSubmit) {
+            this.attemptedEmptySubmit.set(true);
+            return;
+        }
+
+        this.attemptedEmptySubmit.set(false);
+        this.submitting.set(true);
+        this.submitError.set(false);
         this.taskService.submitAssignment(this.id, this.comment, this.selectedFile ?? undefined).subscribe({
             next: () => {
-                this.submitting = false;
+                this.submitting.set(false);
                 this.comment = '';
                 this.selectedFile = null;
                 this.load();
             },
             error: () => {
-                this.submitting = false;
-                this.submitError = true;
+                this.submitting.set(false);
+                this.submitError.set(true);
             },
         });
     }
 
     private load(): void {
-        this.error = false;
+        this.error.set(false);
 
         this.taskService.getAssignment(this.id).subscribe({
             next: (assignment) => {
-                this.assignment = { ...assignment, submission: null, feedback: [], objectives: [] };
-                this.error = false;
+                this.assignment.set({ ...assignment, submission: null, feedback: [], objectives: [] });
+                this.error.set(false);
 
                 this.taskService.getSubmission(this.id).subscribe({
-                    next: (submission) => { if (this.assignment) this.assignment.submission = submission; },
+                    next: (submission) => {
+                        const current = this.assignment();
+                        if (current) this.assignment.set({ ...current, submission });
+                    },
                 });
 
                 const studentId = this.authService.currentUser?.id;
                 if (studentId) {
                     this.taskService.getFeedback(String(studentId), assignment.taskId).subscribe({
-                        next: (feedback) => { if (this.assignment) this.assignment.feedback = feedback; },
+                        next: (feedback) => {
+                            const current = this.assignment();
+                            if (current) this.assignment.set({ ...current, feedback });
+                        },
                     });
                 }
             },
-            error: () => { this.error = true; },
+            error: () => { this.error.set(true); },
         });
     }
 }

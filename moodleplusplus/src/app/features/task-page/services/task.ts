@@ -132,13 +132,13 @@ export class Task {
 		return this.http.delete<void>(`${this.base}/task-assignments/${assignmentId}`);
 	}
 
-	submitAssignment(assignmentId: string, comment: string, file?: File): Observable<void> {
+	submitAssignment(assignmentId: string, comment: string, file?: File): Observable<ISubmission> {
 		const formData = new FormData();
 		formData.append('comment', comment);
 		if (file) {
 			formData.append('file', file);
 		}
-		return this.http.post<void>(`${this.base}/task-assignments/${assignmentId}/submission`, formData);
+		return this.http.post<ISubmission>(`${this.base}/task-assignments/${assignmentId}/submission`, formData);
 	}
 
 	getSubmission(assignmentId: string): Observable<ISubmission> {
@@ -149,8 +149,8 @@ export class Task {
 		return `${this.base}/task-assignments/${assignmentId}/submission/file`;
 	}
 
-	reviewSubmission(assignmentId: string, status: ReviewStatus): Observable<void> {
-		return this.http.patch<void>(`${this.base}/task-assignments/${assignmentId}/submission/status`, { status });
+	reviewSubmission(assignmentId: string, status: ReviewStatus): Observable<ISubmission> {
+		return this.http.patch<ISubmission>(`${this.base}/task-assignments/${assignmentId}/submission/status`, { status });
 	}
 
 	getFeedback(studentId: string, taskId: string): Observable<IFeedbackEntry[]> {

@@ -1,6 +1,6 @@
-@if (error || !assignment) {
+@if (error() || !assignment()) {
 <p>Kunne ikke hente opgaven.</p>
-} @else {
+} @else if (assignment(); as assignment) {
 <div class="task-details-container">
     <a routerLink="/tasks" class="back-link">← Mine Opgaver</a>
     <h1>{{ assignment.title }}</h1>
@@ -47,14 +47,17 @@
             @if (canSubmit) {
             <form (ngSubmit)="onSubmit()">
                 <label for="comment">Kommentar</label>
-                <textarea id="comment" name="comment" [(ngModel)]="comment" required></textarea>
+                <textarea id="comment" name="comment" [(ngModel)]="comment"></textarea>
 
                 <label for="file">Fil (ZIP)</label>
                 <input id="file" type="file" accept=".zip" (change)="onFileSelected($event)" />
 
-                <app-button type="submit" [disabled]="submitting">Aflever</app-button>
+                <app-button type="submit" [disabled]="submitting()">Aflever</app-button>
 
-                @if (submitError) {
+                @if (attemptedEmptySubmit() && hasNothingToSubmit) {
+                <p class="submit-error">Du skal enten skrive en kommentar eller vedhæfte en fil.</p>
+                }
+                @if (submitError()) {
                 <p class="submit-error">Aflevering fejlede. Prøv igen.</p>
                 }
             </form>

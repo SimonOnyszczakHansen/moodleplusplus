@@ -73,9 +73,13 @@ export interface ISubmissionFile {
 }
 
 export interface ISubmission {
+    id: string;
+    assignmentId: string;
     comment: string;
     submittedAt: string;
-    file?: ISubmissionFile;
+    submittedByUserId: string;
+    status: TaskStatus;
+    file: ISubmissionFile | null;
 }
 
 export interface IFeedbackEntry {
