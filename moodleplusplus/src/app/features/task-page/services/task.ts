@@ -1,8 +1,68 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { ICreateTaskRequest, ISubmission, ITask, ITaskAssignmentDetail, ITaskAssignmentSummary, IFeedbackEntry, ReviewStatus, } from '../models/task.model';
+import {
+	ICreateTaskRequest, ISubmission, ITask, ITaskAssignmentDetail, ITaskAssignmentSummary, ITaskAssignmentRow,
+	IFeedbackEntry, ReviewStatus, ITeacherTaskDetail, IApiTaskAssignment, IApiAssignmentRow, IApiTeacherTaskDetail,
+	mapAssignmentStatus,
+} from '../models/task.model';
+import { ISubject } from '../models/subject.model';
+import { IAssignee } from '../models/assignee.model';
+import { IApiGroup } from '../models/group.model';
+import { User } from '../../../core/models/user.interface';
+
+function mapApiGroupToAssignee(api: IApiGroup): IAssignee {
+	return { id: api.id, name: api.name, type: 'group' };
+}
+
+function mapApiUserToAssignee(api: User): IAssignee {
+	return { id: String(api.id), name: api.name, type: 'student' };
+}
+
+function mapApiAssignment(api: IApiTaskAssignment): ITaskAssignmentSummary {
+	return {
+		assignmentId: api.assignmentId,
+		taskId: api.task.id,
+		title: api.task.title,
+		deadline: api.deadline,
+		status: mapAssignmentStatus(api.status),
+		groupId: api.recipientType === 'Group' ? api.recipientId : undefined,
+		groupName: api.recipientType === 'Group' ? api.recipientName : undefined,
+	};
+}
+
+function mapApiAssignmentDetail(api: IApiTaskAssignment): ITaskAssignmentDetail {
+	return {
+		...mapApiAssignment(api),
+		description: api.task.description,
+		submission: null,
+		feedback: [],
+		objectives: [],
+	};
+}
+
+function mapApiAssignmentRow(api: IApiAssignmentRow): ITaskAssignmentRow {
+	return {
+		assignmentId: api.assignmentId,
+		studentId: api.recipientType === 'Student' ? api.recipientId : undefined,
+		studentName: api.recipientType === 'Student' ? api.recipientName : undefined,
+		groupId: api.recipientType === 'Group' ? api.recipientId : undefined,
+		groupName: api.recipientType === 'Group' ? api.recipientName : undefined,
+		status: mapAssignmentStatus(api.status),
+		submission: null,
+		feedback: [],
+	};
+}
+
+function mapApiTeacherTaskDetail(api: IApiTeacherTaskDetail): ITeacherTaskDetail {
+	return {
+		...api.task,
+		objectives: api.objectives,
+		assignments: api.assignments.map(mapApiAssignmentRow),
+	};
+}
 
 @Injectable({ providedIn: 'root' })
 export class Task {
@@ -15,8 +75,22 @@ export class Task {
 		return this.http.get<ITask[]>(`${this.base}/tasks`);
 	}
 
-	getTask(taskId: string): Observable<ITask> {
-		return this.http.get<ITask>(`${this.base}/tasks/${taskId}`);
+	getSubjects(): Observable<ISubject[]> {
+		return this.http.get<ISubject[]>(`${this.base}/subject`);
+	}
+
+	getGroups(): Observable<IAssignee[]> {
+		return this.http.get<IApiGroup[]>(`${this.base}/groups`).pipe(map((groups) => groups.map(mapApiGroupToAssignee)));
+	}
+
+	getStudents(): Observable<IAssignee[]> {
+		return this.http
+			.get<User[]>(`${this.base}/users`)
+			.pipe(map((users) => users.filter((u) => u.role === 'student').map(mapApiUserToAssignee)));
+	}
+
+	getTask(taskId: string): Observable<ITeacherTaskDetail> {
+		return this.http.get<IApiTeacherTaskDetail>(`${this.base}/tasks/${taskId}`).pipe(map(mapApiTeacherTaskDetail));
 	}
 
 	createTask(request: ICreateTaskRequest): Observable<ITask> {
@@ -27,12 +101,14 @@ export class Task {
 		return this.http.patch<ITask>(`${this.base}/tasks/${taskId}`, request);
 	}
 
-	assignTask(taskId: string, studentIds: string[], groupIds: string[]): Observable<void> {
-		return this.http.post<void>(`${this.base}/tasks/${taskId}/assignments`, { studentIds, groupIds });
+	assignTask(taskId: string, studentIds: string[], groupIds: string[]): Observable<ITaskAssignmentSummary[]> {
+		return this.http
+			.post<IApiTaskAssignment[]>(`${this.base}/tasks/${taskId}/assignments`, { studentIds, groupIds })
+			.pipe(map((assignments) => assignments.map(mapApiAssignment)));
 	}
 
 	linkTaskGoals(taskId: string, goalIds: string[]): Observable<void> {
-		return this.http.put<void>(`${this.base}/tasks/${taskId}/objectives`, { goalIds });
+		return this.http.put<void>(`${this.base}/tasks/${taskId}/objectives`, { objectiveIds: goalIds });
 	}
 
 	deleteTask(taskId: string): Observable<void> {
@@ -41,11 +117,19 @@ export class Task {
 
 	// Student: assignments
 	getMyAssignments(): Observable<ITaskAssignmentSummary[]> {
-		return this.http.get<ITaskAssignmentSummary[]>(`${this.base}/task-assignments/me`);
+		return this.http
+			.get<IApiTaskAssignment[]>(`${this.base}/task-assignments/me`)
+			.pipe(map((assignments) => assignments.map(mapApiAssignment)));
 	}
 
 	getAssignment(assignmentId: string): Observable<ITaskAssignmentDetail> {
-		return this.http.get<ITaskAssignmentDetail>(`${this.base}/task-assignments/${assignmentId}`);
+		return this.http
+			.get<IApiTaskAssignment>(`${this.base}/task-assignments/${assignmentId}`)
+			.pipe(map(mapApiAssignmentDetail));
+	}
+
+	removeAssignment(assignmentId: string): Observable<void> {
+		return this.http.delete<void>(`${this.base}/task-assignments/${assignmentId}`);
 	}
 
 	submitAssignment(assignmentId: string, comment: string, file?: File): Observable<void> {
@@ -73,7 +157,7 @@ export class Task {
 		return this.http.get<IFeedbackEntry[]>(`${this.base}/students/${studentId}/tasks/${taskId}/feedback`);
 	}
 
-	addFeedback(studentId: string, taskId: string, text: string): Observable<void> {
-		return this.http.post<void>(`${this.base}/students/${studentId}/tasks/${taskId}/feedback`, { text });
+	addFeedback(studentId: string, taskId: string, text: string, assignmentId?: string): Observable<void> {
+		return this.http.post<void>(`${this.base}/students/${studentId}/tasks/${taskId}/feedback`, { text, assignmentId });
 	}
 }

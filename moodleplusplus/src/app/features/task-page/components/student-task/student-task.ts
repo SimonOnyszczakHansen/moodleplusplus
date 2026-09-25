@@ -35,7 +35,6 @@ export class StudentTask implements OnInit {
 			next: (assignments) => {
 				this.rows = assignments.map((assignment, index) => ({ ...assignment, index: index + 1 }));
 			}
-
 		});
 	}
 

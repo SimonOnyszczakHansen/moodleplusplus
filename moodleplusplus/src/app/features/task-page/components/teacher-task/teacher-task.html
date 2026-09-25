@@ -1,1 +1,61 @@
-<p>teacher-task works!</p>
+<div class="teacher-task-container">
+	<h1>Opgaver</h1>
+	<app-button label="Opret Opgave" (click)="onCreateTask()" variant="primary" class="create-task-button">Opret
+		Opgave</app-button>
+	<app-table [columns]="columns" [rows]="rows" [actions]="actions" emptyMessage="Ingen opgaver fundet."
+		(actionClick)="onActionClick($event)">
+		<ng-template appTableCell="deadline" let-row>
+			{{ row.deadline | date: 'dd/MM/yyyy' }}
+		</ng-template>
+	</app-table>
+	<app-modal [(open)]="showCreateTask" [title]="editingTaskId ? 'Rediger Opgave' : 'Opret Opgave'">
+		<app-input label="Titel" placeholder="Titel" [(value)]="taskTitle"></app-input>
+		<app-dropdown label="Vælg Fag" placeholder="Vælg et fag" [options]="subjectOptions" [(value)]="taskSubjectId"></app-dropdown>
+		<app-input label="Deadline" placeholder="Vælg en dato" type="datetime-local" [(value)]="taskDeadline"></app-input>
+		<app-input label="Beskrivelse" placeholder="Beskrivelse" [(value)]="taskDescription"></app-input>
+
+		<div class="assignee-search">
+			@if (existingAssignments.length) {
+			<ul class="assignee-chips">
+				@for (assignment of existingAssignments; track assignment.assignmentId) {
+				<li class="assignee-chip">
+					{{ assignment.studentName ?? assignment.groupName }}
+					<button type="button" aria-label="Fjern" (click)="onRemoveExistingAssignment(assignment)">&times;</button>
+				</li>
+				}
+			</ul>
+			}
+
+			<app-input label="Tilføj Elever" placeholder="Søg efter Elever eller Grupper" [(value)]="studentSearchQuery"></app-input>
+
+			@if (filteredAssignees.length) {
+			<ul class="assignee-suggestions">
+				@for (assignee of filteredAssignees; track assignee.id) {
+				<li>
+					<button type="button" (click)="onAddAssignee(assignee)">
+						{{ assignee.name }}
+						<span class="assignee-type">{{ assignee.type === 'group' ? 'Gruppe' : 'Elev' }}</span>
+					</button>
+				</li>
+				}
+			</ul>
+			}
+
+			@if (selectedAssignees.length) {
+			<ul class="assignee-chips">
+				@for (assignee of selectedAssignees; track assignee.id) {
+				<li class="assignee-chip">
+					{{ assignee.name }}
+					<button type="button" aria-label="Fjern {{ assignee.name }}" (click)="onRemoveAssignee(assignee)">&times;</button>
+				</li>
+				}
+			</ul>
+			}
+		</div>
+
+		<div class="modal-actions">
+			<app-button label="Annuller" variant="secondary" (click)="onCancelCreateTask()">Anuller</app-button>
+			<app-button label="Opret" variant="primary" (click)="onSubmitTask()">{{ editingTaskId ? 'Gem' : 'Opret' }}</app-button>
+		</div>
+	</app-modal>
+</div>

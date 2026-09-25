@@ -1,9 +1,7 @@
 import { IObjective } from '../../../core/models/educationgoal.model';
 
-// Matches SubmissionDto.Status Danish strings from SubmissionService.ToDto - confirm casing against a real response before relying on this.
 export type TaskStatus = 'Ikke afleveret' | 'Afleveret' | 'Godkendt' | 'Ikke godkendt';
 
-// ReviewSubmissionRequest.Status uses a separate vocabulary ("Godkendt"/"Approved", "Ikke godkendt"/"Rejected") - confirm exact values with backend.
 export type ReviewStatus = 'Godkendt' | 'Ikke godkendt';
 
 export interface ITask {
@@ -12,6 +10,8 @@ export interface ITask {
     title: string;
     description: string;
     deadline: string;
+    createdAt?: string;
+    createdByUserId?: string;
 }
 
 export interface ICreateTaskRequest {
@@ -19,6 +19,41 @@ export interface ICreateTaskRequest {
     title: string;
     description?: string;
     deadline?: string;
+}
+
+export type RecipientType = 'Student' | 'Group';
+
+export interface IApiTaskAssignment {
+    assignmentId: string;
+    task: ITask;
+    recipientType: RecipientType;
+    recipientId: string;
+    recipientName: string;
+    deadline: string;
+    status: number;
+    assignedAt: string;
+}
+
+export interface IApiAssignmentRow {
+    assignmentId: string;
+    recipientType: RecipientType;
+    recipientId: string;
+    recipientName: string;
+    deadline: string;
+    status: number;
+    assignedAt: string;
+}
+
+export interface IApiTeacherTaskDetail {
+    task: ITask;
+    objectives: IObjective[];
+    assignments: IApiAssignmentRow[];
+}
+
+const ASSIGNMENT_STATUS_BY_ORDINAL: TaskStatus[] = ['Ikke afleveret', 'Afleveret', 'Godkendt', 'Ikke godkendt'];
+
+export function mapAssignmentStatus(status: number): TaskStatus {
+    return ASSIGNMENT_STATUS_BY_ORDINAL[status] ?? 'Ikke afleveret';
 }
 
 export interface ITaskAssignmentSummary {
@@ -55,4 +90,22 @@ export interface ITaskAssignmentDetail extends ITaskAssignmentSummary {
     submission: ISubmission | null;
     feedback: IFeedbackEntry[];
     objectives: IObjective[];
+}
+
+// One roster row on the teacher's task detail view - a single student or group's assignment.
+export interface ITaskAssignmentRow {
+    assignmentId: string;
+    studentId?: string;
+    studentName?: string;
+    groupId?: string;
+    groupName?: string;
+    status: TaskStatus;
+    submission: ISubmission | null;
+    feedback: IFeedbackEntry[];
+}
+
+// Matches TasksController GET /{taskId} - the task plus its objectives and every assignment.
+export interface ITeacherTaskDetail extends ITask {
+    objectives: IObjective[];
+    assignments: ITaskAssignmentRow[];
 }
