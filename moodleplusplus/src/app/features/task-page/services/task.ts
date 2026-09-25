@@ -149,6 +149,10 @@ export class Task {
 		return `${this.base}/task-assignments/${assignmentId}/submission/file`;
 	}
 
+	downloadSubmissionFile(assignmentId: string): Observable<Blob> {
+		return this.http.get(this.getSubmissionFileUrl(assignmentId), { responseType: 'blob' });
+	}
+
 	reviewSubmission(assignmentId: string, status: ReviewStatus): Observable<ISubmission> {
 		return this.http.patch<ISubmission>(`${this.base}/task-assignments/${assignmentId}/submission/status`, { status });
 	}

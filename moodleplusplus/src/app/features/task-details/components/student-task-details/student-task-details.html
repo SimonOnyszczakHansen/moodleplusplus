@@ -25,6 +25,7 @@
                 <dd>
                     @if (assignment.submission?.file) {
                     <a [href]="submissionFileUrl" target="_blank">{{ assignment.submission?.file?.fileName }}</a>
+					<app-button (click)="onDownloadFile(assignment.submission?.file?.fileName)" type="button">Download</app-button>
                     } @else {
                     Ingen fil afleveret
                     }
