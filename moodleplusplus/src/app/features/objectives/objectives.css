@@ -1,0 +1,26 @@
+.objectives-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	padding: 2rem;
+}
+
+.header-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.header-row h1 {
+	margin: 0;
+	color: var(--color-text);
+	font-size: 1.75rem;
+}
+
+.modal-actions {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+	margin-top: 1.5rem;
+}
