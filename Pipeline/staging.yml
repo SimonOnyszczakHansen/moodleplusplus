@@ -100,22 +100,22 @@ frontend-staging-configure:
           apk add --no-cache gettext > /dev/null &&
           envsubst "\${NGINX_SERVER_NAME}" \
             < /template.conf \
-            > /output/lms-staging.conf
+            > /output/lms-frontend-staging.conf
         '
 
     - echo "Deploying staging Nginx configuration"
 
     - |
       docker run --rm \
-        -v "$CI_PROJECT_DIR/Docker/nginx/lms-staging.conf:/source/lms-staging.conf:ro" \
+        -v "$CI_PROJECT_DIR/Docker/nginx/lms-frontend-staging.conf:/source/lms-frontend-staging.conf:ro" \
         -v /opt/nginx/conf.d:/target \
         alpine:3.22 \
         sh -c '
-          if [ -f /target/lms-staging.conf ]; then
-            cp /target/lms-staging.conf /target/lms-staging.conf.backup
+          if [ -f /target/lms-frontend-staging.conf ]; then
+            cp /target/lms-frontend-staging.conf /target/lms-frontend-staging.conf.backup
           fi
 
-          cp /source/lms-staging.conf /target/lms-staging.conf
+          cp /source/lms-frontend-staging.conf /target/lms-frontend-staging.conf
         '
 
       if ! docker exec nginx nginx -t; then
@@ -125,10 +125,10 @@ frontend-staging-configure:
           -v /opt/nginx/conf.d:/target \
           alpine:3.22 \
           sh -c '
-            if [ -f /target/lms-staging.conf.backup ]; then
-              mv /target/lms-staging.conf.backup /target/lms-staging.conf
+            if [ -f /target/lms-frontend-staging.conf.backup ]; then
+              mv /target/lms-frontend-staging.conf.backup /target/lms-frontend-staging.conf
             else
-              rm -f /target/lms-staging.conf
+              rm -f /target/lms-frontend-staging.conf
             fi
           '
 
@@ -140,9 +140,9 @@ frontend-staging-configure:
       docker run --rm \
         -v /opt/nginx/conf.d:/target \
         alpine:3.22 \
-        rm -f /target/lms-staging.conf.backup
+        rm -f /target/lms-frontend-staging.conf.backup
 
-      rm -f Docker/nginx/lms-staging.conf
+      rm -f Docker/nginx/lms-frontend-staging.conf
 
       echo "Staging Nginx configuration deployed successfully"
 
