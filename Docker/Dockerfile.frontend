@@ -1,0 +1,27 @@
+# -------------------------
+# Build Angular application
+# -------------------------
+FROM node:24-alpine AS build
+
+WORKDIR /app
+
+COPY moodleplusplus/package.json moodleplusplus/package-lock.json ./
+
+RUN npm ci
+
+COPY moodleplusplus/ ./
+
+ARG API_HOST
+ENV API_HOST=$API_HOST
+
+RUN npm run build
+
+
+# -------------------------
+# Package Angular artifact
+# -------------------------
+FROM alpine:3.22 AS runtime
+
+WORKDIR /app
+
+COPY --from=build /app/dist/moodleplusplus/browser ./dist   
