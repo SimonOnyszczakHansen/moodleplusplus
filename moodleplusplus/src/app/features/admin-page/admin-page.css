@@ -1,0 +1,52 @@
+.admin-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header, .actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.page-header {
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+h1 { margin: 0; }
+.page-header p { color: var(--color-text-secondary); }
+.error { color: var(--color-danger); }
+.success { color: var(--color-success); }
+
+fieldset {
+  display: grid;
+  gap: 0.5rem;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+label { margin-top: 0.75rem; }
+
+input, select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.form-actions { justify-content: flex-end; margin-top: 1.5rem; }
+
+@media (max-width: 768px) {
+  .admin-container { padding: 1rem; }
+}
