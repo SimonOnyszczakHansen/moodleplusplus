@@ -2,83 +2,83 @@
 <p>Kunne ikke hente opgaven.</p>
 } @else if (assignment(); as assignment) {
 <div class="task-details-container">
-    <a routerLink="/tasks" class="back-link">← Mine Opgaver</a>
-    <h1>{{ assignment.title }}</h1>
-    <p class="description">{{ assignment.description }}</p>
+	<a routerLink="/tasks" class="back-link">← Mine Opgaver</a>
+	<h1>{{ assignment.title }}</h1>
+	<p class="description">{{ assignment.description }}</p>
 
-    <div class="panels">
-        <div class="status-card">
-            <h2>Afleveringsstatus</h2>
-            <dl>
-                <dt>Deadline</dt>
-                <dd>{{ assignment.deadline | date: 'dd/MM/yyyy' }}</dd>
+	<div class="panels">
+		<div class="status-card">
+			<h2>Afleveringsstatus</h2>
+			<dl>
+				<dt>Deadline</dt>
+				<dd>{{ assignment.deadline | date: 'dd/MM/yyyy' }}</dd>
 
-                <dt>Status</dt>
-                <dd><app-status-badge [label]="assignment.status" [variant]="assignment.status" /></dd>
+				<dt>Status</dt>
+				<dd><app-status-badge [label]="assignment.status" [variant]="assignment.status" /></dd>
 
-                @if (assignment.groupName) {
-                <dt>Gruppe</dt>
-                <dd>{{ assignment.groupName }}</dd>
-                }
+				@if (assignment.groupName) {
+				<dt>Gruppe</dt>
+				<dd>{{ assignment.groupName }}</dd>
+				}
 
-                <dt>Aflevering</dt>
-                <dd>
-                    @if (assignment.submission?.file) {
-                    <a [href]="submissionFileUrl" target="_blank">{{ assignment.submission?.file?.fileName }}</a>
-					<app-button (click)="onDownloadFile(assignment.submission?.file?.fileName)" type="button">Download</app-button>
-                    } @else {
-                    Ingen fil afleveret
-                    }
-                </dd>
+				<dt>Aflevering</dt>
+				<dd>
+					@if (assignment.submission?.file; as file) {
+					<a [href]="submissionFileUrl" target="_blank">{{ file.fileName }}</a>
+					<app-button (click)="onDownloadFile(file.fileName)" type="button">Download</app-button>
+					} @else {
+					Ingen fil afleveret
+					}
+				</dd>
 
-                <dt>Feedback</dt>
-                <dd>
-                    @if (assignment.feedback.length) {
-                    <ul>
-                        @for (entry of assignment.feedback; track entry.createdAt) {
-                        <li>{{ entry.text }} — {{ entry.teacherName }} ({{ entry.createdAt | date: 'dd/MM/yyyy' }})</li>
-                        }
-                    </ul>
-                    } @else {
-                    Ingen feedback endnu
-                    }
-                </dd>
-            </dl>
+				<dt>Feedback</dt>
+				<dd>
+					@if (assignment.feedback.length) {
+					<ul>
+						@for (entry of assignment.feedback; track entry.createdAt) {
+						<li>{{ entry.text }} — {{ entry.teacherName }} ({{ entry.createdAt | date: 'dd/MM/yyyy' }})</li>
+						}
+					</ul>
+					} @else {
+					Ingen feedback endnu
+					}
+				</dd>
+			</dl>
 
-            @if (canSubmit) {
-            <form (ngSubmit)="onSubmit()">
-                <label for="comment">Kommentar</label>
-                <textarea id="comment" name="comment" [(ngModel)]="comment"></textarea>
+			@if (canSubmit) {
+			<form (ngSubmit)="onSubmit()">
+				<label for="comment">Kommentar</label>
+				<textarea id="comment" name="comment" [(ngModel)]="comment"></textarea>
 
-                <label for="file">Fil (ZIP)</label>
-                <input id="file" type="file" accept=".zip" (change)="onFileSelected($event)" />
+				<label for="file">Fil (ZIP)</label>
+				<input id="file" type="file" accept=".zip" (change)="onFileSelected($event)" />
 
-                <app-button type="submit" [disabled]="submitting()">Aflever</app-button>
+				<app-button type="submit" [disabled]="submitting()">Aflever</app-button>
 
-                @if (attemptedEmptySubmit() && hasNothingToSubmit) {
-                <p class="submit-error">Du skal enten skrive en kommentar eller vedhæfte en fil.</p>
-                }
-                @if (submitError()) {
-                <p class="submit-error">Aflevering fejlede. Prøv igen.</p>
-                }
-            </form>
-            } @else {
-            <p class="already-submitted">Denne opgave er allerede afleveret.</p>
-            }
-        </div>
+				@if (attemptedEmptySubmit() && hasNothingToSubmit) {
+				<p class="submit-error">Du skal enten skrive en kommentar eller vedhæfte en fil.</p>
+				}
+				@if (submitError()) {
+				<p class="submit-error">Aflevering fejlede. Prøv igen.</p>
+				}
+			</form>
+			} @else {
+			<p class="already-submitted">Denne opgave er allerede afleveret.</p>
+			}
+		</div>
 
-        <div class="goals-card">
-            <h2>Målpinde</h2>
-            @if (assignment.objectives.length) {
-            <ul>
-                @for (objective of assignment.objectives; track objective.objectiveId) {
-                <li>{{ objective.content }}</li>
-                }
-            </ul>
-            } @else {
-            <p>Ingen målpinde tilknyttet.</p>
-            }
-        </div>
-    </div>
+		<div class="goals-card">
+			<h2>Målpinde</h2>
+			@if (assignment.objectives.length) {
+			<ul>
+				@for (objective of assignment.objectives; track objective.objectiveId) {
+				<li>{{ objective.content }}</li>
+				}
+			</ul>
+			} @else {
+			<p>Ingen målpinde tilknyttet.</p>
+			}
+		</div>
+	</div>
 </div>
 }
