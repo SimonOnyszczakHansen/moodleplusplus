@@ -8,6 +8,7 @@ export interface LoginResponse {
   name?: string;
   role?: string | number;
   email?: string;
+  isMissingConsents?: boolean;
 }
 
 export interface User {

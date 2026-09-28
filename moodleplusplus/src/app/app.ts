@@ -23,6 +23,10 @@ export class App {
     return this.authService.currentUser?.name ?? 'Bruger';
   }
 
+  get isAdmin(): boolean {
+    return this.authService.isAdmin;
+  }
+
   get currentUserRole(): string {
     // UI-facing Danish label; AuthService/User.role stays in its original casing for logic checks.
     const roleLabels: Record<string, string> = {

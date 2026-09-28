@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { consentGuard } from './core/guards/consent-guard';
+import { adminGuard } from './core/guards/admin-guard';
 import { Dashboard } from './features/dashboard-page/dashboard';
 import { ConsentPage } from './features/consent-page/consent-page';
 import { Login } from './features/login-page/login';
@@ -25,5 +26,10 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'consent', component: ConsentPage, canActivate: [authGuard] },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, consentGuard] },
+  {
+    path: 'admin/users',
+    loadComponent: () => import('./features/admin-page/admin-page').then((m) => m.AdminPage),
+    canActivate: [authGuard, adminGuard, consentGuard],
+  },
   { path: '**', redirectTo: 'dashboard' },
 ];

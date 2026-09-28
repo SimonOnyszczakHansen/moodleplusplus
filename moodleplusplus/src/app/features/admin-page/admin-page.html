@@ -1,0 +1,197 @@
+<section class="admin-container" aria-labelledby="users-title">
+  <header class="page-header">
+    <div>
+      <h1 id="users-title">Brugere</h1>
+      <p>Opret, rediger og slet brugere.</p>
+    </div>
+  </header>
+
+  @if (successMessage()) { <p class="success" role="status">{{ successMessage() }}</p> }
+  @if (loadError()) { <p class="error" role="alert">{{ loadError() }}</p> }
+  @if (actionError() && !editingUser() && !createOpen() && !deleteOpen()) {
+    <p class="error" role="alert">{{ actionError() }}</p>
+  }
+  @if (loading()) { <p role="status">Henter brugere…</p> }
+  @if (!loading() && !loadError()) {
+    <div class="table-toolbar">
+      <div class="search-field">
+        <label for="user-search">Søg brugere</label>
+        <input id="user-search" type="search" placeholder="Søg efter navn eller email"
+          [disabled]="!!editingUser()"
+          [value]="searchQuery()" (input)="setSearchQuery($any($event.target).value)" />
+      </div>
+      <div class="role-field">
+        <label for="user-role-filter">Rolle</label>
+        <select id="user-role-filter" [value]="roleFilter()"
+          [disabled]="!!editingUser()"
+          (change)="setRoleFilter($any($event.target).value)">
+          <option value="">Alle roller</option>
+          @for (role of roles; track role.value) {
+            <option [value]="role.value">{{ role.label }}</option>
+          }
+        </select>
+      </div>
+      <app-button class="create-button" [disabled]="saving() || createOpen() || !!editingUser()" (click)="openCreate()">Opret bruger</app-button>
+    </div>
+    <ng-template #createUserRow>
+      <form class="create-user-form" [formGroup]="userForm" (ngSubmit)="saveUser()" aria-label="Opret bruger">
+        <fieldset class="create-user-fields" [disabled]="saving()">
+          <legend>Opret bruger</legend>
+          <div>
+            <label for="create-user-name">Navn</label>
+            <input #createName id="create-user-name" formControlName="name" autocomplete="off" required
+              [attr.aria-invalid]="userForm.controls.name.touched && userForm.controls.name.invalid"
+              aria-describedby="create-name-error" />
+            <div id="create-name-error">
+              @if (userForm.controls.name.touched && userForm.controls.name.invalid) {
+                <p class="error" role="alert">Indtast et navn.</p>
+              }
+            </div>
+          </div>
+          <div>
+            <label for="create-user-email">Email</label>
+            <input id="create-user-email" type="email" formControlName="email" autocomplete="off" required
+              [attr.aria-invalid]="userForm.controls.email.touched && userForm.controls.email.invalid"
+              aria-describedby="create-email-error" />
+            <div id="create-email-error">
+              @if (userForm.controls.email.touched && userForm.controls.email.invalid) {
+                <p class="error" role="alert">Indtast en gyldig email.</p>
+              }
+            </div>
+          </div>
+          <div>
+            <label for="create-user-password">Kodeord</label>
+            <input id="create-user-password" type="password" formControlName="password" autocomplete="new-password" required
+              [attr.aria-invalid]="userForm.controls.password.touched && userForm.controls.password.invalid"
+              aria-describedby="create-password-error" />
+            <div id="create-password-error">
+              @if (userForm.controls.password.touched && userForm.controls.password.invalid) {
+                <p class="error" role="alert">Indtast et kodeord.</p>
+              }
+            </div>
+          </div>
+          <div>
+            <label for="create-user-role">Rolle</label>
+            <select id="create-user-role" formControlName="role">
+              @for (role of roles; track role.value) {
+                <option [ngValue]="role.value">{{ role.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="actions create-user-actions">
+            <app-button variant="secondary" [disabled]="saving()" (click)="cancelCreate()">Annuller</app-button>
+            <app-button type="submit" [disabled]="saving()">{{ saving() ? 'Gemmer…' : 'Gem bruger' }}</app-button>
+          </div>
+        </fieldset>
+        @if (actionError()) { <p class="error" role="alert">{{ actionError() }}</p> }
+      </form>
+    </ng-template>
+    <ng-template #userActions let-user>
+      @if (editingUser()?.id === user.id) {
+        <form id="edit-user-form" class="edit-user-form" [formGroup]="userForm" (ngSubmit)="saveUser()" aria-label="Rediger bruger">
+          <div class="actions">
+            <app-button variant="secondary" [disabled]="saving()" (click)="cancelEdit()">Annuller</app-button>
+            <app-button type="submit" [disabled]="saving()">{{ saving() ? 'Gemmer…' : 'Gem bruger' }}</app-button>
+          </div>
+          @if (actionError()) { <p class="error" role="alert">{{ actionError() }}</p> }
+        </form>
+      } @else {
+        <div class="actions row-actions">
+          @for (action of actions; track action.id) {
+            <app-button [variant]="action.variant ?? 'primary'" [disabled]="saving() || createOpen() || !!editingUser()"
+              (click)="onAction({ action: action.id, row: user })">{{ action.label }}</app-button>
+          }
+        </div>
+      }
+    </ng-template>
+    <div class="users-table-container" role="region" aria-labelledby="users-title" tabindex="0">
+      <table class="users-table">
+        <thead>
+          <tr>
+            @for (column of columns; track column.key) {
+              <th scope="col">{{ column.label }}</th>
+            }
+            <th scope="col">Handlinger</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (createOpen()) {
+            <tr>
+              <td colspan="4"><ng-container [ngTemplateOutlet]="createUserRow" /></td>
+            </tr>
+          }
+          @for (user of paginatedUsers(); track user.id) {
+            <tr>
+              <td>
+                @if (editingUser()?.id === user.id) {
+                  <fieldset class="edit-user-field" [disabled]="saving()">
+                    <input #editName id="edit-user-name" aria-label="Navn" [formControl]="userForm.controls.name"
+                      form="edit-user-form" autocomplete="off" required
+                      [attr.aria-invalid]="userForm.controls.name.touched && userForm.controls.name.invalid"
+                      aria-describedby="edit-name-error" />
+                    <div id="edit-name-error">
+                      @if (userForm.controls.name.touched && userForm.controls.name.invalid) {
+                        <p class="error" role="alert">Indtast et navn.</p>
+                      }
+                    </div>
+                  </fieldset>
+                } @else { {{ user.name }} }
+              </td>
+              <td>
+                @if (editingUser()?.id === user.id) {
+                  <fieldset class="edit-user-field" [disabled]="saving()">
+                    <input id="edit-user-email" aria-label="Email" type="email" [formControl]="userForm.controls.email"
+                      form="edit-user-form" autocomplete="off" required
+                      [attr.aria-invalid]="userForm.controls.email.touched && userForm.controls.email.invalid"
+                      aria-describedby="edit-email-error" />
+                    <div id="edit-email-error">
+                      @if (userForm.controls.email.touched && userForm.controls.email.invalid) {
+                        <p class="error" role="alert">Indtast en gyldig email.</p>
+                      }
+                    </div>
+                  </fieldset>
+                } @else { {{ user.email }} }
+              </td>
+              <td>{{ roleLabel(user.role) }}</td>
+              <td><ng-container [ngTemplateOutlet]="userActions" [ngTemplateOutletContext]="{ $implicit: user }" /></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="empty-message" colspan="4">
+                {{ users().length ? 'Ingen brugere matcher din søgning eller rolle.' : 'Der er ingen brugere.' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <p class="user-count" role="status">
+        Viser {{ firstUser() }}–{{ lastUser() }} brugere ud af {{ filteredUsers().length }}
+      </p>
+      <nav class="pagination" aria-label="Brugersider">
+        <button type="button" [disabled]="!!editingUser() || currentPage() === 1" (click)="goToPage(currentPage() - 1)">
+          Forrige
+        </button>
+        @for (page of visiblePages(); track page) {
+          <button type="button" [attr.aria-label]="'Side ' + page"
+            [disabled]="!!editingUser()"
+            [attr.aria-current]="page === currentPage() ? 'page' : null"
+            (click)="goToPage(page)">{{ page }}</button>
+        }
+        <button type="button" [disabled]="!!editingUser() || currentPage() === pageCount()" (click)="goToPage(currentPage() + 1)">
+          Næste
+        </button>
+      </nav>
+    </div>
+  }
+</section>
+
+<app-modal title="Slet bruger" [(open)]="deleteOpen">
+  <p>Vil du slette {{ deletingUser()?.name }} ({{ deletingUser()?.email }})?</p>
+  @if (actionError()) { <p class="error" role="alert">{{ actionError() }}</p> }
+  <div class="actions form-actions">
+    <app-button variant="secondary" [disabled]="saving()" (click)="deleteOpen.set(false)">Annuller</app-button>
+    <app-button variant="danger" [disabled]="saving()" (click)="deleteUser()">{{ saving() ? 'Sletter…' : 'Slet bruger' }}</app-button>
+  </div>
+</app-modal>
