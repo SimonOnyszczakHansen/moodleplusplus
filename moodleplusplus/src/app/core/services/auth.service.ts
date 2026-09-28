@@ -61,12 +61,15 @@ export class AuthService {
   logout(): Observable<void> {
     return this.http.post<void>(`${environment.apiHost}/auth/logout`, {}).pipe(
       tap(() => this.clearSession()),
-      tap(() => this.userSubject.next(null)),
     );
   }
 
   get currentUser(): User | null {
     return this.userSubject.value;
+  }
+
+  get isAdmin(): boolean {
+    return this.isAuthenticated && ['1', 'administrator', 'admin'].includes(String(this.currentUser?.role).toLowerCase());
   }
 
   get hasAcceptedConsent(): boolean {
@@ -85,6 +88,7 @@ export class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     localStorage.removeItem(this.CONSENT_KEY);
+    this.userSubject.next(null);
   }
 
   private readStoredUser(): User | null {
