@@ -15,7 +15,7 @@
 
 		<!-- One row per item, with one cell per configured column -->
 		<tbody>
-			@for (row of rows(); track row) {
+			@for (row of rows(); track $index) {
 			<tr>
 				@for (column of columns(); track column.key) {
 				<td>
