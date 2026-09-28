@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, finalize, map, of, shareReplay, tap, throwError } from 'rxjs';
 import { LoginResponse, User } from '../models/user.interface';
 import { environment } from '../../../environments/environment';
 
@@ -11,6 +11,7 @@ export class AuthService {
   private readonly TOKEN_KEY = 'accessToken';
   private readonly USER_KEY = 'currentUser';
   private readonly CONSENT_KEY = 'consentAccepted';
+  private refreshRequest$: Observable<void> | null = null;
 
   private userSubject = new BehaviorSubject<User | null>(this.readStoredUser());
   user$: Observable<User | null> = this.userSubject.asObservable();
@@ -18,24 +19,6 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: { email: string; password: string }): Observable<User> {
-    // Quick local dev fallback so you can test without the API.
-    if (credentials.email === 'test@test.dk' && credentials.password === 'Kode1234!') {
-      const user: User = {
-        id: 'local-test',
-        email: 'test@test.dk',
-        name: 'Test Bruger',
-        role: 'student',
-      };
-
-      const devToken = 'local-dev-token';
-      localStorage.setItem(this.TOKEN_KEY, devToken);
-      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-      this.userSubject.next(user);
-
-      return of(user);
-    }
-    // Remove above later
-
     return this.http.post<LoginResponse>(`${environment.apiHost}/auth/login`, credentials).pipe(
       map((response) => {
         const token = response.jwt ?? response.accessToken ?? '';
@@ -43,7 +26,7 @@ export class AuthService {
           id: response.userId ?? response.id ?? null,
           email: credentials.email,
           name: response.name ?? 'Bruger',
-          role: response.role ?? 'student',
+          role: this.normalizeRole(response.role),
         };
         if (!response.isMissingConsents) {
           localStorage.setItem(this.CONSENT_KEY, 'true');
@@ -69,6 +52,24 @@ export class AuthService {
     return this.http.post<void>(`${environment.apiHost}/auth/logout`, {}).pipe(
       tap(() => this.clearSession()),
     );
+  }
+
+  refreshAccessToken(): Observable<void> {
+    if (!this.refreshRequest$) {
+      this.refreshRequest$ = this.http.post<void>(`${environment.apiHost}/auth/refresh`, {}).pipe(
+        catchError((error: unknown) => {
+          this.clearSession();
+          this.userSubject.next(null);
+          return throwError(() => error);
+        }),
+        finalize(() => {
+          this.refreshRequest$ = null;
+        }),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
+    }
+
+    return this.refreshRequest$;
   }
 
   get currentUser(): User | null {
@@ -106,9 +107,26 @@ export class AuthService {
 
     try {
       const parsed = JSON.parse(rawUser) as User;
-      return parsed?.name ? parsed : null;
+      if (!parsed?.name) {
+        return null;
+      }
+
+      const user = { ...parsed, role: this.normalizeRole(parsed.role) };
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      return user;
     } catch {
       return null;
     }
+  }
+
+  private normalizeRole(role: string | number | null | undefined): string {
+    const normalized = String(role ?? '').toLowerCase();
+    const roleNames: Record<string, string> = {
+      '1': 'administrator',
+      '2': 'teacher',
+      '3': 'student',
+    };
+
+    return roleNames[normalized] ?? (normalized || 'student');
   }
 }
