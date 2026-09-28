@@ -21,7 +21,7 @@ export interface ICreateTaskRequest {
     deadline?: string;
 }
 
-export type RecipientType = 'Student' | 'Group';
+export type RecipientType = 'student' | 'group';
 
 export interface IApiTaskAssignment {
     assignmentId: string;

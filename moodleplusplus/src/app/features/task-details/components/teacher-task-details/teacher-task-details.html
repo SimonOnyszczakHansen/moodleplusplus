@@ -22,7 +22,22 @@
 					<app-status-badge [label]="row.status" [variant]="row.status" />
 				</ng-template>
 				<ng-template appTableCell="fileName" let-row>
-					{{ row.fileName ?? '—' }}
+					@if (row.fileName) {
+						<app-button variant="secondary" [disabled]="downloadingAssignmentId() === row.assignmentId" (click)="onDownloadFile(row)">{{ row.fileName }}</app-button>
+					} @else {
+						—
+					}
+				</ng-template>
+				<ng-template appTableCell="comment" let-row>
+					@if (row.comment; as comment) {
+						@if (isLikelyUrl(comment)) {
+							<a [href]="comment" target="_blank" rel="noopener noreferrer">{{ comment }}</a>
+						} @else {
+							{{ comment }}
+						}
+					} @else {
+						—
+					}
 				</ng-template>
 				<ng-template appTableCell="feedback" let-row>
 					<div class="feedback-actions">

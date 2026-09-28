@@ -1,5 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { IObjective } from '../../../../core/models/educationgoal.model';
 import { Objectives as ObjectivesService } from '../../../objectives/services/objectives';
 import { DatePipe } from '@angular/common';
@@ -21,6 +23,7 @@ interface RosterRow {
 	submittedAt: string | null;
 	status: TaskStatus;
 	fileName: string | null;
+	comment: string | null;
 	feedback: null;
 }
 
@@ -46,6 +49,7 @@ export class TeacherTaskDetails implements OnInit {
 	objectives = signal<IObjective[]>([]);
 	reviewingAssignmentId = signal<string | null>(null);
 	reviewError = signal<string | null>(null);
+	downloadingAssignmentId = signal<string | null>(null);
 	selectedObjectiveIds: string[] = [];
 
 
@@ -58,6 +62,7 @@ export class TeacherTaskDetails implements OnInit {
 		{ key: 'submittedAt', label: 'Afleveringsdato' },
 		{ key: 'status', label: 'Status' },
 		{ key: 'fileName', label: 'Aflevering' },
+		{ key: 'comment', label: 'Kommentar' },
 		{ key: 'feedback', label: 'Feedback' },
 	];
 
@@ -66,7 +71,10 @@ export class TeacherTaskDetails implements OnInit {
 	ngOnInit(): void {
 		const id = this.route.snapshot.paramMap.get('id') ?? '';
 		this.taskService.getTask(id).subscribe({
-			next: (task) => { this.teacherTask.set(task); },
+			next: (task) => {
+				this.teacherTask.set(task);
+				this.loadSubmissions(task.assignments);
+			},
 			error: () => { this.teacherTask.set(null); },
 		});
 
@@ -75,8 +83,39 @@ export class TeacherTaskDetails implements OnInit {
 		this.taskService.getStudents().subscribe({ next: (students) => { this.students.set(students); } });
 	}
 
+	// /tasks/{id} doesn't embed submissions - fetch each non-empty assignment's submission separately.
+	private loadSubmissions(assignments: ITaskAssignmentRow[]): void {
+		const submitted = assignments.filter((a) => a.status !== 'Ikke afleveret');
+		if (!submitted.length) return;
+
+		const requests = submitted.map((assignment) =>
+			this.taskService.getSubmission(assignment.assignmentId).pipe(
+				map((submission) => ({ assignmentId: assignment.assignmentId, submission })),
+				catchError(() => of({ assignmentId: assignment.assignmentId, submission: null })),
+			),
+		);
+
+		forkJoin(requests).subscribe((results) => {
+			const current = this.teacherTask();
+			if (!current) return;
+
+			const submissionByAssignmentId = new Map(results.map((r) => [r.assignmentId, r.submission]));
+			this.teacherTask.set({
+				...current,
+				assignments: current.assignments.map((a) => ({
+					...a,
+					submission: submissionByAssignmentId.get(a.assignmentId) ?? a.submission,
+				})),
+			});
+		});
+	}
+
 	get subjectOptions(): DropdownOption[] {
 		return this.subjects().map((subject) => ({ value: subject.id, label: subject.name }));
+	}
+
+	isLikelyUrl(value: string): boolean {
+		return /^https?:\/\//i.test(value.trim());
 	}
 
 	get filteredAssignees(): IAssignee[] {
@@ -100,6 +139,7 @@ export class TeacherTaskDetails implements OnInit {
 			submittedAt: row.submission?.submittedAt ?? null,
 			status: row.status,
 			fileName: row.submission?.file?.fileName ?? null,
+			comment: row.submission?.comment ?? null,
 			feedback: null,
 		}));
 	}
@@ -268,6 +308,24 @@ export class TeacherTaskDetails implements OnInit {
 
 	onSubmitFeedback(): void {
 
+	}
+
+	onDownloadFile(row: RosterRow): void {
+		if (!row.fileName) return;
+
+		this.downloadingAssignmentId.set(row.assignmentId);
+		this.taskService.downloadSubmissionFile(row.assignmentId).subscribe({
+			next: (blob) => {
+				this.downloadingAssignmentId.set(null);
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = row.fileName!;
+				a.click();
+				URL.revokeObjectURL(url);
+			},
+			error: () => this.downloadingAssignmentId.set(null),
+		});
 	}
 
 }

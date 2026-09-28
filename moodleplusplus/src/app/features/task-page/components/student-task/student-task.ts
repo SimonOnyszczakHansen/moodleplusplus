@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Task as TaskService } from '../../services/task';
@@ -28,13 +28,14 @@ export class StudentTask implements OnInit {
 	];
 	readonly actions: TableAction[] = [{ id: 'view', label: 'Se Opgave' }];
 
-	rows: StudentTaskRow[] = [];
+	rows = signal<StudentTaskRow[]>([]);
 
 	ngOnInit(): void {
 		this.taskService.getMyAssignments().subscribe({
 			next: (assignments) => {
-				this.rows = assignments.map((assignment, index) => ({ ...assignment, index: index + 1 }));
-			}
+				this.rows.set(assignments.map((assignment, index) => ({ ...assignment, index: index + 1 })));
+			},
+			error: (err) => console.error('Assignments fetch failed:', err),
 		});
 	}
 

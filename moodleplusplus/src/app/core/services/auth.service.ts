@@ -4,6 +4,14 @@ import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
 import { LoginResponse, User } from '../models/user.interface';
 import { environment } from '../../../environments/environment';
 
+// Backend returns role as a numeric enum on /auth/login (JWT cookie claim has it as a string,
+// but that cookie is HttpOnly and unreadable from JS). Confirmed mapping from backend Swagger:
+const ROLE_MAP: Record<number, string> = {
+  1: 'Administrator',
+  2: 'Teacher',
+  3: 'Student',
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -24,7 +32,7 @@ export class AuthService {
         id: 'local-test',
         email: 'test@test.dk',
         name: 'Test Bruger',
-        role: 'student',
+        role: 'Student',
       };
 
       const devToken = 'local-dev-token';
@@ -36,14 +44,16 @@ export class AuthService {
     }
     // Remove above later
 
-    return this.http.post<LoginResponse>(`${environment.apiHost}/auth/login`, credentials).pipe(
+    return this.http.post<LoginResponse>(`${environment.apiHost}/auth/login`, credentials, { withCredentials: true }).pipe(
       map((response) => {
         const token = response.jwt ?? response.accessToken ?? '';
+        const rawRole = response.role;
+        const role = typeof rawRole === 'number' ? (ROLE_MAP[rawRole] ?? 'Student') : (rawRole ?? 'Student');
         const user: User = {
           id: response.userId ?? response.id ?? null,
           email: credentials.email,
           name: response.name ?? 'Bruger',
-          role: response.role ?? 'student',
+          role,
         };
         if (!response.isMissingConsents) {
           localStorage.setItem(this.CONSENT_KEY, 'true');

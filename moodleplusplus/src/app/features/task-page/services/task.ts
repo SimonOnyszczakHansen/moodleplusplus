@@ -11,13 +11,19 @@ import {
 import { ISubject } from '../models/subject.model';
 import { IAssignee } from '../models/assignee.model';
 import { IApiGroup } from '../models/group.model';
-import { User } from '../../../core/models/user.interface';
+
+// /user returns role as a raw numeric enum, same as /auth/login (3 = Student).
+interface IApiUser {
+	id: string;
+	name: string;
+	role: number;
+}
 
 function mapApiGroupToAssignee(api: IApiGroup): IAssignee {
 	return { id: api.id, name: api.name, type: 'group' };
 }
 
-function mapApiUserToAssignee(api: User): IAssignee {
+function mapApiUserToAssignee(api: IApiUser): IAssignee {
 	return { id: String(api.id), name: api.name, type: 'student' };
 }
 
@@ -28,8 +34,8 @@ function mapApiAssignment(api: IApiTaskAssignment): ITaskAssignmentSummary {
 		title: api.task.title,
 		deadline: api.deadline,
 		status: mapAssignmentStatus(api.status),
-		groupId: api.recipientType === 'Group' ? api.recipientId : undefined,
-		groupName: api.recipientType === 'Group' ? api.recipientName : undefined,
+		groupId: api.recipientType === 'group' ? api.recipientId : undefined,
+		groupName: api.recipientType === 'group' ? api.recipientName : undefined,
 	};
 }
 
@@ -46,10 +52,10 @@ function mapApiAssignmentDetail(api: IApiTaskAssignment): ITaskAssignmentDetail 
 function mapApiAssignmentRow(api: IApiAssignmentRow): ITaskAssignmentRow {
 	return {
 		assignmentId: api.assignmentId,
-		studentId: api.recipientType === 'Student' ? api.recipientId : undefined,
-		studentName: api.recipientType === 'Student' ? api.recipientName : undefined,
-		groupId: api.recipientType === 'Group' ? api.recipientId : undefined,
-		groupName: api.recipientType === 'Group' ? api.recipientName : undefined,
+		studentId: api.recipientType === 'student' ? api.recipientId : undefined,
+		studentName: api.recipientType === 'student' ? api.recipientName : undefined,
+		groupId: api.recipientType === 'group' ? api.recipientId : undefined,
+		groupName: api.recipientType === 'group' ? api.recipientName : undefined,
 		status: mapAssignmentStatus(api.status),
 		submission: null,
 		feedback: [],
@@ -85,8 +91,8 @@ export class Task {
 
 	getStudents(): Observable<IAssignee[]> {
 		return this.http
-			.get<User[]>(`${this.base}/users`)
-			.pipe(map((users) => users.filter((u) => u.role === 'student').map(mapApiUserToAssignee)));
+			.get<IApiUser[]>(`${this.base}/user`)
+			.pipe(map((users) => users.filter((u) => u.role === 3).map(mapApiUserToAssignee)));
 	}
 
 	getTask(taskId: string): Observable<ITeacherTaskDetail> {

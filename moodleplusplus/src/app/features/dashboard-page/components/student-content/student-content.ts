@@ -1,14 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Card } from '../../../../shared/card/card';
 import { CommonModule } from '@angular/common';
 import { ProgressBar } from '../../../../shared/progress-bar/progress-bar';
 import { Button } from '../../../../shared/button/button';
 import { OnInit } from '@angular/core';
 import { DashboardService } from '../../services/dashboard';
+import { Task } from '../../../task-page/services/task';
 import { Router } from '@angular/router';
 import { ISubject } from '../../models/subject.model';
-import { ITask } from '../../models/task.model';
-import { IQuiz } from '../../models/quiz.model';
+import { IDashboardTask } from '../../models/task.model';
+import { IDashboardQuiz } from '../../models/quiz.model';
 
 @Component({
 	selector: 'app-student-content',
@@ -17,28 +18,35 @@ import { IQuiz } from '../../models/quiz.model';
 	styleUrl: './student-content.css',
 })
 export class StudentContent implements OnInit {
-	subjects: ISubject[] = [];
-	tasks: ITask[] = [];
-	quizzes: IQuiz[] = [];
+	subjects = signal<ISubject[]>([]);
+	tasks = signal<IDashboardTask[]>([]);
+	quizzes = signal<IDashboardQuiz[]>([]);
 
-	constructor(private dashboard: DashboardService, private router: Router) { }
+	constructor(
+		private dashboard: DashboardService,
+		private taskService: Task,
+		private router: Router,
+	) { }
 
 	ngOnInit() {
-		this.dashboard.getDashboardData().subscribe(data => {
-			this.subjects = data.subjects;
-			this.tasks = data.tasks;
-			this.quizzes = data.quizzes;
+		this.dashboard.getDashboardData().subscribe({
+			next: data => {
+				this.tasks.set(data.tasks.items);
+				this.quizzes.set(data.quizzes.items);
+			},
+			error: err => console.error('Student dashboard fetch failed:', err),
 		});
 	}
 
-	get pendingTasks(): ITask[] {
-		return this.tasks
-			.filter(t => t.status === 'Ikke afleveret' || t.status === 'Ikke godkendt')
-			.filter(t => new Date(t.deadline) >= new Date())
+	get pendingTasks(): IDashboardTask[] {
+		return this.tasks()
+			.filter(t => t.status === 'NotSubmitted' || t.status === 'Rejected')
+			.filter(t => !t.deadline || new Date(t.deadline) >= new Date())
 			.slice(0, 8);
 	}
 
-	viewSubject(subjectid: number) {
+
+	viewSubject(subjectid: string) {
 		this.router.navigate(['/subject', subjectid]);
 	}
 
@@ -50,20 +58,20 @@ export class StudentContent implements OnInit {
 		this.router.navigate(['/tasks']);
 	}
 
-	getSubjectName(subjectId: number): string {
-		return this.subjects.find(s => s.id === subjectId)?.name ?? '';
+	getSubjectName(subjectId: string): string {
+		return this.subjects().find(s => s.id === subjectId)?.name ?? '';
 	}
 
-	getSubjectProgress(subjectId: number): number {
-		const subjectQuizzes = this.quizzes.filter(q => q.subjectId === subjectId);
-		const subjectTasks = this.tasks.filter(t => t.subjectId === subjectId);
+	getSubjectProgress(subjectId: string): number {
+		const subjectQuizzes = this.quizzes().filter(q => q.subjectId === subjectId);
+		const subjectTasks = this.tasks().filter(t => t.subjectId === subjectId);
 
 		const quizRatio = subjectQuizzes.length
 			? subjectQuizzes.filter(q => q.passed).length / subjectQuizzes.length
 			: 0;
 
 		const taskRatio = subjectTasks.length
-			? subjectTasks.filter(t => t.status === 'Godkendt').length / subjectTasks.length
+			? subjectTasks.filter(t => t.status === 'Approved').length / subjectTasks.length
 			: 0;
 
 		return Math.round(((quizRatio + taskRatio) / 2) * 100);

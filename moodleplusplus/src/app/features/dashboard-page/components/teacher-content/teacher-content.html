@@ -3,7 +3,7 @@
 		<h2 id="header">Mine Fag</h2>
 		<a (click)="viewAllSubjects()" class="view-all">Se alle &#8594;</a>
 		<div class="subject-cards">
-			<div *ngFor="let subject of subjects">
+			<div *ngFor="let subject of subjects()">
 				<app-card title="{{subject.name}}">
 					<div class="card-content">
 						<div class="button-container">
