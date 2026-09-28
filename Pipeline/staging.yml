@@ -1,0 +1,196 @@
+frontend-staging-build:
+  stage: staging-build
+  tags:
+    - frontend
+
+  variables:
+    STAGING_IMAGE: "lmsfrontend-staging:$CI_COMMIT_SHORT_SHA"
+
+  script:
+    - echo "Building staging frontend $STAGING_IMAGE"
+
+    - docker build
+        --file Docker/Dockerfile.frontend
+        --build-arg API_HOST="$API_HOST"
+        --tag "$STAGING_IMAGE"
+        .
+
+    - docker image inspect "$STAGING_IMAGE" > /dev/null
+
+    - echo "Frontend image built successfully"
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+
+
+frontend-staging-deploy:
+  stage: staging-deploy
+  tags:
+    - frontend
+
+  variables:
+    STAGING_IMAGE: "lmsfrontend-staging:$CI_COMMIT_SHORT_SHA"
+    RELEASE_PATH: "/var/www/lms-frontend/releases/$CI_COMMIT_SHORT_SHA"
+
+  script:
+    - echo "Recording previous frontend release"
+
+    - |
+      PREVIOUS_RELEASE="$(readlink -f /var/www/lms-frontend/current 2>/dev/null || true)"
+
+      if [ -n "$PREVIOUS_RELEASE" ]; then
+        echo "Previous release: $PREVIOUS_RELEASE"
+      else
+        echo "No previous frontend release found"
+      fi
+
+      printf 'PREVIOUS_RELEASE=%s\n' "$PREVIOUS_RELEASE" > staging.env
+
+    - echo "Extracting frontend release $CI_COMMIT_SHORT_SHA"
+
+    - |
+      rm -rf "$RELEASE_PATH"
+      mkdir -p "$RELEASE_PATH"
+
+      CONTAINER_ID="$(docker create "$STAGING_IMAGE")"
+
+      docker cp \
+        "$CONTAINER_ID:/app/dist/." \
+        "$RELEASE_PATH"
+
+      docker rm "$CONTAINER_ID"
+
+    - test -f "$RELEASE_PATH/index.html"
+
+    - echo "Activating frontend release"
+
+    - ln -sfn "$RELEASE_PATH" /var/www/lms-frontend/current
+
+    - echo "Frontend release activated"
+
+  artifacts:
+    reports:
+      dotenv: staging.env
+    expire_in: 1 hour
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+
+
+frontend-staging-configure:
+  stage: staging-configure
+  tags:
+    - frontend
+
+  script:
+    - echo "Rendering staging Nginx configuration"
+
+    - |
+      if [ ! -f "$CI_PROJECT_DIR/Docker/nginx/lms-conf.template" ]; then
+        echo "ERROR: Nginx template does not exist"
+        exit 1
+      fi
+
+      docker run --rm \
+        -e NGINX_SERVER_NAME \
+        -v "$CI_PROJECT_DIR/Docker/nginx/lms-conf.template:/template.conf:ro" \
+        -v "$CI_PROJECT_DIR/Docker/nginx:/output" \
+        alpine:3.22 \
+        sh -c '
+          apk add --no-cache gettext > /dev/null &&
+          envsubst "\${NGINX_SERVER_NAME}" \
+            < /template.conf \
+            > /output/lms-frontend-staging.conf
+        '
+
+    - echo "Deploying staging Nginx configuration"
+
+    - |
+      docker run --rm \
+        -v "$CI_PROJECT_DIR/Docker/nginx/lms-frontend-staging.conf:/source/lms-frontend-staging.conf:ro" \
+        -v /opt/nginx/conf.d:/target \
+        alpine:3.22 \
+        sh -c '
+          if [ -f /target/lms-frontend-staging.conf ]; then
+            cp /target/lms-frontend-staging.conf /target/lms-frontend-staging.conf.backup
+          fi
+
+          cp /source/lms-frontend-staging.conf /target/lms-frontend-staging.conf
+        '
+
+      if ! docker exec nginx nginx -t; then
+        echo "Nginx configuration invalid - restoring previous config"
+
+        docker run --rm \
+          -v /opt/nginx/conf.d:/target \
+          alpine:3.22 \
+          sh -c '
+            if [ -f /target/lms-frontend-staging.conf.backup ]; then
+              mv /target/lms-frontend-staging.conf.backup /target/lms-frontend-staging.conf
+            else
+              rm -f /target/lms-frontend-staging.conf
+            fi
+          '
+
+        exit 1
+      fi
+
+      docker exec nginx nginx -s reload
+
+      docker run --rm \
+        -v /opt/nginx/conf.d:/target \
+        alpine:3.22 \
+        rm -f /target/lms-frontend-staging.conf.backup
+
+      rm -f Docker/nginx/lms-frontend-staging.conf
+
+      echo "Staging Nginx configuration deployed successfully"
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+
+
+frontend-staging-verify:
+  stage: staging-verify
+  tags:
+    - frontend
+
+  script:
+    - echo "Verifying staging frontend"
+
+    - |
+      healthy=false
+
+      for attempt in $(seq 1 12); do
+        if curl --fail --silent \
+          -H "Host: $NGINX_SERVER_NAME" \
+          http://100.106.123.103/health > /dev/null; then
+          echo "Staging frontend is healthy"
+          healthy=true
+          break
+        fi
+
+        echo "Frontend not healthy yet ($attempt/12)"
+        sleep 5
+      done
+
+      if [ "$healthy" != "true" ]; then
+        echo "New frontend deployment failed"
+
+        if [ -n "$PREVIOUS_RELEASE" ] && [ -d "$PREVIOUS_RELEASE" ]; then
+          echo "Rolling back to $PREVIOUS_RELEASE"
+
+          ln -sfn "$PREVIOUS_RELEASE" /var/www/lms-frontend/current
+
+          docker exec nginx nginx -s reload
+
+          echo "Previous frontend release restored"
+        else
+          echo "No previous frontend release available"
+        fi
+
+        exit 1
+      fi
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'

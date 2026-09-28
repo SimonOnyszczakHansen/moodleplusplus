@@ -1,0 +1,17 @@
+.git
+.gitignore
+
+moodleplusplus/node_modules
+moodleplusplus/.angular
+moodleplusplus/dist
+moodleplusplus/coverage
+
+moodleplusplus/src/environments/.env
+moodleplusplus/src/environments/environment.ts
+
+.vscode
+.idea
+
+Docker/docker-compose*.yaml
+Pipeline
+.gitlab-ci.yml

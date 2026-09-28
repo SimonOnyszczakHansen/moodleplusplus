@@ -1,0 +1,28 @@
+validate:
+  stage: validate
+
+  tags:
+    - frontend
+
+  variables:
+    CI_CONTAINER_NAME: "lms-frontend-ci-validate-$CI_JOB_ID"
+    API_HOST: "http://localhost:5000/api/v1"
+
+  script:
+    - >-
+      docker run --rm
+      --name "$CI_CONTAINER_NAME"
+      --user "$(id -u):$(id -g)"
+      -v "$CI_PROJECT_DIR/moodleplusplus:/workspace"
+      -w /workspace
+      -e HOME=/workspace
+      -e API_HOST="$API_HOST"
+      node:24-alpine
+      sh -c 'npm ci &&
+      npm run build'
+
+  after_script:
+    - docker rm -f "$CI_CONTAINER_NAME" 2>/dev/null || true
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
