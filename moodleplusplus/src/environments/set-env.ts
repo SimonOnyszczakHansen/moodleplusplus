@@ -15,7 +15,9 @@ const setEnv = () => {
   }
   // `environment.ts` file structure
   const envConfigFile = `export const environment = {
-  apiHost: '${process.env['API_HOST']}',
+  apiHost: globalThis.location?.hostname === 'localhost' || globalThis.location?.hostname === '127.0.0.1'
+    ? '/api/v1'
+    : '${process.env['API_HOST']}',
   appVersion: '${appVersion}',
   production: true,
 };

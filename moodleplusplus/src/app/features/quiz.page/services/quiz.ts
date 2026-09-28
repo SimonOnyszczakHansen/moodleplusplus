@@ -14,6 +14,10 @@ export class QuizService {
     return this.http.get<Quiz[]>(`${environment.apiHost}/quiz/user/${userId}`);
   }
 
+  getQuizzesByStudent(): Observable<Quiz[]> {
+    return this.http.get<Quiz[]>(`${environment.apiHost}/quiz/student`);
+  }
+
   createQuiz(request: CreateQuizRequest): Observable<void> {
     return this.http.post<void>(`${environment.apiHost}/quiz`, request);
   }

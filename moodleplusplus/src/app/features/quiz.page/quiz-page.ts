@@ -18,21 +18,32 @@ export class QuizPage implements OnInit {
 
 	quizzes = signal<Quiz[]>([]);
 	errorMessage = signal<string | null>(null);
-	readonly isTeacher = String(this.authService.currentUser?.role).toLowerCase() === 'teacher' || String(this.authService.currentUser?.role) === '2';
+	private readonly userRole = String(this.authService.currentUser?.role).toLowerCase();
+	readonly isTeacher = this.userRole === 'teacher' || this.userRole === '2';
 
 	ngOnInit(): void {
 		this.loadQuizzes();
 	}
 
 	loadQuizzes(): void {
-		const userId = this.authService.currentUser?.id;
-		if (userId === null || userId === undefined) {
-			this.errorMessage.set('Kunne ikke finde brugerens ID. Log ind igen, og prøv på ny.');
+		this.errorMessage.set(null);
+		let request;
+
+		if (this.userRole === 'student' || this.userRole === '3') {
+			request = this.quizService.getQuizzesByStudent();
+		} else if (this.isTeacher) {
+			const userId = this.authService.currentUser?.id;
+			if (userId === null || userId === undefined) {
+				this.errorMessage.set('Kunne ikke finde brugerens ID. Log ind igen, og prøv på ny.');
+				return;
+			}
+			request = this.quizService.getQuizzesByUser(String(userId));
+		} else {
+			this.errorMessage.set('Din brugertype kan ikke se quizzer.');
 			return;
 		}
 
-		this.errorMessage.set(null);
-		this.quizService.getQuizzesByUser(String(userId)).subscribe({
+		request.subscribe({
 			next: (quizzes) => {
 				this.quizzes.set(quizzes);
 			},
