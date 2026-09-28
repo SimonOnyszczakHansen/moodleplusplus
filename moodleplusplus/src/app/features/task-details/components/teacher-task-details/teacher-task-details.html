@@ -1,6 +1,6 @@
-@if (!teacherTask) {
+@if (!teacherTask()) {
 <p>Kunne ikke hente opgaven.</p>
-} @else {
+} @else if (teacherTask(); as teacherTask) {
 <div class="task-details-container">
 	<div class="header-row">
 		<div class="task-header">
@@ -24,13 +24,20 @@
 				<ng-template appTableCell="fileName" let-row>
 					{{ row.fileName ?? '—' }}
 				</ng-template>
-				<ng-template appTableCell="feedback">
+				<ng-template appTableCell="feedback" let-row>
 					<div class="feedback-actions">
+						@if (row.status === 'Afleveret') {
+							<app-button variant="primary" [disabled]="reviewingAssignmentId() === row.assignmentId" (click)="onApproveSubmission(row)">Godkend</app-button>
+							<app-button variant="danger" [disabled]="reviewingAssignmentId() === row.assignmentId" (click)="onRejectSubmission(row)">Afvis</app-button>
+						}
 						<app-button variant="secondary">Giv Feedback</app-button>
 						<app-button variant="secondary">Se Historik</app-button>
 					</div>
 				</ng-template>
 			</app-table>
+			@if (reviewError()) {
+				<p class="error-message">{{ reviewError() }}</p>
+			}
 		</div>
 
 		<div class="goals-card">
@@ -56,9 +63,9 @@
 		<app-input label="Beskrivelse" placeholder="Beskrivelse" [(value)]="taskEditModel.description"></app-input>
 
 		<div class="assignee-search">
-			@if (existingAssignments.length) {
+			@if (existingAssignments().length) {
 			<ul class="assignee-chips">
-				@for (assignment of existingAssignments; track assignment.assignmentId) {
+				@for (assignment of existingAssignments(); track assignment.assignmentId) {
 				<li class="assignee-chip">
 					{{ assignment.studentName ?? assignment.groupName }}
 					<button type="button" aria-label="Fjern" (click)="onRemoveExistingAssignment(assignment)">&times;</button>
@@ -100,9 +107,9 @@
 		</div>
 	</app-modal>
 	<app-modal [(open)]="addObjectiveVisible" title="Tilføj Målpind">
-		@if (objectives.length) {
+		@if (objectives().length) {
 		<ul class="objective-checklist">
-			@for (objective of objectives; track objective.objectiveId) {
+			@for (objective of objectives(); track objective.objectiveId) {
 			<li>
 				<label>
 					<input type="checkbox" [checked]="isObjectiveSelected(objective.objectiveId)"
@@ -121,5 +128,6 @@
 			<app-button variant="primary" (click)="onSubmitAddObjective()">Tilføj</app-button>
 		</div>
 	</app-modal>
+
 </div>
 }
