@@ -14,10 +14,11 @@ import { AuthService } from '../../core/services/auth.service';
 export class ConsentPage {
 	tosAccepted = false;
 
-	// TODO: replace once login carries the authenticated user's email forward.
-	private readonly email = '';
-
 	constructor(private consentService: Consent, private router: Router, private authService: AuthService) { }
+
+	private get email(): string {
+		return this.authService.currentUser?.email ?? '';
+	}
 
 	onAcceptTOS() {
 		this.tosAccepted = true;
