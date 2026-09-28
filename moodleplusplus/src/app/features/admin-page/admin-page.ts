@@ -1,17 +1,18 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Injector, OnInit, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NgTemplateOutlet } from '@angular/common';
 import { Observable, finalize } from 'rxjs';
 import { Button } from '../../shared/button/button';
 import { Modal } from '../../shared/modal/modal';
-import { Table, TableAction, TableActionEvent, TableCellTemplate, TableColumn } from '../../shared/table/table';
+import type { TableAction, TableActionEvent, TableColumn } from '../../shared/table/table';
 import { AdminUser } from './models/admin-user';
 import { AdminUsersService } from './services/admin-users';
 
 @Component({
   selector: 'app-admin-page',
-  imports: [ReactiveFormsModule, Button, Modal, Table, TableCellTemplate],
+  imports: [ReactiveFormsModule, NgTemplateOutlet, Button, Modal],
   templateUrl: './admin-page.html',
   styleUrl: './admin-page.css',
 })
@@ -19,14 +20,42 @@ export class AdminPage implements OnInit {
   private readonly service = inject(AdminUsersService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
+  private readonly injector = inject(Injector);
+  private readonly createName = viewChild<ElementRef<HTMLInputElement>>('createName');
+  private readonly editName = viewChild<ElementRef<HTMLInputElement>>('editName');
 
   readonly users = signal<AdminUser[]>([]);
+  readonly searchQuery = signal('');
+  readonly roleFilter = signal('');
+  readonly pageSize = 10;
+  private readonly requestedPage = signal(1);
+  readonly filteredUsers = computed(() => {
+    const query = this.searchQuery().trim().toLocaleLowerCase();
+    const role = this.roleFilter();
+    return this.users().filter((user) =>
+      (!query || user.name.toLocaleLowerCase().includes(query) ||
+        user.email.toLocaleLowerCase().includes(query)) &&
+      (!role || this.roleLabel(user.role) === this.roleLabel(role)),
+    );
+  });
+  readonly pageCount = computed(() => Math.max(1, Math.ceil(this.filteredUsers().length / this.pageSize)));
+  readonly currentPage = computed(() => Math.min(this.requestedPage(), this.pageCount()));
+  readonly paginatedUsers = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize;
+    return this.filteredUsers().slice(start, start + this.pageSize);
+  });
+  readonly firstUser = computed(() => this.filteredUsers().length ? (this.currentPage() - 1) * this.pageSize + 1 : 0);
+  readonly lastUser = computed(() => Math.min(this.currentPage() * this.pageSize, this.filteredUsers().length));
+  readonly visiblePages = computed(() => {
+    const start = Math.max(1, Math.min(this.currentPage() - 2, this.pageCount() - 4));
+    return Array.from({ length: Math.min(5, this.pageCount()) }, (_, index) => start + index);
+  });
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly loadError = signal('');
   readonly actionError = signal('');
   readonly successMessage = signal('');
-  readonly editorOpen = signal(false);
+  readonly createOpen = signal(false);
   readonly deleteOpen = signal(false);
   readonly editingUser = signal<AdminUser | null>(null);
   readonly deletingUser = signal<AdminUser | null>(null);
@@ -56,6 +85,20 @@ export class AdminPage implements OnInit {
     this.loadUsers();
   }
 
+  setSearchQuery(query: string): void {
+    this.searchQuery.set(query);
+    this.requestedPage.set(1);
+  }
+
+  setRoleFilter(role: string): void {
+    this.roleFilter.set(role);
+    this.requestedPage.set(1);
+  }
+
+  goToPage(page: number): void {
+    this.requestedPage.set(Math.max(1, Math.min(page, this.pageCount())));
+  }
+
   loadUsers(): void {
     if (this.loading()) return;
     this.loading.set(true);
@@ -64,7 +107,10 @@ export class AdminPage implements OnInit {
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.loading.set(false)),
     ).subscribe({
-      next: (users) => this.users.set(users),
+      next: (users) => {
+        this.users.set(users);
+        this.goToPage(this.currentPage());
+      },
       error: (error: HttpErrorResponse) => this.loadError.set(
         this.errorMessage(error, 'Brugerne kunne ikke hentes. Prøv igen.'),
       ),
@@ -72,17 +118,25 @@ export class AdminPage implements OnInit {
   }
 
   openCreate(): void {
-    if (this.saving()) return;
+    if (this.saving() || this.createOpen() || this.editingUser()) return;
     this.editingUser.set(null);
     this.clearMessages();
     this.userForm.reset({ name: '', email: '', password: '', role: 3 });
     this.userForm.controls.password.setValidators([Validators.required]);
     this.userForm.controls.password.updateValueAndValidity();
-    this.editorOpen.set(true);
+    this.createOpen.set(true);
+    afterNextRender(() => this.createName()?.nativeElement.focus(), { injector: this.injector });
+  }
+
+  cancelCreate(): void {
+    if (this.saving()) return;
+    this.createOpen.set(false);
+    this.userForm.reset({ name: '', email: '', password: '', role: 3 });
+    this.actionError.set('');
   }
 
   onAction(event: TableActionEvent<AdminUser>): void {
-    if (this.saving()) return;
+    if (this.saving() || this.createOpen() || this.editingUser()) return;
     this.clearMessages();
     if (event.action === 'delete') {
       this.deletingUser.set(event.row);
@@ -92,8 +146,15 @@ export class AdminPage implements OnInit {
       this.userForm.reset({ name: event.row.name, email: event.row.email, password: '', role: 3 });
       this.userForm.controls.password.clearValidators();
       this.userForm.controls.password.updateValueAndValidity();
-      this.editorOpen.set(true);
+      afterNextRender(() => this.editName()?.nativeElement.focus(), { injector: this.injector });
     }
+  }
+
+  cancelEdit(): void {
+    if (this.saving()) return;
+    this.editingUser.set(null);
+    this.userForm.reset({ name: '', email: '', password: '', role: 3 });
+    this.actionError.set('');
   }
 
   saveUser(): void {
@@ -116,7 +177,8 @@ export class AdminPage implements OnInit {
       finalize(() => this.saving.set(false)),
     ).subscribe({
       next: () => {
-        this.editorOpen.set(false);
+        this.editingUser.set(null);
+        this.createOpen.set(false);
         this.userForm.controls.password.reset();
         this.successMessage.set(user ? 'Brugeren er opdateret.' : 'Brugeren er oprettet.');
         this.loadUsers();
@@ -140,6 +202,7 @@ export class AdminPage implements OnInit {
         this.deleteOpen.set(false);
         this.deletingUser.set(null);
         this.users.update((users) => users.filter((entry) => entry.id !== user.id));
+        this.goToPage(this.currentPage());
         this.successMessage.set('Brugeren er slettet.');
       },
       error: (error: HttpErrorResponse) => this.actionError.set(
