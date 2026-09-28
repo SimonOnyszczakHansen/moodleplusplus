@@ -19,24 +19,6 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: { email: string; password: string }): Observable<User> {
-    // Quick local dev fallback so you can test without the API.
-    if (credentials.email === 'test@test.dk' && credentials.password === 'Kode1234!') {
-      const user: User = {
-        id: 'local-test',
-        email: 'test@test.dk',
-        name: 'Test Bruger',
-        role: 'student',
-      };
-
-      const devToken = 'local-dev-token';
-      localStorage.setItem(this.TOKEN_KEY, devToken);
-      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-      this.userSubject.next(user);
-
-      return of(user);
-    }
-    // Remove above later
-
     return this.http.post<LoginResponse>(`${environment.apiHost}/auth/login`, credentials).pipe(
       map((response) => {
         const token = response.jwt ?? response.accessToken ?? '';

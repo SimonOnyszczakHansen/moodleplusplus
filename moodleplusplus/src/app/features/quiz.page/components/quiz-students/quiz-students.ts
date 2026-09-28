@@ -1,5 +1,6 @@
 import { Component, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { Modal } from '../../../../shared/modal/modal';
 import { User } from '../../../../core/models/user.interface';
@@ -11,11 +12,14 @@ interface AttachedStudent {
 	name: string;
 	email: string;
 	attached: boolean;
+	status: string | null;
+	completedAt: string | null;
+	scorePercentage: number | null;
 }
 
 @Component({
 	selector: 'app-quiz-students',
-	imports: [FormsModule, Modal],
+	imports: [FormsModule, Modal, RouterLink],
 	templateUrl: './quiz-students.html',
 	styleUrl: './quiz-students.css',
 })
@@ -81,16 +85,38 @@ export class QuizStudents {
 		);
 	}
 
+	statusLabel(student: AttachedStudent): string {
+		if (!student.attached) {
+			return 'Ikke tilføjet';
+		}
+
+		const status = student.status?.toLowerCase();
+		if (status === 'passed') {
+			return 'Gennemført - Bestået';
+		}
+		if (status === 'failed') {
+			return 'Gennemført - Ikke bestået';
+		}
+		return 'Afventer besvarelse';
+	}
+
 	private mapStudents(attached: QuizStudentResponse[], users: User[]): AttachedStudent[] {
-		const attachedIds = new Set(attached.map((student) => student.studentId));
+		const assignmentsByStudentId = new Map(attached.map((student) => [student.studentId, student]));
 		return users
 			.filter((user) => String(user.role).toLowerCase() === '3' || String(user.role).toLowerCase() === 'student')
 			.filter((user): user is User & { id: string | number } => user.id !== null && user.id !== undefined)
-			.map((user) => ({
-				studentId: String(user.id),
-				name: user.name,
-				email: user.email ?? '',
-				attached: attachedIds.has(String(user.id)),
-			}));
+			.map((user) => {
+				const studentId = String(user.id);
+				const assignment = assignmentsByStudentId.get(studentId);
+				return {
+					studentId,
+					name: user.name,
+					email: user.email ?? '',
+					attached: Boolean(assignment),
+					status: assignment?.status ?? null,
+					completedAt: assignment?.completedAt ?? null,
+					scorePercentage: assignment?.scorePercentage ?? null,
+				};
+			});
 	}
 }

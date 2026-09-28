@@ -60,6 +60,23 @@
 	border-bottom: 1px solid var(--color-border);
 }
 
+.student-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+}
+
+.student-actions a {
+	color: var(--color-primary);
+	font-size: 0.85rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.student-actions a:hover {
+	text-decoration: underline;
+}
+
 .student-list button {
 	flex: 0 0 auto;
 	min-width: 5rem;
@@ -97,6 +114,11 @@
 .student-info span {
 	color: var(--color-text-muted);
 	font-size: 0.9rem;
+}
+
+.student-info .student-status {
+	color: var(--color-text-secondary);
+	font-size: 0.82rem;
 }
 
 .roster-message {

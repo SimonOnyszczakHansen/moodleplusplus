@@ -40,6 +40,18 @@
 						<div class="quiz-actions">
 							<app-quiz-students [quizId]="quiz.id" [quizTitle]="quiz.title"></app-quiz-students>
 						</div>
+					} @else if (isStudent) {
+						<div class="quiz-actions">
+							@if (quizStatusesLoaded()) {
+								@if (quizStatuses()[quiz.id]?.completedAt) {
+									<a class="quiz-score" [routerLink]="['/quizzes', quiz.id, 'review', currentUserId]">
+										Resultat: {{ quizStatuses()[quiz.id]?.scorePercentage }}% - Se svar
+									</a>
+								} @else {
+									<a class="answer-quiz-button" [routerLink]="['/quizzes', quiz.id, 'answer']">Besvar Quiz</a>
+								}
+							}
+						</div>
 					}
 				</li>
 			}
