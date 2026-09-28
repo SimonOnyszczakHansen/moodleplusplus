@@ -11,6 +11,6 @@ export class DashboardService {
   constructor(private http: HttpClient) {}
 
   getDashboardData(): Observable<IDashboard> {
-    return this.http.get<IDashboard>(`${environment.apiHost}/dashboard`);
+    return this.http.get<IDashboard>(`${environment.apiHost}/dashboard/me`);
   }
 }

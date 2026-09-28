@@ -1,0 +1,43 @@
+<section class="quiz-page">
+	<header class="page-header">
+		<div>
+			<p class="breadcrumb">Mine fag <span>/</span> Quizzer</p>
+			<h1>Quizzer</h1>
+		</div>
+		@if (isTeacher) {
+			<a class="add-quiz-button" routerLink="/quizzes/create">+ Opret Quiz</a>
+		}
+	</header>
+
+	@if (errorMessage()) {
+		<div class="page-message error-message" role="alert">
+			<p>{{ errorMessage() }}</p>
+			<button type="button" class="text-button" (click)="loadQuizzes()">Prøv igen</button>
+		</div>
+	} @else if (quizzes().length === 0) {
+		<p class="page-message">Der er ingen quizzer endnu.</p>
+	} @else {
+		<ul class="quiz-grid" aria-label="Dine quizzer">
+			@for (quiz of quizzes(); track quiz.id) {
+				<li class="quiz-card">
+					<div class="quiz-card-heading">
+						<h2>{{ quiz.title }}</h2>
+					</div>
+					@if (quiz.description) {
+						<p class="quiz-description">{{ quiz.description }}</p>
+					}
+					<dl class="quiz-details">
+						<div>
+							<dt>Beståelsesgrænse</dt>
+							<dd>{{ quiz.passingPercentage }}%</dd>
+						</div>
+						<div>
+							<dt>Oprettet</dt>
+							<dd>{{ quiz.createdAt | date: 'dd/MM/yyyy' }}</dd>
+						</div>
+					</dl>
+				</li>
+			}
+		</ul>
+	}
+</section>

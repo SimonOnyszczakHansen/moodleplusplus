@@ -7,6 +7,8 @@ import { Login } from './features/login-page/login';
 import { Task } from './features/task-page/task';
 import { TaskDetails } from './features/task-details/task-details';
 import { Objectives } from './features/objectives/objectives';
+import { QuizPage } from './features/quiz.page/quiz-page';
+import { CreateQuiz } from './features/quiz.page/components/create-quiz/create-quiz';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -14,6 +16,8 @@ export const routes: Routes = [
   { path: 'tasks', component: Task, canActivate: [authGuard, consentGuard] },
   { path: 'tasks/:id', component: TaskDetails, canActivate: [authGuard, consentGuard] },
   { path: 'objectives/:subjectId', component: Objectives, canActivate: [authGuard, consentGuard] },
+  { path: 'quizzes/create', component: CreateQuiz, canActivate: [authGuard, consentGuard] },
+  { path: 'quizzes', component: QuizPage, canActivate: [authGuard, consentGuard] },
   { path: 'login', component: Login },
   { path: 'consent', component: ConsentPage, canActivate: [authGuard] },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, consentGuard] },

@@ -43,8 +43,16 @@ export class AuthService {
           id: response.userId ?? response.id ?? null,
           email: credentials.email,
           name: response.name ?? 'Bruger',
-          role: response.role ?? 'student',
+          role: this.normalizeRole(response.role),
         };
+
+        if (!response.isMissingConsents) {
+          localStorage.setItem(this.CONSENT_KEY, 'true');
+        }
+
+        else {
+          localStorage.setItem(this.CONSENT_KEY, 'false');
+        }
 
         if (token) {
           localStorage.setItem(this.TOKEN_KEY, token);
@@ -95,9 +103,26 @@ export class AuthService {
 
     try {
       const parsed = JSON.parse(rawUser) as User;
-      return parsed?.name ? parsed : null;
+      if (!parsed?.name) {
+        return null;
+      }
+
+      const user = { ...parsed, role: this.normalizeRole(parsed.role) };
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      return user;
     } catch {
       return null;
     }
+  }
+
+  private normalizeRole(role: string | number | null | undefined): string {
+    const normalized = String(role ?? '').toLowerCase();
+    const roleNames: Record<string, string> = {
+      '1': 'administrator',
+      '2': 'teacher',
+      '3': 'student',
+    };
+
+    return roleNames[normalized] ?? (normalized || 'student');
   }
 }
