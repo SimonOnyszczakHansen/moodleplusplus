@@ -53,6 +53,8 @@ export class AuthService {
         }
         if (token) {
           localStorage.setItem(this.TOKEN_KEY, token);
+        } else {
+          localStorage.removeItem(this.TOKEN_KEY);
         }
 
         localStorage.setItem(this.USER_KEY, JSON.stringify(user));
