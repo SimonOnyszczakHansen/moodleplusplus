@@ -4,7 +4,6 @@ export interface LoginResponse {
   tokenType?: string;
   userId?: string | number;
   id?: string | number;
-  isMissingConsents: boolean;
   name?: string;
   role?: string | number;
   email?: string;
