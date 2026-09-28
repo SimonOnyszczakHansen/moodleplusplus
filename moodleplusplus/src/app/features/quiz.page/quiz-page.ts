@@ -2,12 +2,13 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { QuizStudents } from './components/quiz-students/quiz-students';
 import { Quiz } from './models/responses';
 import { QuizService } from './services/quiz';
 
 @Component({
 	selector: 'app-quiz-page',
-	imports: [DatePipe, RouterLink],
+	imports: [DatePipe, RouterLink, QuizStudents],
 	templateUrl: './quiz-page.html',
 	styleUrl: './quiz-page.css',
 })
@@ -17,7 +18,7 @@ export class QuizPage implements OnInit {
 
 	quizzes = signal<Quiz[]>([]);
 	errorMessage = signal<string | null>(null);
-	readonly isTeacher = this.authService.currentUser?.role?.toLowerCase() === 'teacher';
+	readonly isTeacher = String(this.authService.currentUser?.role).toLowerCase() === 'teacher' || String(this.authService.currentUser?.role) === '2';
 
 	ngOnInit(): void {
 		this.loadQuizzes();

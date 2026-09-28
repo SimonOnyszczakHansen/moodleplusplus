@@ -36,6 +36,11 @@
 							<dd>{{ quiz.createdAt | date: 'dd/MM/yyyy' }}</dd>
 						</div>
 					</dl>
+					@if (isTeacher) {
+						<div class="quiz-actions">
+							<app-quiz-students [quizId]="quiz.id" [quizTitle]="quiz.title"></app-quiz-students>
+						</div>
+					}
 				</li>
 			}
 		</ul>
