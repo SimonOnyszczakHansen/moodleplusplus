@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, tap, of } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, finalize, map, of, shareReplay, tap, throwError } from 'rxjs';
 import { LoginResponse, User } from '../models/user.interface';
 import { environment } from '../../../environments/environment';
 
@@ -11,6 +11,7 @@ export class AuthService {
   private readonly TOKEN_KEY = 'accessToken';
   private readonly USER_KEY = 'currentUser';
   private readonly CONSENT_KEY = 'consentAccepted';
+  private refreshRequest$: Observable<void> | null = null;
 
   private userSubject = new BehaviorSubject<User | null>(this.readStoredUser());
   user$: Observable<User | null> = this.userSubject.asObservable();
@@ -71,6 +72,24 @@ export class AuthService {
       tap(() => this.clearSession()),
       tap(() => this.userSubject.next(null)),
     );
+  }
+
+  refreshAccessToken(): Observable<void> {
+    if (!this.refreshRequest$) {
+      this.refreshRequest$ = this.http.post<void>(`${environment.apiHost}/auth/refresh`, {}).pipe(
+        catchError((error: unknown) => {
+          this.clearSession();
+          this.userSubject.next(null);
+          return throwError(() => error);
+        }),
+        finalize(() => {
+          this.refreshRequest$ = null;
+        }),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
+    }
+
+    return this.refreshRequest$;
   }
 
   get currentUser(): User | null {
