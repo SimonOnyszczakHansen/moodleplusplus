@@ -45,7 +45,12 @@ export class AuthService {
           name: response.name ?? 'Bruger',
           role: response.role ?? 'student',
         };
-
+        if (!response.isMissingConsents) {
+          localStorage.setItem(this.CONSENT_KEY, 'true');
+        }
+        else {
+          localStorage.setItem(this.CONSENT_KEY, 'false');
+        }
         if (token) {
           localStorage.setItem(this.TOKEN_KEY, token);
         }

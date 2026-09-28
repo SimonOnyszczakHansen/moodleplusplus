@@ -17,6 +17,6 @@ export class Consent {
     }
     // Remove above later
 
-    return this.http.patch<void>(`${environment.apiHost}/consent`, consent);
+    return this.http.post<void>(`${environment.apiHost}/auth/consent`, consent);
   }
 }
