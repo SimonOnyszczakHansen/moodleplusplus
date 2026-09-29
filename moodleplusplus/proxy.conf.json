@@ -1,0 +1,9 @@
+{
+  "/api": {
+    "target": "https://apistaging.moodleplusplus.dk",
+    "secure": true,
+    "changeOrigin": true,
+    "cookieDomainRewrite": "",
+    "cookiePathRewrite": "/"
+  }
+}

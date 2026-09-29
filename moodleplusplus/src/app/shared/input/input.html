@@ -1,0 +1,16 @@
+<label>
+  @if (label()) {
+    <span>{{ label() }}</span>
+  }
+  <input
+    #field
+    [type]="type()"
+    [name]="name()"
+    [placeholder]="placeholder()"
+    [autocomplete]="autocomplete()"
+    [disabled]="disabled()"
+    [required]="required()"
+    [value]="value()"
+    (input)="value.set(field.value)"
+  />
+</label>

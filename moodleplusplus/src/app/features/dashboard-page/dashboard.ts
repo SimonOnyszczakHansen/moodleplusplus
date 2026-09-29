@@ -1,0 +1,38 @@
+import { Component, OnInit } from '@angular/core';
+import { StudentContent } from './components/student-content/student-content';
+import { TeacherContent } from './components/teacher-content/teacher-content';
+import { IDashboard } from './models/dashboard.model';
+import { DashboardService } from './services/dashboard';
+import { AuthService } from '../../core/services/auth.service';
+import { User } from '../../core/models/user.interface';
+
+@Component({
+  selector: 'app-dashboard',
+  imports: [StudentContent, TeacherContent],
+  templateUrl: './dashboard.html',
+  styleUrl: './dashboard.css',
+})
+
+export class Dashboard implements OnInit {
+  userRole?: string;
+  dashboard?: IDashboard;
+
+  constructor(
+    private dashboardService: DashboardService,
+    private auth: AuthService,
+  ) {}
+
+  ngOnInit(): void {
+    const role = this.auth.currentUser?.role;
+    const roleNames: Record<string, string> = {
+      '1': 'administrator',
+      '2': 'teacher',
+      '3': 'student',
+    };
+    this.userRole = role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase();
+
+    this.dashboardService.getDashboardData().subscribe((data) => {
+      this.dashboard = data;
+    });
+  }
+}

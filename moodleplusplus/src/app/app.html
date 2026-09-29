@@ -1,0 +1,27 @@
+
+<div class="app-shell">
+  <aside class="sidebar" *ngIf="showNavigation">
+    <div class="brand">Moodle<span class="p1">+</span><span class="p2">+</span></div>
+    <span class="role-tag">{{ currentUserRole }}</span>
+
+    <nav class="nav-menu" aria-label="Main navigation">
+      @if (isAdmin) {
+        <a routerLink="/admin/users">Brugere</a>
+      } @else {
+        <a routerLink="/dashboard">Dashboard</a>
+        <a routerLink="/dashboard">Fag</a>
+        <a routerLink="/dashboard">Grupper</a>
+        <a routerLink="/dashboard">Opgaver</a>
+        <a routerLink="/quizzes">Quizzer</a>
+      }
+	  <span class="spacer"></span>
+      <button type="button" class="logout-button" (click)="logout()">Log ud</button>
+    </nav>
+
+    <div class="user-chip">{{ currentUserName }}</div>
+  </aside>
+
+  <main class="content-area">
+    <router-outlet />
+  </main>
+</div>

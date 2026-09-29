@@ -1,0 +1,31 @@
+<main class="quiz-review-page">
+	<nav class="breadcrumb" aria-label="Brødkrumme">
+		<a routerLink="/quizzes">Mine fag / Quizzer</a>
+		<span>/ Svar</span>
+	</nav>
+
+	@if (isLoading()) {
+		<p class="page-message">Henter svar...</p>
+	} @else if (errorMessage()) {
+		<p class="page-message error-message" role="alert">{{ errorMessage() }}</p>
+	} @else {
+		<header class="page-header">
+			<h1>{{ quizTitle() }}</h1>
+			<p>Resultat: {{ correctCount() }} / {{ questions().length }} rigtige ({{ scorePercentage() }}%)</p>
+		</header>
+
+		<ol class="review-list">
+			@for (question of questions(); track question.questionId) {
+				<li [class.correct-answer]="question.isCorrect" [class.incorrect-answer]="!question.isCorrect">
+					<h2>{{ question.questionText }}</h2>
+					<p><strong>Dit svar:</strong> {{ question.selectedAnswerText ?? 'Intet svar' }}</p>
+					@if (!question.isCorrect) {
+						<p><strong>Korrekt svar:</strong> {{ question.correctAnswerText }}</p>
+					}
+				</li>
+			}
+		</ol>
+
+		<a class="back-button" routerLink="/quizzes">Tilbage til quizzer</a>
+	}
+</main>

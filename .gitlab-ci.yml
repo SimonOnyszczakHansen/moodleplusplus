@@ -1,0 +1,23 @@
+stages:
+  - validate
+
+  - staging-build
+  - staging-deploy
+  - staging-configure
+  - staging-verify
+
+  - production-build
+  - production-deploy
+  - production-configure
+  - production-verify
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - when: never
+
+include:
+  - local: "Pipeline/validate.yml"
+  - local: "Pipeline/staging.yml"
+  - local: "Pipeline/production.yml"

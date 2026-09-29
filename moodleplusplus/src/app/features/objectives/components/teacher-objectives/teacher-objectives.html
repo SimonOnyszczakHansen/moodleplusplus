@@ -1,0 +1,18 @@
+<div class="objectives-container">
+	<div class="header-row">
+		<h1>Målpinde</h1>
+		<app-button variant="primary" (click)="onCreateObjective()">Opret Målpind</app-button>
+	</div>
+
+	<app-table [columns]="columns" [rows]="rows" [actions]="actions" emptyMessage="Ingen målpinde fundet."
+		(actionClick)="onActionClick($event)" />
+
+	<app-modal [(open)]="showCreateObjective" [title]="editingObjectiveId ? 'Rediger Målpind' : 'Opret Målpind'">
+		<app-input label="Målpind" placeholder="Beskrivelse" [(value)]="objectiveContent"></app-input>
+
+		<div class="modal-actions">
+			<app-button variant="secondary" (click)="onCancelCreateObjective()">Annuller</app-button>
+			<app-button variant="primary" (click)="onSubmitObjective()">{{ editingObjectiveId ? 'Gem' : 'Opret' }}</app-button>
+		</div>
+	</app-modal>
+</div>

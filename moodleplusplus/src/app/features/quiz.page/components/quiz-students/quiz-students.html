@@ -1,0 +1,48 @@
+<button type="button" class="roster-button" (click)="open()">Tilføj Elever</button>
+
+<app-modal [(open)]="isOpen" [title]="'Elever til ' + quizTitle()">
+	<div class="roster-content">
+		<label class="student-search">
+			<span>Søg efter elever</span>
+			<input
+				type="search"
+				[ngModel]="searchTerm()"
+				(ngModelChange)="searchTerm.set($event)"
+				placeholder="Søg efter elever">
+		</label>
+
+		@if (errorMessage()) {
+			<p class="roster-message error-message" role="alert">{{ errorMessage() }}</p>
+		} @else if (students() === null) {
+			<p class="roster-message" role="status">Indlæser...</p>
+		} @else if (filteredStudents.length === 0) {
+			<p class="roster-message">Ingen elever fundet.</p>
+		} @else {
+			<ul class="student-list">
+				@for (student of filteredStudents; track student.studentId) {
+					<li>
+						<div class="student-info">
+							<strong>{{ student.name }}</strong>
+							@if (student.email) {
+								<span>{{ student.email }}</span>
+							}
+							<span class="student-status">{{ statusLabel(student) }}@if (student.completedAt) { - {{ student.scorePercentage }}% }</span>
+						</div>
+						<div class="student-actions">
+							@if (student.attached && student.completedAt) {
+								<a [routerLink]="['/quizzes', quizId(), 'review', student.studentId]">Se svar ({{ student.scorePercentage }}%)</a>
+							}
+							<button
+								type="button"
+								[class.remove-button]="student.attached"
+								[disabled]="updatingStudentIds().has(student.studentId) || student.completedAt !== null"
+								(click)="updateStudent(student)">
+								{{ updatingStudentIds().has(student.studentId) ? '...' : student.attached ? 'Fjern' : 'Tilføj' }}
+							</button>
+						</div>
+					</li>
+				}
+			</ul>
+		}
+	</div>
+</app-modal>
