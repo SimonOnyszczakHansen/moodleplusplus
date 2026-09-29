@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SubjectsService } from '../../services/subjects';
 import { Router } from '@angular/router';
 import { Card } from '../../../../shared/card/card';
@@ -13,7 +13,7 @@ import { ISubject } from '../../models/subjects.model';
   templateUrl: './student-subjects.html',
   styleUrl: './student-subjects.css',
 })
-export class StudentSubjects {
+export class StudentSubjects implements OnInit {
   subjects: ISubject[] = [];
 
   constructor(
@@ -27,15 +27,15 @@ export class StudentSubjects {
     });
   }
 
-  viewSubject(subjectid: number) {
-    this.router.navigate(['/subject', subjectid]);
+  viewSubject(subjectId: string | number) {
+    this.router.navigate(['/subject', subjectId]);
   }
 
-  // getSubjectName(subjectId: number): string {
+  // getSubjectName(subjectId: string | number): string {
   //   return this.subjects.find((s) => s.id === subjectId)?.name ?? '';
   // }
 
-  getSubjectProgress(subjectId: number): number {
+  getSubjectProgress(subjectId: string | number): number {
     return 40;
     // const subjectQuizzes = this.quizzes.filter((q) => q.subjectId === subjectId);
     // const subjectTasks = this.tasks.filter((t) => t.subjectId === subjectId);

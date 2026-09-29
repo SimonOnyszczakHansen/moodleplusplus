@@ -1,0 +1,103 @@
+<section class="subject-overview">
+    <header class="page-header">
+        <div class="breadcrumb">Mine Fag / {{ subjectTitle }}</div>
+    </header>
+
+    <div class="hero-card">
+        <div class="hero-content">
+            <p class="eyebrow">Fag</p>
+            <h1>{{ subjectTitle }}</h1>
+            <div class="meta-row">
+                <div class="meta-item">
+                    <span class="meta-label">Underviser</span>
+                    <strong>David Svarrer</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Elever</span>
+                    <strong>{{ students.length }} Elever</strong>
+                </div>
+            </div>
+        </div>
+
+        @if (isTeacher) {
+        <div class="action-row">
+            <app-button variant="secondary">Rediger fag</app-button>
+            <app-button variant="danger">Slet fag</app-button>
+        </div>
+        }
+    </div>
+
+    <nav class="tab-bar" aria-label="Emne navigation">
+        <button type="button" class="tab active">Overblik</button>
+        <button type="button" class="tab">Opgaver</button>
+        <button type="button" class="tab">Quizzer</button>
+    </nav>
+
+    <div class="overview-grid">
+        <section class="panel goals-panel">
+            <div class="panel-header">
+                <h2>Målpinde</h2>
+                <a href="javascript:void(0)">Se alle →</a>
+            </div>
+
+            <ul class="goal-list">
+                @if (goals.length) {
+                @for (goal of goals; track goal.id) {
+                <li>{{ goal.content }}</li>
+                }
+                } @else {
+                <li>Ingen mål er oprettet for dette fag endnu.</li>
+                }
+            </ul>
+        </section>
+
+        <section class="panel teacher-panel">
+            <div class="panel-header">
+                <h2>Underviser</h2>
+            </div>
+
+            <div class="person-card">
+                <div class="avatar">DS</div>
+                <div class="person-copy">
+                    <strong>David Svarrer</strong>
+                    <span>Underviser</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel students-panel">
+            <div class="panel-header">
+                <h2>Elever</h2>
+                <button type="button" class="inline-action">+ Tilføj Elever</button>
+            </div>
+
+            <ul class="student-list">
+                @for (student of students; track student.email) {
+                <li class="student-row">
+                    <div class="student-name">{{ student.name }}</div>
+                    <div class="student-email">{{ student.email }}</div>
+                </li>
+                }
+            </ul>
+        </section>
+
+        <section class="panel tasks-panel">
+            <div class="panel-header">
+                <h2>Opgaver</h2>
+                <a href="javascript:void(0)">Se alle →</a>
+            </div>
+
+            <div class="task-list">
+                @for (task of tasks; track task.title) {
+                <article class="task-item">
+                    <div>
+                        <span class="task-status">{{ task.status }}</span>
+                        <h3>{{ task.title }}</h3>
+                    </div>
+                    <span class="task-deadline">{{ task.due }}</span>
+                </article>
+                }
+            </div>
+        </section>
+    </div>
+</section>

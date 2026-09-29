@@ -13,19 +13,10 @@ import { TeacherSubjects } from '../../../subject-page/components/teacher-subjec
   templateUrl: './teacher-content.html',
   styleUrl: './teacher-content.css',
 })
-export class TeacherContent implements OnInit {
+export class TeacherContent {
   tasks: ITask[] = [];
 
-  constructor(
-    private dashboard: DashboardService,
-    private router: Router,
-  ) {}
-
-  ngOnInit() {
-    this.dashboard.getDashboardData().subscribe((data) => {
-      this.tasks = data.tasks;
-    });
-  }
+  constructor(private router: Router) {}
 
   get upcomingTasks(): ITask[] {
     return this.tasks.filter((t) => new Date(t.deadline) >= new Date()).slice(0, 8);

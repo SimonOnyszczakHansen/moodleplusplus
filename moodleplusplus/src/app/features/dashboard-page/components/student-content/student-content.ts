@@ -16,21 +16,11 @@ import { StudentSubjects } from '../../../subject-page/components/student-subjec
   templateUrl: './student-content.html',
   styleUrl: './student-content.css',
 })
-export class StudentContent implements OnInit {
+export class StudentContent {
   tasks: ITask[] = [];
   quizzes: IQuiz[] = [];
 
-  constructor(
-    private dashboard: DashboardService,
-    private router: Router,
-  ) {}
-
-  ngOnInit() {
-    this.dashboard.getDashboardData().subscribe((data) => {
-      this.tasks = data.tasks;
-      this.quizzes = data.quizzes;
-    });
-  }
+  constructor(private router: Router) {}
 
   get pendingTasks(): ITask[] {
     return this.tasks
