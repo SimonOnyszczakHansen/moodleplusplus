@@ -28,7 +28,7 @@ export class Dashboard implements OnInit {
       '2': 'teacher',
       '3': 'student',
     };
-    this.userRole = role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase();
+    this.userRole.set(role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase());
 
     this.dashboardService.getDashboardData().subscribe({
       next: (data) => {

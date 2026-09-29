@@ -28,21 +28,15 @@ export class App {
   }
 
   get currentUserRole(): string {
-    // UI-facing Danish label; AuthService/User.role stays in its original casing for logic checks.
+    // UI-facing Danish label; AuthService.currentUser.role is already normalized to lowercase.
     const roleLabels: Record<string, string> = {
-      Student: 'Elev',
-      Teacher: 'Underviser',
-      Administrator: 'Administrator',
+      student: 'Elev',
+      teacher: 'Underviser',
+      administrator: 'Administrator',
     };
 
     const role = this.authService.currentUser?.role;
-    const roleNames: Record<string, string> = {
-      '1': 'admin',
-      '2': 'teacher',
-      '3': 'student',
-    };
-    const normalizedRole = role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase();
-    return (normalizedRole && roleLabels[normalizedRole]) ?? 'Ukendt';
+    return (role ? roleLabels[role] : undefined) ?? 'Ukendt';
   }
 
   logout(): void {
