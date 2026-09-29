@@ -1,9 +1,15 @@
 stages:
   - validate
+
   - staging-build
   - staging-deploy
   - staging-configure
   - staging-verify
+
+  - production-build
+  - production-deploy
+  - production-configure
+  - production-verify
 
 workflow:
   rules:
@@ -14,4 +20,4 @@ workflow:
 include:
   - local: "Pipeline/validate.yml"
   - local: "Pipeline/staging.yml"
-  
+  - local: "Pipeline/production.yml"
