@@ -1,0 +1,231 @@
+frontend-production-merge-sanity:
+  stage: validate
+  tags:
+    - frontend
+
+  script:
+    - |
+      if [ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" = "main" ] &&
+         [ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" != "pre-production" ]; then
+        echo "ERROR: main only accepts merge requests from pre-production."
+        echo "Source: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+        echo "Target: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+        exit 1
+      fi
+
+      echo "Production merge source check passed."
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+
+frontend-production-build:
+  stage: production-build
+  tags:
+    - frontend
+
+  environment:
+    name: production
+
+  variables:
+    PRODUCTION_IMAGE: "lmsfrontend-production:$CI_COMMIT_SHORT_SHA"
+
+  script:
+    - echo "Building production frontend $PRODUCTION_IMAGE"
+
+    - docker build
+        --file Docker/Dockerfile.frontend
+        --build-arg API_HOST="$API_HOST"
+        --tag "$PRODUCTION_IMAGE"
+        .
+
+    - docker image inspect "$PRODUCTION_IMAGE" > /dev/null
+
+    - echo "Production frontend image built successfully"
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+
+
+frontend-production-deploy:
+  stage: production-deploy
+  tags:
+    - frontend
+
+  environment:
+    name: production
+
+  variables:
+    PRODUCTION_IMAGE: "lmsfrontend-production:$CI_COMMIT_SHORT_SHA"
+    RELEASE_PATH: "/var/www/lms-frontend/production/releases/$CI_COMMIT_SHORT_SHA"
+
+  script:
+    - echo "Recording previous production frontend release"
+
+    - |
+      PREVIOUS_RELEASE="$(readlink -f /var/www/lms-frontend/production/current 2>/dev/null || true)"
+
+      if [ -n "$PREVIOUS_RELEASE" ]; then
+        echo "Previous release: $PREVIOUS_RELEASE"
+      else
+        echo "No previous production frontend release found"
+      fi
+
+      printf 'PREVIOUS_RELEASE=%s\n' "$PREVIOUS_RELEASE" > production.env
+
+    - echo "Extracting production frontend release $CI_COMMIT_SHORT_SHA"
+
+    - |
+      rm -rf "$RELEASE_PATH"
+      mkdir -p "$RELEASE_PATH"
+
+      CONTAINER_ID="$(docker create "$PRODUCTION_IMAGE")"
+
+      docker cp \
+        "$CONTAINER_ID:/app/dist/." \
+        "$RELEASE_PATH"
+
+      docker rm "$CONTAINER_ID"
+
+    - test -f "$RELEASE_PATH/index.html"
+
+    - echo "Activating production frontend release"
+
+    - ln -sfn "$RELEASE_PATH" /var/www/lms-frontend/production/current
+
+    - echo "Production frontend release activated"
+
+  artifacts:
+    reports:
+      dotenv: production.env
+    expire_in: 1 hour
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+
+
+frontend-production-configure:
+  stage: production-configure
+  tags:
+    - frontend
+
+  environment:
+    name: production
+
+  script:
+    - echo "Rendering production Nginx configuration"
+
+    - |
+      if [ ! -f "$CI_PROJECT_DIR/Docker/nginx/lms-production.conf.template" ]; then
+        echo "ERROR: Production Nginx template does not exist"
+        exit 1
+      fi
+
+      docker run --rm \
+        -e NGINX_SERVER_NAME \
+        -e NGINX_BACKEND_HOST \
+        -e NGINX_BACKEND_PORT \
+        -v "$CI_PROJECT_DIR/Docker/nginx/lms-production.conf.template:/template.conf:ro" \
+        -v "$CI_PROJECT_DIR/Docker/nginx:/output" \
+        alpine:3.22 \
+        sh -c '
+          apk add --no-cache gettext > /dev/null &&
+          envsubst "\${NGINX_SERVER_NAME} \${NGINX_BACKEND_HOST} \${NGINX_BACKEND_PORT}" \
+            < /template.conf \
+            > /output/lms-frontend-production.conf
+        '
+
+    - echo "Deploying production Nginx configuration"
+
+    - |
+      docker run --rm \
+        -v "$CI_PROJECT_DIR/Docker/nginx/lms-frontend-production.conf:/source/lms-frontend-production.conf:ro" \
+        -v /opt/nginx/conf.d:/target \
+        alpine:3.22 \
+        sh -c '
+          if [ -f /target/lms-frontend-production.conf ]; then
+            cp /target/lms-frontend-production.conf /target/lms-frontend-production.conf.backup
+          fi
+
+          cp /source/lms-frontend-production.conf /target/lms-frontend-production.conf
+        '
+
+      if ! docker exec nginx nginx -t; then
+        echo "Production Nginx configuration invalid - restoring previous config"
+
+        docker run --rm \
+          -v /opt/nginx/conf.d:/target \
+          alpine:3.22 \
+          sh -c '
+            if [ -f /target/lms-frontend-production.conf.backup ]; then
+              mv /target/lms-frontend-production.conf.backup /target/lms-frontend-production.conf
+            else
+              rm -f /target/lms-frontend-production.conf
+            fi
+          '
+
+        rm -f Docker/nginx/lms-frontend-production.conf
+        exit 1
+      fi
+
+      docker exec nginx nginx -s reload
+
+      docker run --rm \
+        -v /opt/nginx/conf.d:/target \
+        alpine:3.22 \
+        rm -f /target/lms-frontend-production.conf.backup
+
+      rm -f Docker/nginx/lms-frontend-production.conf
+
+      echo "Production Nginx configuration deployed successfully"
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+
+
+frontend-production-verify:
+  stage: production-verify
+  tags:
+    - frontend
+
+  environment:
+    name: production
+
+  script:
+    - echo "Verifying production frontend"
+
+    - |
+      healthy=false
+
+      for attempt in $(seq 1 12); do
+        if curl --fail --silent \
+          -H "Host: $NGINX_SERVER_NAME" \
+          http://100.106.123.103/health > /dev/null; then
+          echo "Production frontend is healthy"
+          healthy=true
+          break
+        fi
+
+        echo "Production frontend not healthy yet ($attempt/12)"
+        sleep 5
+      done
+
+      if [ "$healthy" != "true" ]; then
+        echo "New production frontend deployment failed"
+
+        if [ -n "$PREVIOUS_RELEASE" ] && [ -d "$PREVIOUS_RELEASE" ]; then
+          echo "Rolling back to $PREVIOUS_RELEASE"
+
+          ln -sfn "$PREVIOUS_RELEASE" /var/www/lms-frontend/production/current
+
+          docker exec nginx nginx -s reload
+
+          echo "Previous production frontend release restored"
+        else
+          echo "No previous production frontend release available"
+        fi
+
+        exit 1
+      fi
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'

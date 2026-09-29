@@ -1,0 +1,39 @@
+server {
+    listen 80;
+    server_name ${NGINX_SERVER_NAME};
+
+    root /var/www/lms-frontend/production/current;
+    index index.html;
+
+    # Backend API
+    location /api/v1/ {
+        proxy_pass http://${NGINX_BACKEND_HOST}:${NGINX_BACKEND_PORT};
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Backend health
+    location /health {
+        proxy_pass http://${NGINX_BACKEND_HOST}:${NGINX_BACKEND_PORT};
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Angular assets
+    location ~* \.(?:js|css|woff2?|ttf|eot|ico|svg|png|jpg|jpeg|gif|webp)$ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Angular SPA
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
