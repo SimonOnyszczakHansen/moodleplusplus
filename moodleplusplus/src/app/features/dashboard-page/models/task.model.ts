@@ -1,8 +1,13 @@
-export interface ITask {
-	id: number;
+export interface IDashboardTask {
+	assignmentId: string;
+	taskId: string;
 	title: string;
-	description: string;
-	deadline: string;
+	subjectId: string;
+	recipientType: string;
+	groupId: string | null;
 	status: string;
-	subjectId: number;
+	assignedAt: string;
+	deadline: string | null;
+	submittedAt: string | null;
+	feedbackCount: number;
 }

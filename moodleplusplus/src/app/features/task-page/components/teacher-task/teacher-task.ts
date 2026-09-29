@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -36,11 +36,11 @@ export class TeacherTask implements OnInit {
 
 	studentSearchQuery = '';
 	selectedAssignees: IAssignee[] = [];
-	existingAssignments: ITaskAssignmentRow[] = [];
+	existingAssignments = signal<ITaskAssignmentRow[]>([]);
 
-	subjects: ISubject[] = [];
-	groups: IAssignee[] = [];
-	students: IAssignee[] = [];
+	subjects = signal<ISubject[]>([]);
+	groups = signal<IAssignee[]>([]);
+	students = signal<IAssignee[]>([]);
 
 	readonly columns: TableColumn<TeacherTaskRow>[] = [
 		{ key: 'index', label: '#' },
@@ -49,29 +49,33 @@ export class TeacherTask implements OnInit {
 	];
 	readonly actions: TableAction[] = [{ id: 'view', label: 'Se Opgave' }, { id: 'edit', label: 'Rediger' }, { id: 'delete', label: 'Slet', variant: 'danger' }];
 
-	rows: TeacherTaskRow[] = [];
+	rows = signal<TeacherTaskRow[]>([]);
 
 	get subjectOptions(): DropdownOption[] {
-		return this.subjects.map((subject) => ({ value: subject.id, label: subject.name }));
+		return this.subjects().map((subject) => ({ value: subject.id, label: subject.name }));
 	}
 
 	ngOnInit(): void {
 		this.taskService.getTasks().subscribe({
 			next: (tasks) => {
-				this.rows = tasks.map((task, index) => ({ ...task, index: index + 1 }));
-			}
+				this.rows.set(tasks.map((task, index) => ({ ...task, index: index + 1 })));
+			},
+			error: (err) => console.error('Tasks fetch failed:', err),
 		});
 
 		this.taskService.getSubjects().subscribe({
-			next: (subjects) => { this.subjects = subjects; },
+			next: (subjects) => { this.subjects.set(subjects); },
+			error: (err) => console.error('Subjects fetch failed:', err),
 		});
 
 		this.taskService.getGroups().subscribe({
-			next: (groups) => { this.groups = groups; },
+			next: (groups) => { this.groups.set(groups); },
+			error: (err) => console.error('Groups fetch failed:', err),
 		});
 
 		this.taskService.getStudents().subscribe({
-			next: (students) => { this.students = students; },
+			next: (students) => { this.students.set(students); },
+			error: (err) => console.error('Students fetch failed:', err),
 		});
 	}
 
@@ -103,14 +107,15 @@ export class TeacherTask implements OnInit {
 		this.showCreateTask = true;
 
 		this.taskService.getTask(row.id).subscribe({
-			next: (task) => { this.existingAssignments = task.assignments; },
+			next: (task) => { this.existingAssignments.set(task.assignments); },
+			error: (err) => console.error('Task detail fetch failed:', err),
 		});
 	}
 
 	onRemoveExistingAssignment(assignment: ITaskAssignmentRow): void {
 		this.taskService.removeAssignment(assignment.assignmentId).subscribe({
 			next: () => {
-				this.existingAssignments = this.existingAssignments.filter((a) => a.assignmentId !== assignment.assignmentId);
+				this.existingAssignments.update((list) => list.filter((a) => a.assignmentId !== assignment.assignmentId));
 			},
 		});
 	}
@@ -124,7 +129,7 @@ export class TeacherTask implements OnInit {
 		const query = this.studentSearchQuery.trim().toLowerCase();
 		if (!query) return [];
 
-		return [...this.students, ...this.groups].filter(
+		return [...this.students(), ...this.groups()].filter(
 			(assignee) =>
 				assignee.name.toLowerCase().includes(query) &&
 				!this.selectedAssignees.some((selected) => selected.id === assignee.id),
@@ -166,7 +171,7 @@ export class TeacherTask implements OnInit {
 						this.taskService.assignTask(taskId, studentIds, groupIds).subscribe();
 					}
 
-					this.rows = this.rows.map((row) => (row.id === taskId ? { ...task, index: row.index } : row));
+					this.rows.update((rows) => rows.map((row) => (row.id === taskId ? { ...task, index: row.index } : row)));
 					this.resetCreateTaskForm();
 					this.showCreateTask = false;
 				},
@@ -181,7 +186,7 @@ export class TeacherTask implements OnInit {
 					this.taskService.assignTask(task.id, studentIds, groupIds).subscribe();
 				}
 
-				this.rows = [...this.rows, { ...task, index: this.rows.length + 1 }];
+				this.rows.update((rows) => [...rows, { ...task, index: rows.length + 1 }]);
 				this.resetCreateTaskForm();
 				this.showCreateTask = false;
 			},
@@ -196,13 +201,13 @@ export class TeacherTask implements OnInit {
 		this.taskDeadline = '';
 		this.studentSearchQuery = '';
 		this.selectedAssignees = [];
-		this.existingAssignments = [];
+		this.existingAssignments.set([]);
 	}
 
 	onDeleteTask(taskId: string): void {
 		this.taskService.deleteTask(taskId).subscribe({
 			next: () => {
-				this.rows = this.rows.filter((row) => row.id !== taskId);
+				this.rows.update((rows) => rows.filter((row) => row.id !== taskId));
 			},
 		});
 	}

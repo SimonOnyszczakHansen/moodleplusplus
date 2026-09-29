@@ -1,4 +1,5 @@
 .task-details-container {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	gap: 1.5rem;
@@ -16,12 +17,21 @@
 
 .task-header {
 	flex: 1;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 1.5rem;
 	background-color: var(--color-surface);
 	padding: 1.5rem;
 	border-radius: 1rem;
 	box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 	margin-top: 4rem;
-	height: 15rem;
+	min-height: 15rem;
+}
+
+.header-info {
+	flex: 2 1 20rem;
 }
 
 .edit-button {
@@ -68,12 +78,7 @@ h1 {
 }
 
 .goals-card {
-	flex: 1 1 18rem;
-	padding: 1.5rem;
-	border: 1px solid var(--color-border);
-	border-radius: 1rem;
-	background: var(--color-surface);
-	box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+	flex: 1 1 14rem;
 }
 
 .goals-header {
@@ -101,6 +106,7 @@ h1 {
 
 .modal-actions {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: center;
 	gap: 1rem;
 	margin-top: 1.5rem;
@@ -231,6 +237,7 @@ h1 {
 
 .add-objective-actions {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.75rem;
 }
 
@@ -242,6 +249,40 @@ h1 {
 
 .review-actions {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.75rem;
 	margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+	.task-details-container {
+		padding: 1rem;
+		max-width: 100%;
+	}
+
+	.back-link {
+		top: 0.5rem;
+		left: 0.5rem;
+	}
+
+	.edit-button {
+		top: 0.5rem;
+		right: 0.5rem;
+	}
+
+	.task-header {
+		margin-top: 3rem;
+		padding: 1rem;
+		gap: 1rem;
+	}
+
+	.panels {
+		gap: 1rem;
+	}
+
+	.roster,
+	.header-info,
+	.goals-card {
+		flex-basis: 100%;
+	}
 }
