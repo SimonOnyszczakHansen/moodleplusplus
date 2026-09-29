@@ -7,6 +7,16 @@
 	margin: 0 auto;
 }
 
+.header-card {
+	flex: 1;
+	background-color: var(--color-surface);
+	padding: 1.5rem;
+	border-radius: 1rem;
+	box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+	margin-top: 4rem;
+	height: 15rem;
+}
+
 .back-link {
 	color: var(--color-primary);
 	text-decoration: none;
@@ -18,9 +28,10 @@
 }
 
 h1 {
-	margin: 0;
+	margin: 0 0 1rem;
 	color: var(--color-text);
 	font-size: 1.75rem;
+
 }
 
 .description {

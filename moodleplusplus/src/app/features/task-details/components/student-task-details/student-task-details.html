@@ -2,9 +2,11 @@
 <p>Kunne ikke hente opgaven.</p>
 } @else if (assignment(); as assignment) {
 <div class="task-details-container">
-	<a routerLink="/tasks" class="back-link">← Mine Opgaver</a>
+	<app-button class="back-link" variant="secondary" (click)="goBack()">← Mine Opgaver</app-button>
+	<div class="header-card">
 	<h1>{{ assignment.title }}</h1>
 	<p class="description">{{ assignment.description }}</p>
+	</div>
 
 	<div class="panels">
 		<div class="status-card">

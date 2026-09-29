@@ -1,12 +1,29 @@
-@if (!teacherTask()) {
-<p>Kunne ikke hente opgaven.</p>
-} @else if (teacherTask(); as teacherTask) {
+@if (teacherTask(); as teacherTask) {
 <div class="task-details-container">
+	<app-button class="back-link" variant="secondary" (click)="goBack()">← Mine Opgaver</app-button>
 	<div class="header-row">
 		<div class="task-header">
-			<h1>{{ teacherTask.title }}</h1>
-			<p class="description">{{ teacherTask.description }}</p>
-			<p>Deadline: {{ teacherTask.deadline | date: 'dd-MM-yyyy' }}</p>
+			<div class="header-info">
+				<h1>{{ teacherTask.title }}</h1>
+				<p class="description">{{ teacherTask.description }}</p>
+				<p>Deadline: {{ teacherTask.deadline | date: 'dd-MM-yyyy' }}</p>
+			</div>
+
+			<div class="goals-card">
+				<div class="goals-header">
+					<h2>Målpinde</h2>
+					<app-button variant="primary" (click)="onViewAddObjective()">Tilføj Målpind</app-button>
+				</div>
+				@if (teacherTask.objectives.length) {
+				<ul>
+					@for (objective of teacherTask.objectives; track objective.objectiveId) {
+					<li>{{ objective.content }}</li>
+					}
+				</ul>
+				} @else {
+				<p>Ingen målpinde tilknyttet.</p>
+				}
+			</div>
 		</div>
 		<app-button variant="primary" class="edit-button" (click)="onViewUpdate()">Rediger</app-button>
 	</div>
@@ -23,58 +40,47 @@
 				</ng-template>
 				<ng-template appTableCell="fileName" let-row>
 					@if (row.fileName) {
-						<app-button variant="secondary" [disabled]="downloadingAssignmentId() === row.assignmentId" (click)="onDownloadFile(row)">{{ row.fileName }}</app-button>
+					<app-button variant="primary" [disabled]="downloadingAssignmentId() === row.assignmentId"
+						(click)="onDownloadFile(row)">Download</app-button>
 					} @else {
-						—
+					—
 					}
 				</ng-template>
 				<ng-template appTableCell="comment" let-row>
 					@if (row.comment; as comment) {
-						@if (isLikelyUrl(comment)) {
-							<a [href]="comment" target="_blank" rel="noopener noreferrer">{{ comment }}</a>
-						} @else {
-							{{ comment }}
-						}
+					@if (isLikelyUrl(comment)) {
+					<a [href]="comment" target="_blank" rel="noopener noreferrer">{{ comment }}</a>
 					} @else {
-						—
+					{{ comment }}
+					}
+					} @else {
+					—
 					}
 				</ng-template>
 				<ng-template appTableCell="feedback" let-row>
-					<div class="feedback-actions">
+					<app-action-menu>
 						@if (row.status === 'Afleveret') {
-							<app-button variant="primary" [disabled]="reviewingAssignmentId() === row.assignmentId" (click)="onApproveSubmission(row)">Godkend</app-button>
-							<app-button variant="danger" [disabled]="reviewingAssignmentId() === row.assignmentId" (click)="onRejectSubmission(row)">Afvis</app-button>
+						<button type="button" [disabled]="reviewingAssignmentId() === row.assignmentId"
+							(click)="onApproveSubmission(row)">Godkend</button>
+						<button type="button" [disabled]="reviewingAssignmentId() === row.assignmentId"
+							(click)="onRejectSubmission(row)">Afvis</button>
 						}
-						<app-button variant="secondary">Giv Feedback</app-button>
-						<app-button variant="secondary">Se Historik</app-button>
-					</div>
+						<button type="button">Giv Feedback</button>
+						<button type="button">Se Historik</button>
+					</app-action-menu>
 				</ng-template>
 			</app-table>
 			@if (reviewError()) {
-				<p class="error-message">{{ reviewError() }}</p>
-			}
-		</div>
-
-		<div class="goals-card">
-			<div class="goals-header">
-				<h2>Målpinde</h2>
-				<app-button variant="primary" (click)="onViewAddObjective()">Tilføj</app-button>
-			</div>
-			@if (teacherTask.objectives.length) {
-			<ul>
-				@for (objective of teacherTask.objectives; track objective.objectiveId) {
-				<li>{{ objective.content }}</li>
-				}
-			</ul>
-			} @else {
-			<p>Ingen målpinde tilknyttet.</p>
+			<p class="error-message">{{ reviewError() }}</p>
 			}
 		</div>
 	</div>
 	<app-modal [(open)]="updateVisible" title="Rediger Opgave">
 		<app-input label="Titel" placeholder="Titel" [(value)]="taskEditModel.title"></app-input>
-		<app-dropdown label="Vælg Fag" placeholder="Vælg et fag" [options]="subjectOptions" [(value)]="taskEditModel.subjectId"></app-dropdown>
-		<app-input label="Deadline" placeholder="Vælg en dato" type="datetime-local" [(value)]="taskEditModel.deadline"></app-input>
+		<app-dropdown label="Vælg Fag" placeholder="Vælg et fag" [options]="subjectOptions"
+			[(value)]="taskEditModel.subjectId"></app-dropdown>
+		<app-input label="Deadline" placeholder="Vælg en dato" type="datetime-local"
+			[(value)]="taskEditModel.deadline"></app-input>
 		<app-input label="Beskrivelse" placeholder="Beskrivelse" [(value)]="taskEditModel.description"></app-input>
 
 		<div class="assignee-search">
@@ -83,13 +89,15 @@
 				@for (assignment of existingAssignments(); track assignment.assignmentId) {
 				<li class="assignee-chip">
 					{{ assignment.studentName ?? assignment.groupName }}
-					<button type="button" aria-label="Fjern" (click)="onRemoveExistingAssignment(assignment)">&times;</button>
+					<button type="button" aria-label="Fjern"
+						(click)="onRemoveExistingAssignment(assignment)">&times;</button>
 				</li>
 				}
 			</ul>
 			}
 
-			<app-input label="Tilføj Elever" placeholder="Søg efter Elever eller Grupper" [(value)]="studentSearchQuery"></app-input>
+			<app-input label="Tilføj Elever" placeholder="Søg efter Elever eller Grupper"
+				[(value)]="studentSearchQuery"></app-input>
 
 			@if (filteredAssignees.length) {
 			<ul class="assignee-suggestions">
@@ -109,7 +117,8 @@
 				@for (assignee of selectedAssignees; track assignee.id) {
 				<li class="assignee-chip">
 					{{ assignee.name }}
-					<button type="button" aria-label="Fjern {{ assignee.name }}" (click)="onRemoveAssignee(assignee)">&times;</button>
+					<button type="button" aria-label="Fjern {{ assignee.name }}"
+						(click)="onRemoveAssignee(assignee)">&times;</button>
 				</li>
 				}
 			</ul>

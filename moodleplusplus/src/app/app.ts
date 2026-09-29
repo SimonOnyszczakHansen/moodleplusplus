@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
@@ -25,6 +25,16 @@ export class App {
 
   get isAdmin(): boolean {
     return this.authService.isAdmin;
+  }
+
+  readonly mobileNavOpen = signal(false);
+
+  toggleMobileNav(): void {
+    this.mobileNavOpen.update((open) => !open);
+  }
+
+  closeMobileNav(): void {
+    this.mobileNavOpen.set(false);
   }
 
   get currentUserRole(): string {

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { IObjective } from '../../../../core/models/educationgoal.model';
@@ -15,6 +15,7 @@ import { Table, TableCellTemplate, TableColumn } from '../../../../shared/table/
 import { Modal } from '../../../../shared/modal/modal';
 import { Input } from '../../../../shared/input/input';
 import { Dropdown, DropdownOption } from '../../../../shared/dropdown/dropdown';
+import { ActionMenu } from '../../../../shared/action-menu/action-menu';
 
 // Flattened roster row for the shared Table component - feedback is a dummy key, only used to place the buttons column.
 interface RosterRow {
@@ -29,7 +30,7 @@ interface RosterRow {
 
 @Component({
 	selector: 'app-teacher-task-details',
-	imports: [DatePipe, Button, StatusBadge, Table, TableCellTemplate, Modal, Input, Dropdown],
+	imports: [DatePipe, Button, StatusBadge, Table, TableCellTemplate, Modal, Input, Dropdown, ActionMenu],
 	templateUrl: './teacher-task-details.html',
 	styleUrl: './teacher-task-details.css',
 })
@@ -63,10 +64,10 @@ export class TeacherTaskDetails implements OnInit {
 		{ key: 'status', label: 'Status' },
 		{ key: 'fileName', label: 'Aflevering' },
 		{ key: 'comment', label: 'Kommentar' },
-		{ key: 'feedback', label: 'Feedback' },
+		{ key: 'feedback', label: '  ' },
 	];
 
-	constructor(private route: ActivatedRoute, private taskService: TaskService, private objectivesService: ObjectivesService) { }
+	constructor(private route: ActivatedRoute, private taskService: TaskService, private objectivesService: ObjectivesService, private router: Router) { }
 
 	ngOnInit(): void {
 		const id = this.route.snapshot.paramMap.get('id') ?? '';
@@ -328,4 +329,7 @@ export class TeacherTaskDetails implements OnInit {
 		});
 	}
 
+	goBack(): void {
+		this.router.navigate(['/tasks']);
+	}
 }
