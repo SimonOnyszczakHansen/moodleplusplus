@@ -8,7 +8,7 @@ import { booleanAttribute, Component, input, model } from '@angular/core';
 })
 export class Input {
   readonly label = input('');
-  readonly type = input<'text' | 'email' | 'password' | 'search' | 'tel' | 'url'>('text');
+  readonly type = input<'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'datetime-local'>('text');
   readonly placeholder = input('');
   readonly name = input('');
   readonly autocomplete = input('off');

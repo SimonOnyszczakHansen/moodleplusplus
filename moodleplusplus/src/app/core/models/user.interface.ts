@@ -5,13 +5,14 @@ export interface LoginResponse {
   userId?: string | number;
   id?: string | number;
   name?: string;
-  role?: string;
+  role?: string | number;
   email?: string;
+  isMissingConsents?: boolean;
 }
 
 export interface User {
   id?: string | number | null;
   email?: string;
   name: string;
-  role: string;
+  role: string | number;
 }

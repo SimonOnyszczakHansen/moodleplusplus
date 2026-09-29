@@ -8,25 +8,25 @@
   white-space: nowrap;
 }
 
-.badge[data-status="ikke afleveret"] {
+.badge[data-status="Ikke afleveret"] {
   background: color-mix(in srgb, var(--color-warning) 70%, white);
   border: 2px solid var(--color-warning);
   color: var(--color-text-light);
 }
 
-.badge[data-status="afleveret"] {
+.badge[data-status="Afleveret"] {
   background: color-mix(in srgb, var(--color-info) 70%, white);
   border: 2px solid var(--color-info);
   color: var(--color-text-light);
 }
 
-.badge[data-status="godkendt"] {
+.badge[data-status="Godkendt"] {
   background: color-mix(in srgb, var(--color-success) 70%, white);
   border: 2px solid var(--color-success);
   color: var(--color-text-light);
 }
 
-.badge[data-status="afvist"] {
+.badge[data-status="Ikke godkendt"] {
   background: color-mix(in srgb, var(--color-danger) 70%, white);
   border: 2px solid var(--color-danger);
   color: var(--color-text-light);

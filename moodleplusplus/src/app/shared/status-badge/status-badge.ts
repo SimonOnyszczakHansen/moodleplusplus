@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type StatusVariant = 'ikke afleveret' | 'afleveret' | 'godkendt' | 'afvist';
+export type StatusVariant = 'Ikke afleveret' | 'Afleveret' | 'Godkendt' | 'Ikke godkendt';
 @Component({
   selector: 'app-status-badge',
   imports: [],
@@ -9,5 +9,5 @@ export type StatusVariant = 'ikke afleveret' | 'afleveret' | 'godkendt' | 'afvis
 })
 export class StatusBadge {
 	readonly label = input('');
-	readonly variant = input<StatusVariant>('ikke afleveret');
+	readonly variant = input<StatusVariant>('Ikke afleveret');
 }

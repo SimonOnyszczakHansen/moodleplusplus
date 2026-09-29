@@ -1,0 +1,133 @@
+@if (!teacherTask()) {
+<p>Kunne ikke hente opgaven.</p>
+} @else if (teacherTask(); as teacherTask) {
+<div class="task-details-container">
+	<div class="header-row">
+		<div class="task-header">
+			<h1>{{ teacherTask.title }}</h1>
+			<p class="description">{{ teacherTask.description }}</p>
+			<p>Deadline: {{ teacherTask.deadline | date: 'dd-MM-yyyy' }}</p>
+		</div>
+		<app-button variant="primary" class="edit-button" (click)="onViewUpdate()">Rediger</app-button>
+	</div>
+
+	<div class="panels">
+		<div class="roster">
+			<h2>Afleveringer</h2>
+			<app-table [columns]="rosterColumns" [rows]="rosterRows" emptyMessage="Ingen afleveringer endnu.">
+				<ng-template appTableCell="submittedAt" let-row>
+					{{ row.submittedAt ? (row.submittedAt | date: 'dd-MM-yyyy') : '—' }}
+				</ng-template>
+				<ng-template appTableCell="status" let-row>
+					<app-status-badge [label]="row.status" [variant]="row.status" />
+				</ng-template>
+				<ng-template appTableCell="fileName" let-row>
+					{{ row.fileName ?? '—' }}
+				</ng-template>
+				<ng-template appTableCell="feedback" let-row>
+					<div class="feedback-actions">
+						@if (row.status === 'Afleveret') {
+							<app-button variant="primary" [disabled]="reviewingAssignmentId() === row.assignmentId" (click)="onApproveSubmission(row)">Godkend</app-button>
+							<app-button variant="danger" [disabled]="reviewingAssignmentId() === row.assignmentId" (click)="onRejectSubmission(row)">Afvis</app-button>
+						}
+						<app-button variant="secondary">Giv Feedback</app-button>
+						<app-button variant="secondary">Se Historik</app-button>
+					</div>
+				</ng-template>
+			</app-table>
+			@if (reviewError()) {
+				<p class="error-message">{{ reviewError() }}</p>
+			}
+		</div>
+
+		<div class="goals-card">
+			<div class="goals-header">
+				<h2>Målpinde</h2>
+				<app-button variant="primary" (click)="onViewAddObjective()">Tilføj</app-button>
+			</div>
+			@if (teacherTask.objectives.length) {
+			<ul>
+				@for (objective of teacherTask.objectives; track objective.objectiveId) {
+				<li>{{ objective.content }}</li>
+				}
+			</ul>
+			} @else {
+			<p>Ingen målpinde tilknyttet.</p>
+			}
+		</div>
+	</div>
+	<app-modal [(open)]="updateVisible" title="Rediger Opgave">
+		<app-input label="Titel" placeholder="Titel" [(value)]="taskEditModel.title"></app-input>
+		<app-dropdown label="Vælg Fag" placeholder="Vælg et fag" [options]="subjectOptions" [(value)]="taskEditModel.subjectId"></app-dropdown>
+		<app-input label="Deadline" placeholder="Vælg en dato" type="datetime-local" [(value)]="taskEditModel.deadline"></app-input>
+		<app-input label="Beskrivelse" placeholder="Beskrivelse" [(value)]="taskEditModel.description"></app-input>
+
+		<div class="assignee-search">
+			@if (existingAssignments().length) {
+			<ul class="assignee-chips">
+				@for (assignment of existingAssignments(); track assignment.assignmentId) {
+				<li class="assignee-chip">
+					{{ assignment.studentName ?? assignment.groupName }}
+					<button type="button" aria-label="Fjern" (click)="onRemoveExistingAssignment(assignment)">&times;</button>
+				</li>
+				}
+			</ul>
+			}
+
+			<app-input label="Tilføj Elever" placeholder="Søg efter Elever eller Grupper" [(value)]="studentSearchQuery"></app-input>
+
+			@if (filteredAssignees.length) {
+			<ul class="assignee-suggestions">
+				@for (assignee of filteredAssignees; track assignee.id) {
+				<li>
+					<button type="button" (click)="onAddAssignee(assignee)">
+						{{ assignee.name }}
+						<span class="assignee-type">{{ assignee.type === 'group' ? 'Gruppe' : 'Elev' }}</span>
+					</button>
+				</li>
+				}
+			</ul>
+			}
+
+			@if (selectedAssignees.length) {
+			<ul class="assignee-chips">
+				@for (assignee of selectedAssignees; track assignee.id) {
+				<li class="assignee-chip">
+					{{ assignee.name }}
+					<button type="button" aria-label="Fjern {{ assignee.name }}" (click)="onRemoveAssignee(assignee)">&times;</button>
+				</li>
+				}
+			</ul>
+			}
+		</div>
+
+		<div class="modal-actions">
+			<app-button variant="secondary" (click)="updateVisible = false">Annuller</app-button>
+			<app-button variant="primary" (click)="onSubmitUpdate()">Gem</app-button>
+		</div>
+	</app-modal>
+	<app-modal [(open)]="addObjectiveVisible" title="Tilføj Målpind">
+		@if (objectives().length) {
+		<ul class="objective-checklist">
+			@for (objective of objectives(); track objective.objectiveId) {
+			<li>
+				<label>
+					<input type="checkbox" [checked]="isObjectiveSelected(objective.objectiveId)"
+						(change)="onToggleObjective(objective.objectiveId)">
+					{{ objective.content }}
+				</label>
+			</li>
+			}
+		</ul>
+		} @else {
+		<p>Ikke flere målpinde at tilføje.</p>
+		}
+
+		<div class="modal-actions">
+			<app-button variant="secondary" (click)="addObjectiveVisible = false">Annuller</app-button>
+			<app-button variant="primary" (click)="onSubmitAddObjective()">Tilføj</app-button>
+		</div>
+	</app-modal>
+
+</div>
+}

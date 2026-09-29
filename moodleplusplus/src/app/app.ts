@@ -23,6 +23,10 @@ export class App {
     return this.authService.currentUser?.name ?? 'Bruger';
   }
 
+  get isAdmin(): boolean {
+    return this.authService.isAdmin;
+  }
+
   get currentUserRole(): string {
     // UI-facing Danish label; AuthService/User.role stays in its original casing for logic checks.
     const roleLabels: Record<string, string> = {
@@ -32,7 +36,13 @@ export class App {
     };
 
     const role = this.authService.currentUser?.role;
-    return (role && roleLabels[role]) ?? 'Ukendt';
+    const roleNames: Record<string, string> = {
+      '1': 'admin',
+      '2': 'teacher',
+      '3': 'student',
+    };
+    const normalizedRole = role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase();
+    return (normalizedRole && roleLabels[normalizedRole]) ?? 'Ukendt';
   }
 
   logout(): void {
