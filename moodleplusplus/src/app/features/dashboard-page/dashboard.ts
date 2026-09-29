@@ -41,4 +41,12 @@ export class Dashboard implements OnInit {
       error: (err) => console.error('Dashboard fetch failed:', err),
     });
   }
+
+  viewAllSubjects() {
+    this.router.navigate(['/subjects']);
+  }
+
+  viewAllTasks() {
+    this.router.navigate(['/tasks']);
+  }
 }
