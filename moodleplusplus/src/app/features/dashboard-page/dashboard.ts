@@ -22,7 +22,13 @@ export class Dashboard implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.userRole.set(this.auth.currentUser?.role);
+    const role = this.auth.currentUser?.role;
+    const roleNames: Record<string, string> = {
+      '1': 'administrator',
+      '2': 'teacher',
+      '3': 'student',
+    };
+    this.userRole = role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase();
 
     this.dashboardService.getDashboardData().subscribe({
       next: (data) => {

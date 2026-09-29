@@ -1,0 +1,85 @@
+
+<main class="create-quiz-page">
+	<nav class="breadcrumb" aria-label="Brødkrumme">
+		<a routerLink="/quizzes">Mine fag / Quizzer</a>
+		<span>/ Opret Quiz</span>
+	</nav>
+	<header class="page-header">
+		<h1>Opret Quiz</h1>
+	</header>
+
+	<form class="quiz-form" (ngSubmit)="createQuiz()">
+		<div class="quiz-details">
+			<label>
+				Titel
+				<input type="text" [(ngModel)]="quizTitle" name="title" required>
+			</label>
+
+			<label>
+				Procent for at bestå
+				<input type="number" [(ngModel)]="passingPercentage" name="passingPercentage" min="0" max="100" step="1" required>
+			</label>
+
+			<label>
+				Fag
+				<select [(ngModel)]="selectedSubjectId" name="subjectId" required>
+					<option value="" disabled>Vælg fag</option>
+					@for (subject of subjects(); track subject.id) {
+						<option [value]="subject.id">{{ subject.name }}</option>
+					}
+				</select>
+			</label>
+
+			<label>
+				Beskrivelse
+				<textarea [(ngModel)]="quizDescription" name="description" rows="2" required></textarea>
+			</label>
+		</div>
+
+		@for (question of questions; track $index; let questionIndex = $index) {
+			<section class="question-editor">
+				<div class="question-heading">
+					<h3>Spørgsmål {{ questionIndex + 1 }}</h3>
+					@if (questions.length > 1) {
+						<button type="button" class="quiet-button" (click)="removeQuestion(questionIndex)">Fjern</button>
+					}
+				</div>
+				<label>
+					Spørgsmål
+					<textarea [(ngModel)]="question.questionText" [name]="'question' + questionIndex" rows="2" required></textarea>
+				</label>
+
+				<div class="answer-list">
+					@for (option of question.answerOptions; track $index; let answerIndex = $index) {
+						<div class="answer-row">
+							<input
+								type="radio"
+								[name]="'correctAnswer' + questionIndex"
+								[checked]="question.correctAnswerIndex === answerIndex"
+								(change)="question.correctAnswerIndex = answerIndex"
+								[attr.aria-label]="'Markér svar ' + (answerIndex + 1) + ' som korrekt'">
+							<span class="answer-number">Svar {{ answerIndex + 1 }}</span>
+							<input
+								type="text"
+								[(ngModel)]="option.answerText"
+								[name]="'answer' + questionIndex + '-' + answerIndex"
+								[attr.aria-label]="'Tekst til svar ' + (answerIndex + 1)"
+								required>
+						</div>
+					}
+				</div>
+			</section>
+		}
+
+		<button type="button" class="text-button" (click)="addQuestion()">+ Tilføj spørgsmål</button>
+
+		@if (createErrorMessage()) {
+			<p class="error-message" role="alert">{{ createErrorMessage() }}</p>
+		}
+
+		<div class="form-actions">
+			<a class="quiet-button" routerLink="/quizzes">Annuller</a>
+			<button type="submit" class="add-quiz-button" [disabled]="isSaving()">Opret Quiz</button>
+		</div>
+	</form>
+</main>

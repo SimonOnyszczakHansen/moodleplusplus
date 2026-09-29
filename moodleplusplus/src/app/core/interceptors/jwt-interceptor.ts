@@ -1,14 +1,23 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, switchMap, throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-  // 1. Get the access token from storage (set during login)
-  const token = localStorage.getItem('accessToken');
+  const authService = inject(AuthService);
+  const credentialedRequest = req.clone({ withCredentials: true });
+  const isAuthRequest = /\/auth\/(login|logout|refresh)(?:\?|$)/.test(req.url);
 
-  // Send the auth cookie (if backend uses one) and the Bearer token (if backend returned one) together.
-  const cloned = req.clone({
-    withCredentials: true,
-    ...(token ? { setHeaders: { Authorization: `Bearer ${token}` } } : {}),
-  });
-  return next(cloned);
+  return next(credentialedRequest).pipe(
+    catchError((error: unknown) => {
+      if (!(error instanceof HttpErrorResponse) || error.status !== 401 || isAuthRequest) {
+        return throwError(() => error);
+      }
+
+      return authService.refreshAccessToken().pipe(
+        switchMap(() => next(credentialedRequest)),
+      );
+    }),
+  );
 };
 

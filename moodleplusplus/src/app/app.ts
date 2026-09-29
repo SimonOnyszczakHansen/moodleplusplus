@@ -36,7 +36,13 @@ export class App {
     };
 
     const role = this.authService.currentUser?.role;
-    return (role && roleLabels[role]) ?? 'Ukendt';
+    const roleNames: Record<string, string> = {
+      '1': 'admin',
+      '2': 'teacher',
+      '3': 'student',
+    };
+    const normalizedRole = role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase();
+    return (normalizedRole && roleLabels[normalizedRole]) ?? 'Ukendt';
   }
 
   logout(): void {

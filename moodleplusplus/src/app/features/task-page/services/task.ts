@@ -91,8 +91,8 @@ export class Task {
 
 	getStudents(): Observable<IAssignee[]> {
 		return this.http
-			.get<IApiUser[]>(`${this.base}/user`)
-			.pipe(map((users) => users.filter((u) => u.role === 3).map(mapApiUserToAssignee)));
+			.get<User[]>(`${this.base}/users`)
+			.pipe(map((users) => users.filter((user) => String(user.role).toLowerCase() === 'student' || String(user.role) === '3').map(mapApiUserToAssignee)));
 	}
 
 	getTask(taskId: string): Observable<ITeacherTaskDetail> {

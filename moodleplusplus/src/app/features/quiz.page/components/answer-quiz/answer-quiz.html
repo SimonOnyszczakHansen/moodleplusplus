@@ -1,0 +1,51 @@
+<main class="answer-quiz-page">
+	<nav class="breadcrumb" aria-label="Brødkrumme">
+		<a routerLink="/quizzes">Mine fag / Quizzer</a>
+		<span>/ Besvar Quiz</span>
+	</nav>
+
+	@if (isLoading()) {
+		<p class="page-message">Henter quiz...</p>
+	} @else if (errorMessage() && !quiz()) {
+		<p class="page-message error-message" role="alert">{{ errorMessage() }}</p>
+	} @else if (quiz(); as currentQuiz) {
+		<header class="page-header">
+			<h1>{{ currentQuiz.title }}</h1>
+			@if (currentQuiz.description) {
+				<p>{{ currentQuiz.description }}</p>
+			}
+		</header>
+
+		<form (submit)="$event.preventDefault(); submitQuiz()">
+			@for (question of currentQuiz.questions; track question.id; let questionIndex = $index) {
+				<fieldset class="question-block">
+					<legend>{{ questionIndex + 1 }}. {{ question.questionText }}</legend>
+					<div class="answer-options">
+						@for (option of question.answerOptions; track option.id) {
+							<label class="answer-option" [class.selected]="selectedAnswers()[question.id] === option.id">
+								<input
+									type="radio"
+									[name]="question.id"
+									[value]="option.id"
+									[checked]="selectedAnswers()[question.id] === option.id"
+									(change)="selectAnswer(question.id, option.id)">
+								<span>{{ option.answerText }}</span>
+							</label>
+						}
+					</div>
+				</fieldset>
+			}
+
+			@if (errorMessage()) {
+				<p class="error-message" role="alert">{{ errorMessage() }}</p>
+			}
+
+			<div class="form-actions">
+				<a class="cancel-button" routerLink="/quizzes">Tilbage</a>
+				<button type="submit" [disabled]="!canSubmit || isSubmitting()">
+					{{ isSubmitting() ? 'Afleverer...' : 'Aflever Quiz' }}
+				</button>
+			</div>
+		</form>
+	}
+</main>
