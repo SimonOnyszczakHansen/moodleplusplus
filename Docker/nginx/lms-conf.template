@@ -2,7 +2,7 @@ server {
     listen 80;
     server_name ${NGINX_SERVER_NAME};
 
-    root /var/www/lms-frontend/current;
+    root /var/www/lms-frontend/staging/current;
     index index.html;
 
     # Health endpoint used by the deployment pipeline
