@@ -1,10 +1,19 @@
 <div class="container">
-  <h1 id="header">Mine Fag</h1>
+  <div class="header-container">
+    <h1>Mine Fag</h1>
+    @if (userRole === 'teacher') {
+    <app-button variant="primary" (click)="onCreateSubject()">Opret Fag</app-button>
+    }
+  </div>
 
-  @if (userRole === 'student') {
-  <app-student-subjects />
-  }
-  @if (userRole === 'teacher') {
-  <app-teacher-subjects />
-  }
+  <app-modal [(open)]="showCreateSubject" [title]="'Opret Opgave'">
+    <app-input label="Navn" placeholder="Navn" [(value)]="subjectName"></app-input>
+
+    <div class="modal-actions">
+      <app-button label="Annuller" variant="secondary" (click)="onCancelCreateSubject()">Anuller</app-button>
+      <app-button label="Opret" variant="primary" (click)="onSubmitSubject()">Opret</app-button>
+    </div>
+  </app-modal>
+
+  <app-subject-list></app-subject-list>
 </div>

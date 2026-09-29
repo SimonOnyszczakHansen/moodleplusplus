@@ -1,10 +1,24 @@
 <div class="dashboard-container">
 	<h1>Velkommen, {{ userName }} </h1>
 
-	@if (userRole === 'student') {
-	<app-student-content></app-student-content>
-	}
-	@if (userRole === 'teacher') {
-	<app-teacher-content></app-teacher-content>
-	}
+	<div class="content">
+		<div class="subjects-container">
+			<h2 id="header">Mine Fag</h2>
+			<a (click)="viewAllSubjects()" class="view-all">Se alle &#8594;</a>
+			<app-subject-list></app-subject-list>
+		</div>
+		<div class="deadlines-container">
+			<a (click)="viewAllTasks()" class="view-all">Se alle &#8594;</a>
+			<h2 id="header">Kommende Afleveringer</h2>
+			<div class="deadline-cards">
+				<!-- <div *ngFor="let task of pendingTasks" class="deadline-card">
+					<div class="deadline-info">
+						<p class="deadline-title">{{ task.title }}</p>
+						<p class="deadline-subject">{{ getSubjectName(task.subjectId) }}</p>
+					</div>
+					<span class="deadline-date">{{ task.deadline | date: 'dd-MM-yyyy' }}</span>
+				</div> -->
+			</div>
+		</div>
+	</div>
 </div>

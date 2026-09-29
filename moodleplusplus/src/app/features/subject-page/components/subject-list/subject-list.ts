@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { SubjectsService } from '../../services/subjects';
 import { Router } from '@angular/router';
 import { Card } from '../../../../shared/card/card';
@@ -8,13 +8,13 @@ import { Button } from '../../../../shared/button/button';
 import { ISubject } from '../../models/subjects.model';
 
 @Component({
-  selector: 'app-student-subjects',
+  selector: 'app-subject-list',
   imports: [CommonModule, Card, ProgressBar, Button],
-  templateUrl: './student-subjects.html',
-  styleUrl: './student-subjects.css',
+  templateUrl: './subject-list.html',
+  styleUrl: './subject-list.css',
 })
-export class StudentSubjects implements OnInit {
-  subjects: ISubject[] = [];
+export class SubjectList implements OnInit {
+  subjects = signal<ISubject[]>([]);
 
   constructor(
     private subjectsService: SubjectsService,
@@ -22,8 +22,16 @@ export class StudentSubjects implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.subjectsService.getSubjectsData().subscribe((data) => {
-      this.subjects = data;
+    this.loadSubjects();
+    this.subjectsService.refresh$.subscribe(() => this.loadSubjects());
+  }
+
+  private loadSubjects() {
+    this.subjectsService.getSubjectsData().subscribe({
+      next: (subjects) => {
+        this.subjects.set(subjects);
+      },
+      error: (err) => console.error('Subjects fetch failed:', err),
     });
   }
 

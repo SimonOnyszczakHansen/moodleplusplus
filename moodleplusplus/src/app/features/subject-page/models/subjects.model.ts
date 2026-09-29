@@ -30,3 +30,7 @@ export interface ITeacherSubject {
   assignedAt?: string;
   assigned_at?: string;
 }
+
+export interface ICreateSubjectRequest {
+  name: string;
+}
