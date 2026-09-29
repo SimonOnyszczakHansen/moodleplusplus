@@ -1,0 +1,24 @@
+@if (loadError()) {
+<p class="error-message">Kunne ikke hente afleveringshistorikken.</p>
+} @else {
+<div class="history-container">
+	<app-button class="back-link" variant="secondary" (click)="goBack()">← Tilbage</app-button>
+	<h1>Afleveringshistorik for {{ name }}</h1>
+
+	<div class="history-entry">
+		@if (sortedFeedback.length) {
+		@for (entry of sortedFeedback; track entry.createdAt; let i = $index) {
+		<div class="feedback-round">
+			<h3>Aflevering {{ i + 1 }}. {{ entry.createdAt | date: 'dd-MM-yyyy' }}</h3>
+			<p>{{ entry.text }}</p>
+			@if (entry.teacherName) {
+			<p class="feedback-teacher">- <span class="feedback-teacher">{{ entry.teacherName }}</span></p>
+			}
+		</div>
+		}
+		} @else {
+		<p class="no-content-text">Ingen feedback endnu</p>
+		}
+	</div>
+</div>
+}

@@ -41,9 +41,11 @@
 						<li>{{ entry.text }} - <span class="feedback-teacher">{{ entry.teacherName }} ({{ entry.createdAt | date: 'dd-MM-yyyy' }})</span></li>
 						}
 					</ul>
-						<app-button variant="primary" (click)="onViewHistory(assignment.assignmentId)" class="history-button">Se Historik</app-button>
 					} @else {
 					Ingen feedback endnu
+					}
+					@if (assignment.submission) {
+					<app-button variant="primary" (click)="onViewHistory(assignment.assignmentId)" class="history-button">Se Historik</app-button>
 					}
 				</dd>
 			</dl>

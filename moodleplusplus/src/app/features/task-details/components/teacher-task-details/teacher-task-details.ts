@@ -39,7 +39,6 @@ interface RosterRow {
 export class TeacherTaskDetails implements OnInit {
 	teacherTask = signal<ITeacherTaskDetail | null>(null);
 
-	viewHistoryVisible = false;
 	feedbackVisible = false;
 	addObjectiveVisible = false;
 	updateVisible = false;
@@ -157,8 +156,13 @@ export class TeacherTaskDetails implements OnInit {
 		}));
 	}
 
-	onViewHistory(): void {
-		this.viewHistoryVisible = true;
+	onViewHistory(row: RosterRow): void {
+		const teacherTask = this.teacherTask();
+		if (!teacherTask) return;
+
+		this.router.navigate(['/tasks', teacherTask.id, 'assignments', row.assignmentId, 'history'], {
+			queryParams: { name: row.name, studentId: row.studentId ?? null, returnTo: `/tasks/${teacherTask.id}` },
+		});
 	}
 
 	onViewFeedback(): void {
