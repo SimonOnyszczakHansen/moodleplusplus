@@ -98,6 +98,10 @@ export class StudentTaskDetails implements OnInit {
 		this.router.navigate(['/tasks']);
 	}
 
+	onViewHistory(assignmentId: string): void {
+		// Implement the logic to view the history of the assignment
+	}
+
 	private load(): void {
 		this.error.set(false);
 

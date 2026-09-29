@@ -1,3 +1,30 @@
+.modal-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.modal-content label {
+	font-weight: 600;
+	color: var(--color-text-secondary);
+}
+
+.modal-content textarea {
+	min-height: 6rem;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: 0.5rem;
+	background: var(--color-surface);
+	color: var(--color-text);
+	font: inherit;
+	resize: vertical;
+}
+
+.modal-content textarea:focus {
+	outline: none;
+	border-color: var(--color-primary);
+}
+
 .task-details-container {
 	position: relative;
 	display: flex;
@@ -252,6 +279,13 @@ h1 {
 	flex-wrap: wrap;
 	gap: 0.75rem;
 	margin-bottom: 1rem;
+}
+
+.no-content-text {
+	color: var(--color-text-muted);
+	font-style: italic;
+	margin: 0;
+	font-size: 0.85rem;
 }
 
 @media (max-width: 768px) {
