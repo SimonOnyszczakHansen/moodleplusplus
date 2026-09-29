@@ -2,7 +2,7 @@
 	<h1>Opgaver</h1>
 	<app-button label="Opret Opgave" (click)="onCreateTask()" variant="primary" class="create-task-button">Opret
 		Opgave</app-button>
-	<app-table [columns]="columns" [rows]="rows" [actions]="actions" emptyMessage="Ingen opgaver fundet."
+	<app-table [columns]="columns" [rows]="rows()" [actions]="actions" emptyMessage="Ingen opgaver fundet."
 		(actionClick)="onActionClick($event)">
 		<ng-template appTableCell="deadline" let-row>
 			{{ row.deadline | date: 'dd/MM/yyyy' }}
@@ -15,9 +15,9 @@
 		<app-input label="Beskrivelse" placeholder="Beskrivelse" [(value)]="taskDescription"></app-input>
 
 		<div class="assignee-search">
-			@if (existingAssignments.length) {
+			@if (existingAssignments().length) {
 			<ul class="assignee-chips">
-				@for (assignment of existingAssignments; track assignment.assignmentId) {
+				@for (assignment of existingAssignments(); track assignment.assignmentId) {
 				<li class="assignee-chip">
 					{{ assignment.studentName ?? assignment.groupName }}
 					<button type="button" aria-label="Fjern" (click)="onRemoveExistingAssignment(assignment)">&times;</button>

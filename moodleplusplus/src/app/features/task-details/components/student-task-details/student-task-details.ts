@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task as TaskService } from '../../../task-page/services/task';
@@ -18,6 +18,7 @@ export class StudentTaskDetails implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly taskService = inject(TaskService);
 	private readonly authService = inject(AuthService);
+	private readonly router = inject(Router);
 
 	assignment = signal<ITaskAssignmentDetail | null>(null);
 	error = signal(false);
@@ -37,7 +38,8 @@ export class StudentTaskDetails implements OnInit {
 	}
 
 	get canSubmit(): boolean {
-		return this.assignment()?.status === 'Ikke afleveret';
+		const status = this.assignment()?.status;
+		return status === 'Ikke afleveret' || status === 'Ikke godkendt';
 	}
 
 	get hasNothingToSubmit(): boolean {
@@ -90,6 +92,10 @@ export class StudentTaskDetails implements OnInit {
 				this.submitError.set(true);
 			},
 		});
+	}
+
+	goBack(): void {
+		this.router.navigate(['/tasks']);
 	}
 
 	private load(): void {

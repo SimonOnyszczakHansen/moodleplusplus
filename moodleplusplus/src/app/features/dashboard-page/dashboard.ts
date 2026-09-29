@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { IDashboard } from './models/dashboard.model';
+import { DashboardService } from './services/dashboard';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { SubjectList } from '../subject-page/components/subject-list/subject-list';
@@ -10,12 +12,13 @@ import { SubjectList } from '../subject-page/components/subject-list/subject-lis
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
-  userRole?: string;
-  userName?: string;
+  userRole = signal<string | undefined>(undefined);
+  dashboard = signal<IDashboard | undefined>(undefined);
 
   constructor(
     private auth: AuthService,
     private router: Router,
+    private dashboardService: DashboardService,
   ) {}
 
   ngOnInit(): void {
@@ -25,17 +28,17 @@ export class Dashboard implements OnInit {
       '2': 'teacher',
       '3': 'student',
     };
-    this.userRole =
+    this.userRole.set(
       role === undefined
         ? undefined
-        : (roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase());
-  }
+        : (roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase()),
+    );
 
-  viewAllSubjects() {
-    this.router.navigate(['/subjects']);
-  }
-
-  viewAllTasks() {
-    this.router.navigate(['/tasks']);
+    this.dashboardService.getDashboardData().subscribe({
+      next: (data) => {
+        this.dashboard.set(data);
+      },
+      error: (err) => console.error('Dashboard fetch failed:', err),
+    });
   }
 }
