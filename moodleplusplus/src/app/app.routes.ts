@@ -5,6 +5,8 @@ import { adminGuard } from './core/guards/admin-guard';
 import { Dashboard } from './features/dashboard-page/dashboard';
 import { ConsentPage } from './features/consent-page/consent-page';
 import { Login } from './features/login-page/login';
+import { SubjectPage } from './features/subject-page/subject-page';
+import { SubjectOverview } from './features/subject-page/components/subject-overview/subject-overview';
 import { Task } from './features/task-page/task';
 import { TaskDetails } from './features/task-details/task-details';
 import { Objectives } from './features/objectives/objectives';
@@ -26,6 +28,12 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'consent', component: ConsentPage, canActivate: [authGuard] },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, consentGuard] },
+  { path: 'subjects', component: SubjectPage, canActivate: [authGuard, consentGuard] },
+  {
+    path: 'subject/:id',
+    component: SubjectOverview,
+    canActivate: [authGuard, consentGuard],
+  },
   {
     path: 'admin/users',
     loadComponent: () => import('./features/admin-page/admin-page').then((m) => m.AdminPage),

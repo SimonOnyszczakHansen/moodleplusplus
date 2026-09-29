@@ -1,0 +1,47 @@
+.student-subjects {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.view-all {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.subjects-container {
+  position: relative;
+  height: auto;
+  width: auto;
+  padding: 1rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+}
+
+.subject-cards {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.card-content {
+  font-size: 0.9rem;
+  min-height: 10rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}

@@ -1,4 +1,3 @@
-
 <div class="app-shell">
   <aside class="sidebar" *ngIf="showNavigation">
     <div class="sidebar-header">
@@ -16,16 +15,16 @@
 
       <nav class="nav-menu" aria-label="Main navigation">
         @if (isAdmin) {
-          <a routerLink="/admin/users" (click)="closeMobileNav()">Brugere</a>
+        <a routerLink="/admin/users" (click)="closeMobileNav()">Brugere</a>
         } @else {
-          <a routerLink="/dashboard" (click)="closeMobileNav()">Dashboard</a>
-          <a routerLink="/dashboard" (click)="closeMobileNav()">Fag</a>
-          <a routerLink="/dashboard" (click)="closeMobileNav()">Grupper</a>
-          <a routerLink="/tasks" (click)="closeMobileNav()">Opgaver</a>
-          <a routerLink="/quizzes" (click)="closeMobileNav()">Quizzer</a>
+        <a routerLink="/dashboard" (click)="closeMobileNav()">Dashboard</a>
+        <a routerLink="/subjects" (click)="closeMobileNav()">Fag</a>
+        <a routerLink="/dashboard" (click)="closeMobileNav()">Grupper</a>
+        <a routerLink="/tasks" (click)="closeMobileNav()">Opgaver</a>
+        <a routerLink="/quizzes" (click)="closeMobileNav()">Quizzer</a>
         }
-	  <span class="spacer"></span>
-      <button type="button" class="logout-button" (click)="logout()">Log ud</button>
+        <span class="spacer"></span>
+        <button type="button" class="logout-button" (click)="logout()">Log ud</button>
       </nav>
 
       <div class="user-chip">{{ currentUserName }}</div>
