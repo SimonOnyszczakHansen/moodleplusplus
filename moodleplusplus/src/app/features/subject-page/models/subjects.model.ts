@@ -34,3 +34,7 @@ export interface ITeacherSubject {
 export interface ICreateSubjectRequest {
   name: string;
 }
+
+export interface IEditSubjectRequest {
+  name: string;
+}

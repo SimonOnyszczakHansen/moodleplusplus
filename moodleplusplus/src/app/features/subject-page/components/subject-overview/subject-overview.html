@@ -12,17 +12,13 @@
                     <span class="meta-label">Underviser</span>
                     <strong>David Svarrer</strong>
                 </div>
-                <div class="meta-item">
-                    <span class="meta-label">Elever</span>
-                    <strong>{{ students.length }} Elever</strong>
-                </div>
             </div>
         </div>
 
         @if (isTeacher) {
         <div class="action-row">
-            <app-button variant="secondary">Rediger fag</app-button>
-            <app-button variant="danger">Slet fag</app-button>
+            <app-button variant="secondary" (click)="onEditSubject()">Rediger fag</app-button>
+            <app-button variant="danger" (click)="onDeleteSubject()">Slet fag</app-button>
         </div>
         }
     </div>
@@ -34,70 +30,63 @@
     </nav>
 
     <div class="overview-grid">
-        <section class="panel goals-panel">
-            <div class="panel-header">
-                <h2>Målpinde</h2>
-                <a href="javascript:void(0)">Se alle →</a>
-            </div>
-
-            <ul class="goal-list">
-                @if (goals.length) {
-                @for (goal of goals; track goal.id) {
-                <li>{{ goal.content }}</li>
-                }
-                } @else {
-                <li>Ingen mål er oprettet for dette fag endnu.</li>
-                }
-            </ul>
-        </section>
-
-        <section class="panel teacher-panel">
-            <div class="panel-header">
-                <h2>Underviser</h2>
-            </div>
-
-            <div class="person-card">
-                <div class="avatar">DS</div>
-                <div class="person-copy">
-                    <strong>David Svarrer</strong>
-                    <span>Underviser</span>
-                </div>
-            </div>
-        </section>
-
-        <section class="panel students-panel">
-            <div class="panel-header">
-                <h2>Elever</h2>
-                <button type="button" class="inline-action">+ Tilføj Elever</button>
-            </div>
-
-            <ul class="student-list">
-                @for (student of students; track student.email) {
-                <li class="student-row">
-                    <div class="student-name">{{ student.name }}</div>
-                    <div class="student-email">{{ student.email }}</div>
-                </li>
-                }
-            </ul>
-        </section>
-
         <section class="panel tasks-panel">
             <div class="panel-header">
                 <h2>Opgaver</h2>
-                <a href="javascript:void(0)">Se alle →</a>
+                <a (click)="viewAllTasks()">Se alle &#8594;</a>
             </div>
 
             <div class="task-list">
-                @for (task of tasks; track task.title) {
+                @if (tasks().length) {
+                @for (task of tasks(); track task.id) {
                 <article class="task-item">
                     <div>
-                        <span class="task-status">{{ task.status }}</span>
+                        <!-- <span class="task-status">{{ task.status }}</span> -->
                         <h3>{{ task.title }}</h3>
+                        <span>{{ task.description }}</span>
                     </div>
-                    <span class="task-deadline">{{ task.due }}</span>
+                    <span class="task-deadline">{{ task.deadline }}</span>
                 </article>
+                }
+                } @else {
+                <li class="no-data">Ingen mål er oprettet for dette fag endnu.</li>
                 }
             </div>
         </section>
+
+        <section class="panel goals-panel">
+            <div class="panel-header">
+                <h2>Målpinde</h2>
+                <a (click)="viewAllGoals()">Se alle &#8594;</a>
+            </div>
+
+            @if (goals().length) {
+            <ul class="goal-list">
+                @for (goal of goals(); track goal.id) {
+                <li>{{ goal.content }}</li>
+                }
+            </ul>
+            } @else {
+            <li class="no-data">Ingen mål er oprettet for dette fag endnu.</li>
+            }
+        </section>
     </div>
+    <app-modal [(open)]="showEditSubject" [title]="'Rediger Fag'">
+        <app-input label="Navn" placeholder="Navn" [(value)]="subjectName"></app-input>
+
+        <div class="modal-actions">
+            <app-button label="Annuller" variant="secondary" (click)="onCancelEditSubject()">Anuller</app-button>
+            <app-button label="Opret" variant="primary" (click)="onSubmitEditSubject()">Gem</app-button>
+        </div>
+    </app-modal>
+
+    <app-modal [(open)]="showDeleteSubject" [title]="'Fjern Fag'">
+        <app-input label="Skriv 'CONFIRM' for at slette faget" placeholder="CONFIRM"
+            [(value)]="deleteConfirm"></app-input>
+
+        <div class="modal-actions">
+            <app-button variant="secondary" (click)="onCancelDeleteSubject()">Anuller</app-button>
+            <app-button variant="danger" [disabled]="isConfirmed" (click)="onSubmitDeleteSubject()">Fjern</app-button>
+        </div>
+    </app-modal>
 </section>

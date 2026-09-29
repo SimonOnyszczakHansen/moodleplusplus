@@ -1,7 +1,3 @@
-:host {
-  display: block;
-}
-
 .subject-overview {
   display: flex;
   flex-direction: column;
@@ -117,19 +113,11 @@
 }
 
 .goals-panel {
-  grid-column: 1;
-}
-
-.teacher-panel {
   grid-column: 2;
-}
-
-.students-panel {
-  grid-column: 1;
 }
 
 .tasks-panel {
-  grid-column: 2;
+  grid-column: 1;
 }
 
 .panel-header {
@@ -156,8 +144,7 @@
   cursor: pointer;
 }
 
-.goal-list,
-.student-list {
+.goal-list {
   margin: 0;
   padding-left: 1.1rem;
   display: flex;
@@ -166,64 +153,8 @@
   color: var(--color-text-secondary);
 }
 
-.goal-list li,
-.student-row {
+.goal-list li {
   line-height: 1.5;
-}
-
-.person-card {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 0.75rem 0.5rem 0;
-}
-
-.avatar {
-  display: grid;
-  place-items: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-turquoise));
-  color: var(--color-text-light);
-  font-weight: 700;
-}
-
-.person-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.person-copy span {
-  color: var(--color-text-secondary);
-}
-
-.student-list {
-  list-style: none;
-  padding-left: 0;
-  gap: 0.75rem;
-}
-
-.student-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.student-row:last-child {
-  border-bottom: 0;
-}
-
-.student-name {
-  font-weight: 700;
-}
-
-.student-email {
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
 }
 
 .task-list {
@@ -264,14 +195,24 @@
   font-size: 0.85rem;
 }
 
+.no-data {
+  color: var(--color-text-secondary);
+  margin-left: 0.9rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
 @media (max-width: 900px) {
   .overview-grid {
     grid-template-columns: 1fr;
   }
 
   .goals-panel,
-  .teacher-panel,
-  .students-panel,
   .tasks-panel {
     grid-column: auto;
   }
