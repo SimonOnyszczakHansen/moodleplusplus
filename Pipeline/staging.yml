@@ -20,7 +20,7 @@ frontend-staging-build:
     - echo "Frontend image built successfully"
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "pre-production" && $CI_PIPELINE_SOURCE == "push"'
 
 
 frontend-staging-deploy:
@@ -74,7 +74,7 @@ frontend-staging-deploy:
     expire_in: 1 hour
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "pre-production" && $CI_PIPELINE_SOURCE == "push"'
 
 
 frontend-staging-configure:
@@ -147,7 +147,7 @@ frontend-staging-configure:
       echo "Staging Nginx configuration deployed successfully"
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "pre-production" && $CI_PIPELINE_SOURCE == "push"'
 
 
 frontend-staging-verify:
@@ -193,4 +193,4 @@ frontend-staging-verify:
       fi
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "pre-production" && $CI_PIPELINE_SOURCE == "push"'
