@@ -14,10 +14,16 @@ import { QuizPage } from './features/quiz.page/quiz-page';
 import { CreateQuiz } from './features/quiz.page/components/create-quiz/create-quiz';
 import { AnswerQuiz } from './features/quiz.page/components/answer-quiz/answer-quiz';
 import { QuizReview } from './features/quiz.page/components/quiz-review/quiz-review';
+import { teacherGuard } from './core/guards/teacher-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, consentGuard] },
+  {
+    path: 'groups',
+    loadComponent: () => import('./features/groups-page/groups-page').then((m) => m.GroupsPage),
+    canActivate: [authGuard, consentGuard, teacherGuard],
+  },
   { path: 'tasks', component: Task, canActivate: [authGuard, consentGuard] },
   { path: 'tasks/:id', component: TaskDetails, canActivate: [authGuard, consentGuard] },
   {

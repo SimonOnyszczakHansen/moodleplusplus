@@ -19,7 +19,9 @@
         } @else {
         <a routerLink="/dashboard" (click)="closeMobileNav()">Dashboard</a>
         <a routerLink="/subjects" (click)="closeMobileNav()">Fag</a>
-        <a routerLink="/dashboard" (click)="closeMobileNav()">Grupper</a>
+          @if (isTeacher) {
+            <a routerLink="/groups" (click)="closeMobileNav()">Grupper</a>
+          }        
         <a routerLink="/tasks" (click)="closeMobileNav()">Opgaver</a>
         <a routerLink="/quizzes" (click)="closeMobileNav()">Quizzer</a>
         }

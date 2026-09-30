@@ -26,7 +26,10 @@ export class App {
   get isAdmin(): boolean {
     return this.authService.isAdmin;
   }
-
+  
+  get isTeacher(): boolean {
+    return this.authService.isTeacher;
+  }
   readonly mobileNavOpen = signal(false);
 
   toggleMobileNav(): void {

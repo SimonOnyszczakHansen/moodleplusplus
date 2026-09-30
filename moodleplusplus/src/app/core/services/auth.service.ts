@@ -90,6 +90,10 @@ export class AuthService {
     return this.isAuthenticated && ['1', 'administrator', 'admin'].includes(String(this.currentUser?.role).toLowerCase());
   }
 
+  get isTeacher(): boolean {
+    return this.isAuthenticated && ['2', 'teacher'].includes(String(this.currentUser?.role).toLowerCase());
+  }
+
   get hasAcceptedConsent(): boolean {
     return localStorage.getItem(this.CONSENT_KEY) === 'true';
   }
