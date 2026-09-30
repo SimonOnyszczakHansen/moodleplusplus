@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +16,8 @@ import { Router } from '@angular/router';
 })
 export class Login {
   loginForm!: FormGroup;
-  errorMessage: string | null = null;
+  readonly errorMessage = signal<string | null>(null);
+  readonly isLoggingIn = signal(false);
 
   constructor(
     private fb: FormBuilder,
@@ -37,25 +39,30 @@ export class Login {
   }
 
   onSubmit() {
+    if (this.isLoggingIn()) return;
+
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
-    this.errorMessage = null;
+    this.errorMessage.set(null);
+    this.isLoggingIn.set(true);
 
-    this.authService.login(this.loginForm.value).subscribe({
+    this.authService.login(this.loginForm.value).pipe(
+      finalize(() => this.isLoggingIn.set(false)),
+    ).subscribe({
       next: () => {
         const destination = this.authService.hasAcceptedConsent ? '/dashboard' : '/consent';
         this.router.navigate([destination]);
       },
       error: (err: { status: number; error?: { message?: string } }) => {
         if (err.status === 401) {
-          this.errorMessage = 'Forkert email eller kodeord.';
+          this.errorMessage.set('Forkert email eller kodeord.');
           return;
         }
 
-        this.errorMessage = err.error?.message || 'Der opstod en serverfejl.';
+        this.errorMessage.set(err.error?.message || 'Der opstod en serverfejl.');
       },
     });
   }

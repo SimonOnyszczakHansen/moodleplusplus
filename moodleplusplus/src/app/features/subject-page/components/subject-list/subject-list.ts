@@ -27,7 +27,7 @@ export class SubjectList implements OnInit {
   }
 
   private loadSubjects() {
-    this.subjectsService.getSubjectsData().subscribe({
+    this.subjectsService.getMySubjects().subscribe({
       next: (subjects) => {
         this.subjects.set(subjects);
       },
