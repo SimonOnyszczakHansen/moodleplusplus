@@ -1,3 +1,15 @@
+export type IDashboardTaskPreview = Pick<
+	IDashboardTask,
+	'assignmentId' | 'taskId' | 'subjectId' | 'title' | 'status' | 'deadline'
+> & { recipientName?: string };
+
+export interface ITeacherDashboardAssignment extends IDashboardTaskPreview {
+	recipientType: string;
+	recipientId: string;
+	recipientName: string;
+	assignedAt: string;
+}
+
 export interface IDashboardTask {
 	assignmentId: string;
 	taskId: string;

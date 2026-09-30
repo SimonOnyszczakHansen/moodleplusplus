@@ -10,6 +10,7 @@ import {
 } from '../models/subjects.model';
 import { environment } from '../../../../environments/environment';
 import { ITask } from '../../task-page/models/task.model';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,10 +18,20 @@ import { ITask } from '../../task-page/models/task.model';
 export class SubjectsService {
   private refreshSubject = new Subject<void>();
   readonly refresh$ = this.refreshSubject.asObservable();
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private auth: AuthService,
+  ) {}
 
   getSubjectsData(): Observable<ISubject[]> {
-    return this.http.get<ISubject[]>(`${environment.apiHost}/subject`);
+    return this.http.get<ISubject[]>(`${environment.apiHost}/subject/getAllMySubjectsByTeacherId`);
+  }
+
+  getMySubjects(): Observable<ISubject[]> {
+    const endpoint = this.auth.isTeacher
+      ? '/subject/getAllMySubjectsByTeacherId'
+      : '/subject/getAllMySubjects';
+    return this.http.get<ISubject[]>(`${environment.apiHost}${endpoint}`);
   }
 
   getSubjectById(subjectId: string): Observable<ISubject> {
