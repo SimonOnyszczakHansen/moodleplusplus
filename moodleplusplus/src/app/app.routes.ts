@@ -26,6 +26,11 @@ export const routes: Routes = [
   },
   { path: 'tasks', component: Task, canActivate: [authGuard, consentGuard] },
   { path: 'tasks/:id', component: TaskDetails, canActivate: [authGuard, consentGuard] },
+  {
+    path: 'tasks/:taskId/assignments/:assignmentId/history',
+    loadComponent: () => import('./features/submission-history/submission-history').then((m) => m.SubmissionHistory),
+    canActivate: [authGuard, consentGuard],
+  },
   { path: 'objectives/:subjectId', component: Objectives, canActivate: [authGuard, consentGuard] },
   { path: 'quizzes/create', component: CreateQuiz, canActivate: [authGuard, consentGuard] },
   { path: 'quizzes/:quizId/answer', component: AnswerQuiz, canActivate: [authGuard, consentGuard] },

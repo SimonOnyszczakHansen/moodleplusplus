@@ -33,7 +33,11 @@
 			<h2>Afleveringer</h2>
 			<app-table [columns]="rosterColumns" [rows]="rosterRows" emptyMessage="Ingen afleveringer endnu.">
 				<ng-template appTableCell="submittedAt" let-row>
-					{{ row.submittedAt ? (row.submittedAt | date: 'dd-MM-yyyy') : '—' }}
+					@if (row.submittedAt) {
+					{{ row.submittedAt | date: 'dd-MM-yyyy' }}
+					} @else {
+					<p class="no-content-text">Ikke afleveret</p>
+					}
 				</ng-template>
 				<ng-template appTableCell="status" let-row>
 					<app-status-badge [label]="row.status" [variant]="row.status" />
@@ -43,7 +47,7 @@
 					<app-button variant="primary" [disabled]="downloadingAssignmentId() === row.assignmentId"
 						(click)="onDownloadFile(row)">Download</app-button>
 					} @else {
-					—
+					<p class="no-content-text">Ingen Fil</p>
 					}
 				</ng-template>
 				<ng-template appTableCell="comment" let-row>
@@ -54,7 +58,7 @@
 					{{ comment }}
 					}
 					} @else {
-					—
+					<p class="no-content-text">Ingen Kommentar</p>
 					}
 				</ng-template>
 				<ng-template appTableCell="feedback" let-row>
@@ -64,9 +68,9 @@
 							(click)="onApproveSubmission(row)">Godkend</button>
 						<button type="button" [disabled]="reviewingAssignmentId() === row.assignmentId"
 							(click)="onRejectSubmission(row)">Afvis</button>
+						<button type="button" (click)="onGiveFeedback(row)">Giv Feedback</button>
 						}
-						<button type="button">Giv Feedback</button>
-						<button type="button">Se Historik</button>
+						<button type="button" (click)="onViewHistory(row)">Se Historik</button>
 					</app-action-menu>
 				</ng-template>
 			</app-table>
@@ -150,6 +154,22 @@
 		<div class="modal-actions">
 			<app-button variant="secondary" (click)="addObjectiveVisible = false">Annuller</app-button>
 			<app-button variant="primary" (click)="onSubmitAddObjective()">Tilføj</app-button>
+		</div>
+	</app-modal>
+	<app-modal [(open)]="feedbackVisible" title="Giv Feedback">
+		<div class="modal-content">
+			<label for="feedback">Feedback</label>
+			<textarea id="feedback" name="feedback" placeholder="Skriv din feedback her" [(ngModel)]="feedbackText"></textarea>
+			<app-dropdown label="Status" placeholder="Behold nuværende status" [options]="reviewStatusOptions"
+				[(value)]="selectedReviewStatus"></app-dropdown>
+			@if (feedbackError()) {
+			<p class="error-message">{{ feedbackError() }}</p>
+			}
+		</div>
+		<div class="modal-actions">
+			<app-button variant="secondary" (click)="feedbackVisible = false">Annuller</app-button>
+			<app-button variant="primary" [disabled]="!feedbackText.trim()"
+				(click)="onSubmitFeedback()">Send</app-button>
 		</div>
 	</app-modal>
 

@@ -16,10 +16,12 @@ import { Modal } from '../../../../shared/modal/modal';
 import { Input } from '../../../../shared/input/input';
 import { Dropdown, DropdownOption } from '../../../../shared/dropdown/dropdown';
 import { ActionMenu } from '../../../../shared/action-menu/action-menu';
+import { FormsModule } from '@angular/forms';
 
 // Flattened roster row for the shared Table component - feedback is a dummy key, only used to place the buttons column.
 interface RosterRow {
 	assignmentId: string;
+	studentId?: string;
 	name: string;
 	submittedAt: string | null;
 	status: TaskStatus;
@@ -30,14 +32,13 @@ interface RosterRow {
 
 @Component({
 	selector: 'app-teacher-task-details',
-	imports: [DatePipe, Button, StatusBadge, Table, TableCellTemplate, Modal, Input, Dropdown, ActionMenu],
+	imports: [DatePipe, FormsModule, Button, StatusBadge, Table, TableCellTemplate, Modal, Input, Dropdown, ActionMenu],
 	templateUrl: './teacher-task-details.html',
 	styleUrl: './teacher-task-details.css',
 })
 export class TeacherTaskDetails implements OnInit {
 	teacherTask = signal<ITeacherTaskDetail | null>(null);
 
-	viewHistoryVisible = false;
 	feedbackVisible = false;
 	addObjectiveVisible = false;
 	updateVisible = false;
@@ -52,11 +53,20 @@ export class TeacherTaskDetails implements OnInit {
 	reviewError = signal<string | null>(null);
 	downloadingAssignmentId = signal<string | null>(null);
 	selectedObjectiveIds: string[] = [];
+	selectedRosterRow = signal<RosterRow | null>(null);
+	feedbackError = signal<string | null>(null);
+	readonly reviewStatusOptions: DropdownOption[] = [
+		{ value: 'Godkendt', label: 'Godkend' },
+		{ value: 'Ikke godkendt', label: 'Afvis' },
+	];
+	selectedReviewStatus = '';
 
 
 	studentSearchQuery = '';
 	selectedAssignees: IAssignee[] = [];
 	existingAssignments = signal<ITaskAssignmentRow[]>([]);
+
+	feedbackText = '';
 
 	readonly rosterColumns: TableColumn<RosterRow>[] = [
 		{ key: 'name', label: 'Elever' },
@@ -136,6 +146,7 @@ export class TeacherTaskDetails implements OnInit {
 
 		return teacherTask.assignments.map((row) => ({
 			assignmentId: row.assignmentId,
+			studentId: row.studentId,
 			name: row.studentName ?? row.groupName ?? '—',
 			submittedAt: row.submission?.submittedAt ?? null,
 			status: row.status,
@@ -145,12 +156,18 @@ export class TeacherTaskDetails implements OnInit {
 		}));
 	}
 
-	onViewHistory(): void {
-		this.viewHistoryVisible = true;
+	onViewHistory(row: RosterRow): void {
+		const teacherTask = this.teacherTask();
+		if (!teacherTask) return;
+
+		this.router.navigate(['/tasks', teacherTask.id, 'assignments', row.assignmentId, 'history'], {
+			queryParams: { name: row.name, studentId: row.studentId ?? null, returnTo: `/tasks/${teacherTask.id}` },
+		});
 	}
 
 	onViewFeedback(): void {
 		this.feedbackVisible = true;
+		console.log(this.reviewingAssignmentId());
 	}
 
 	onViewAddObjective(): void {
@@ -307,8 +324,35 @@ export class TeacherTaskDetails implements OnInit {
 		});
 	}
 
-	onSubmitFeedback(): void {
+	onGiveFeedback(row: RosterRow): void {
+		this.selectedRosterRow.set(row);
+		this.feedbackText = '';
+		this.selectedReviewStatus = '';
+		this.feedbackError.set(null);
+		this.feedbackVisible = true;
+	}
 
+	onSubmitFeedback(): void {
+		const teacherTask = this.teacherTask();
+		const row = this.selectedRosterRow();
+		if (!teacherTask || !row || !row.studentId || !this.feedbackText.trim()) return;
+
+		this.feedbackError.set(null);
+		this.taskService.addFeedback(row.studentId, teacherTask.id, this.feedbackText, row.assignmentId).subscribe({
+			next: () => {
+				const status = this.selectedReviewStatus as ReviewStatus | '';
+				if (status) {
+					this.onReviewSubmission(row, status);
+				}
+				this.feedbackVisible = false;
+				this.feedbackText = '';
+				this.selectedReviewStatus = '';
+				this.selectedRosterRow.set(null);
+			},
+			error: () => {
+				this.feedbackError.set('Kunne ikke sende feedback. Prøv igen.');
+			},
+		});
 	}
 
 	onDownloadFile(row: RosterRow): void {

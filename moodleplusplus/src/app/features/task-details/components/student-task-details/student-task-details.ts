@@ -98,6 +98,16 @@ export class StudentTaskDetails implements OnInit {
 		this.router.navigate(['/tasks']);
 	}
 
+	onViewHistory(assignmentId: string): void {
+		const assignment = this.assignment();
+		if (!assignment) return;
+
+		const currentUserId = this.authService.currentUser?.id;
+		this.router.navigate(['/tasks', assignment.taskId, 'assignments', assignmentId, 'history'], {
+			queryParams: { name: 'dig', studentId: currentUserId ? String(currentUserId) : null, returnTo: `/tasks/${this.id}` },
+		});
+	}
+
 	private load(): void {
 		this.error.set(false);
 
