@@ -8,6 +8,7 @@ import { afterRenderEffect, Component, ElementRef, input, model, viewChild } fro
 })
 export class Modal {
 	readonly title = input('');
+	readonly dismissible = input(true);
 	readonly open = model(false);
 	private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
 
@@ -24,7 +25,7 @@ export class Modal {
 	}
 
 	close() {
-		this.open.set(false);
+		if (this.dismissible()) this.open.set(false);
 	}
 
 	onCancel(event: Event) {
