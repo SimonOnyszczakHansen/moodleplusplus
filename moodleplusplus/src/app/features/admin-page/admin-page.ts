@@ -72,7 +72,6 @@ export class AdminPage implements OnInit {
   readonly roles = [
     { value: 3, label: 'Elev' },
     { value: 2, label: 'Underviser' },
-    { value: 1, label: 'Administrator' },
   ];
   readonly userForm = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.pattern(/\S/)]],
