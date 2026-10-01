@@ -1,13 +1,25 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+
+// Services
 import { AuthService } from '../../../../core/services/auth.service';
+import { SubjectsService } from '../../../../core/services/subjects/subjects.service';
+
+// Shared
 import { Button } from '../../../../shared/button/button';
-import { IEditSubjectRequest, ISubject, ISubjectGoal } from '../../models/subjects.model';
-import { SubjectsService } from '../../services/subjects';
-import { ITask } from '../../../task-page/models/task.model';
 import { Modal } from '../../../../shared/modal/modal';
 import { Input } from '../../../../shared/input/input';
+
+// Models
+import {
+  IEditSubjectRequest,
+  ISubject,
+  ISubjectGoal,
+} from '../../../../core/models/subjects.model';
+import { ITask } from '../../../../core/models/tasks.model';
+import { User } from '../../../../core/models/user.interface';
+import { TasksService } from '../../../../core/services/tasks/tasks.service';
 
 @Component({
   selector: 'app-subject-overview',
@@ -19,6 +31,7 @@ export class SubjectOverview implements OnInit {
   subject = signal<ISubject | undefined>(undefined);
   goals = signal<ISubjectGoal[]>([]);
   tasks = signal<ITask[]>([]);
+  students = signal<User[]>([]);
 
   showDeleteSubject = false;
   showEditSubject = false;
@@ -27,10 +40,11 @@ export class SubjectOverview implements OnInit {
   deleteConfirm = '';
 
   constructor(
-    private route: ActivatedRoute,
-    private subjectsService: SubjectsService,
-    private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private subjectsService: SubjectsService,
+    private tasksService: TasksService,
   ) {}
 
   ngOnInit(): void {
@@ -49,9 +63,14 @@ export class SubjectOverview implements OnInit {
       error: (err) => console.error('Goals fetch failed:', err),
     });
 
-    this.subjectsService.getTasksBySubjectId(subjectId).subscribe({
+    this.tasksService.getTasksBySubjectId(subjectId).subscribe({
       next: (tasks) => this.tasks.set(tasks),
       error: (err) => console.error('Tasks fetch failed:', err),
+    });
+
+    this.subjectsService.getStudentsBySubjectId(subjectId).subscribe({
+      next: (students) => this.students.set(students),
+      error: (err) => console.error('Students fetch failed:', err),
     });
   }
 
@@ -63,12 +82,19 @@ export class SubjectOverview implements OnInit {
     return this.authService.currentUser?.role === 'teacher';
   }
 
-  viewAllTasks() {
-    this.router.navigate(['/tasks']);
+  viewSubjectTasks() {
+    const subjectId = this.route.snapshot.paramMap.get('id')!;
+    this.router.navigate([`/subject/${subjectId}/tasks`]);
   }
 
-  viewAllGoals() {
-    this.router.navigate(['/goals']);
+  viewSubjectGoals() {
+    const subjectId = this.route.snapshot.paramMap.get('id')!;
+    this.router.navigate([`/subject/${subjectId}/goals`]);
+  }
+
+  viewSubjectStudents() {
+    const subjectId = this.route.snapshot.paramMap.get('id')!;
+    this.router.navigate([`/subject/${subjectId}/students`]);
   }
 
   onEditSubject(): void {

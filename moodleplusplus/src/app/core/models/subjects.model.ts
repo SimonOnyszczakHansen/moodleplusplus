@@ -38,3 +38,16 @@ export interface ICreateSubjectRequest {
 export interface IEditSubjectRequest {
   name: string;
 }
+
+export interface ICreateGoalRequest {
+  subjectId: string;
+  content: string;
+}
+
+export interface IEditGoalRequest {
+  content: string;
+}
+
+export interface ISubjectGoalRow extends ISubjectGoal {
+  index: number;
+}

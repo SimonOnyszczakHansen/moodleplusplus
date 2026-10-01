@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { DashboardResponse } from '../models/dashboard.model';
 import { environment } from '../../../../environments/environment';
-import { IApiTaskAssignment } from '../../task-page/models/task.model';
+import { IApiTaskAssignment } from '../../../core/models/tasks.model';
 import { IDashboardTaskPreview } from '../models/task.model';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -18,7 +18,9 @@ export class DashboardService {
 
   getDashboardData(): Observable<DashboardResponse> {
     const endpoint = this.auth.isTeacher ? '/dashboard/teacher/me' : '/dashboard/me';
-    return this.http.get<DashboardResponse>(`${environment.apiHost}${endpoint}`, { withCredentials: true });
+    return this.http.get<DashboardResponse>(`${environment.apiHost}${endpoint}`, {
+      withCredentials: true,
+    });
   }
 
   // Use all assignments for progress and deadline ordering when the dashboard response is paginated.
@@ -28,13 +30,17 @@ export class DashboardService {
       .get<IApiTaskAssignment[]>(`${environment.apiHost}/task-assignments/me`, {
         withCredentials: true,
       })
-      .pipe(map((assignments) => assignments.map((assignment) => ({
-        assignmentId: assignment.assignmentId,
-        taskId: assignment.task.id,
-        subjectId: assignment.task.subjectId,
-        title: assignment.task.title,
-        deadline: assignment.deadline,
-        status: statuses[assignment.status] ?? 'Unknown',
-      }))));
+      .pipe(
+        map((assignments) =>
+          assignments.map((assignment) => ({
+            assignmentId: assignment.assignmentId,
+            taskId: assignment.task.id,
+            subjectId: assignment.task.subjectId,
+            title: assignment.task.title,
+            deadline: assignment.deadline,
+            status: statuses[assignment.status] ?? 'Unknown',
+          })),
+        ),
+      );
   }
 }

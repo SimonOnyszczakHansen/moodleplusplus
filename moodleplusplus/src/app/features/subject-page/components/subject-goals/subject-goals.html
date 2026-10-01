@@ -1,0 +1,32 @@
+<div class="container">
+    <header class="page-header">
+        <div class="breadcrumb">Mine Fag / {{ subjectTitle }} / Opgaver</div>
+        @if (isTeacher) {
+        <app-button (click)="onCreateGoal()" variant="primary">Opret Målpind</app-button>
+        }
+    </header>
+
+    <app-table [columns]="columns" [rows]="rows()" [actions]="actions" emptyMessage="Ingen målpinde fundet."
+        (actionClick)="onActionClick($event)">
+    </app-table>
+
+    <app-modal [(open)]="showCreateGoal" [title]="goalId ? 'Rediger Målpind' : 'Opret Målpind'">
+        <app-input placeholder="Content" [(value)]="formContent"></app-input>
+
+        <div class="modal-actions">
+            <app-button label="Annuller" variant="secondary" (click)="onCancelGoal()">Anuller</app-button>
+            <app-button label="Opret" variant="primary" (click)="onSubmitGoal()">{{ goalId ? 'Gem' :
+                'Opret'}}</app-button>
+        </div>
+    </app-modal>
+
+    <app-modal [(open)]="showDeleteGoal" [title]="'Fjern Målpind'">
+        <app-input label="Skriv 'CONFIRM' for at slette målpinden" placeholder="CONFIRM"
+            [(value)]="deleteConfirm"></app-input>
+
+        <div class="modal-actions">
+            <app-button variant="secondary" (click)="onCancelGoal()">Anuller</app-button>
+            <app-button variant="danger" [disabled]="isConfirmed" (click)="onSubmitDeleteGoal()">Fjern</app-button>
+        </div>
+    </app-modal>
+</div>

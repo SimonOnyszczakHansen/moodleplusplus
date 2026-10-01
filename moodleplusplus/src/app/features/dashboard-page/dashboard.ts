@@ -4,8 +4,8 @@ import { DashboardResponse } from './models/dashboard.model';
 import { DashboardService } from './services/dashboard';
 import { RouterLink } from '@angular/router';
 import { Observable, catchError, combineLatest, map, of, switchMap } from 'rxjs';
-import { SubjectsService } from '../subject-page/services/subjects';
-import { ISubject } from '../subject-page/models/subjects.model';
+import { SubjectsService } from '../../core/services/subjects/subjects.service';
+import { ISubject } from '../../core/models/subjects.model';
 import { IDashboardTaskPreview } from './models/task.model';
 import { ProgressBar } from '../../shared/progress-bar/progress-bar';
 
@@ -27,8 +27,9 @@ export class Dashboard implements OnInit {
   });
   hasMoreAssignments = computed(() => {
     const data = this.dashboard();
-    return !!data && 'assignments' in data
-      && data.assignments.totalCount > data.assignments.items.length;
+    return (
+      !!data && 'assignments' in data && data.assignments.totalCount > data.assignments.items.length
+    );
   });
   subjects = signal<ISubject[]>([]);
   tasks = signal<IDashboardTaskPreview[]>([]);
@@ -56,8 +57,8 @@ export class Dashboard implements OnInit {
       };
     }),
   );
-  subjectNames = computed(() =>
-    new Map(this.subjects().map((subject) => [String(subject.id), subject.name])),
+  subjectNames = computed(
+    () => new Map(this.subjects().map((subject) => [String(subject.id), subject.name])),
   );
 
   constructor(
@@ -90,9 +91,10 @@ export class Dashboard implements OnInit {
           if ('assignments' in data) {
             return of({ data, subjects, tasks: data.assignments.items });
           }
-          const tasks: Observable<IDashboardTaskPreview[]> = data.tasks.totalCount > data.tasks.items.length
-            ? this.dashboardService.getAllTasks()
-            : of(data.tasks.items);
+          const tasks: Observable<IDashboardTaskPreview[]> =
+            data.tasks.totalCount > data.tasks.items.length
+              ? this.dashboardService.getAllTasks()
+              : of(data.tasks.items);
           return tasks.pipe(map((tasks) => ({ data, subjects, tasks })));
         }),
       )
