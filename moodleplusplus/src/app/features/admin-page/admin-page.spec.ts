@@ -159,7 +159,7 @@ describe('AdminPage', () => {
     service.createUser.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 409 })));
     component.setSearchQuery('no matches');
     component.openCreate();
-    component.userForm.setValue({ name: 'New User', email: 'new@example.com', password: 'secret', role: 1 });
+    component.userForm.setValue({ name: 'New User', email: 'new@example.com', password: 'secret', role: 3 });
     fixture.detectChanges();
     const element: HTMLElement = fixture.nativeElement;
     element.querySelector<HTMLFormElement>('.create-user-form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
