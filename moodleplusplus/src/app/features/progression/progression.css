@@ -1,0 +1,91 @@
+.progression-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	padding: 2rem;
+	color: var(--color-text);
+}
+
+.header-card {
+	padding: 1.5rem 1.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: 1.5rem;
+	background: var(--color-surface);
+	box-shadow: 0 12px 24px rgb(15 23 42 / 8%);
+}
+
+.header-title {
+	font-size: 2.25rem;
+	font-weight: 600;
+	margin-bottom: 1rem;
+}
+
+.header-row {
+	display: flex;
+	align-items: stretch;
+	gap: 1.5rem;
+}
+
+.stat-card {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 1.25rem 1.5rem;
+	border: 1px solid var(--color-border);
+	border-radius: 1rem;
+	background: var(--color-surface);
+	margin-top: 2rem;
+}
+
+.stat-label {
+	font-size: 0.9rem;
+	color: var(--color-text);
+}
+
+.stat-value {
+	font-size: 1.75rem;
+	font-weight: 700;
+}
+
+app-progress-bar ::ng-deep .progress-heading {
+	display: none;
+}
+
+app-progress-bar ::ng-deep .progress-track {
+	height: 0.9rem;
+	width: 100%;
+}
+
+.tables-container {
+	display: flex;
+	gap: 2rem;
+}
+
+.task-table,
+.goal-table {
+	flex-direction: column;
+	width: 50%;
+}
+
+@media (max-width: 1024px) {
+	.tables-container {
+		flex-direction: column;
+	}
+
+	.task-table,
+	.goal-table {
+		width: 100%;
+	}
+}
+
+@media (max-width: 640px) {
+	.header-card {
+		padding: 1.25rem;
+	}
+
+	.header-row {
+		flex-direction: column;
+		align-items: stretch;
+	}
+}

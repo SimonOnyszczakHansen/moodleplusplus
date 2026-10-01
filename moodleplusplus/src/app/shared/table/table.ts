@@ -38,7 +38,7 @@ export class Table<T extends object = Record<string, unknown>> {
   readonly columns = input<readonly TableColumn<T>[]>([]);
   readonly rows = input<readonly T[]>([]);
   readonly actions = input<readonly TableAction[]>([]);
-  readonly emptyMessage = input('No data to display.');
+  readonly emptyMessage = input('Ingen data at vise.');
   readonly actionClick = output<TableActionEvent<T>>();
 
   // Custom per-column cell content, projected via <ng-template appTableCell="key">.
