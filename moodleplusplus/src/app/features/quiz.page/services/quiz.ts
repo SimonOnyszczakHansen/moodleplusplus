@@ -15,7 +15,7 @@ export class QuizService {
   }
 
   getQuizzesByStudent(): Observable<Quiz[]> {
-    return this.http.get<Quiz[]>(`${environment.apiHost}/quiz/student`);
+    return this.http.get<Quiz[]>(`${environment.apiHost}/quiz/students/me/quizzes`);
   }
 
   getMyQuizStatus(quizId: string): Observable<QuizStudentResponse> {

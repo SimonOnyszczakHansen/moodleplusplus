@@ -1,0 +1,38 @@
+<div class="progression-container">
+	<div class="header-card">
+		<h1 class="header-title">Progression - {{ progress()!.subject.name }}</h1>
+		<div class="header-row">
+			<div class="stat-card">
+				<span class="stat-label">Samlet Progression</span>
+				<span class="stat-value">{{ progress()!.completionPercentage | number:'1.0-2' }}%</span>
+				<app-progress-bar [value]="progress()!.completionPercentage"></app-progress-bar>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Godkendte Opgaver</span>
+				<span class="stat-value">{{ progress()!.summary.tasks.approved }} / {{
+					progress()!.summary.tasks.assigned }}</span>
+				<app-progress-bar [value]="progress()!.summary.tasks.completionPercentage"></app-progress-bar>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Gennemførte Quizzer</span>
+				<span class="stat-value">{{ progress()!.summary.quizzes.completed }} / {{
+					progress()!.summary.quizzes.assigned }}</span>
+				<app-progress-bar [value]="progress()!.summary.quizzes.completionPercentage"></app-progress-bar>
+			</div>
+		</div>
+	</div>
+	<div class="tables-container">
+		<app-table class="task-table" [rows]="progress()!.tasks"
+			[columns]="[{ key: 'title', label: 'Opgave' }, { key: 'status', label: 'Status' }]">
+			<ng-template appTableCell="status" let-row>
+				<app-status-badge [label]="statusLabelTask(row.status)" [variant]="statusLabelTask(row.status)" />
+			</ng-template>
+		</app-table>
+		<app-table class="goal-table" [rows]="progress()!.quizzes"
+			[columns]="[{ key: 'title', label: 'Quiz' }, { key: 'status', label: 'Status' }]">
+			<ng-template appTableCell="status" let-row>
+				<app-status-badge [label]="statusLabelQuiz(row.status)" [variant]="statusLabelQuiz(row.status)" />
+			</ng-template>
+		</app-table>
+	</div>
+</div>

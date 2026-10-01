@@ -15,6 +15,7 @@ import { CreateQuiz } from './features/quiz.page/components/create-quiz/create-q
 import { AnswerQuiz } from './features/quiz.page/components/answer-quiz/answer-quiz';
 import { QuizReview } from './features/quiz.page/components/quiz-review/quiz-review';
 import { teacherGuard } from './core/guards/teacher-guard';
+import { Progression } from './features/progression/progression';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -28,13 +29,18 @@ export const routes: Routes = [
   { path: 'tasks/:id', component: TaskDetails, canActivate: [authGuard, consentGuard] },
   {
     path: 'tasks/:taskId/assignments/:assignmentId/history',
-    loadComponent: () => import('./features/submission-history/submission-history').then((m) => m.SubmissionHistory),
+    loadComponent: () =>
+      import('./features/submission-history/submission-history').then((m) => m.SubmissionHistory),
     canActivate: [authGuard, consentGuard],
   },
   { path: 'objectives/:subjectId', component: Objectives, canActivate: [authGuard, consentGuard] },
   { path: 'quizzes/create', component: CreateQuiz, canActivate: [authGuard, consentGuard] },
   { path: 'quizzes/:quizId/answer', component: AnswerQuiz, canActivate: [authGuard, consentGuard] },
-  { path: 'quizzes/:quizId/review/:studentId', component: QuizReview, canActivate: [authGuard, consentGuard] },
+  {
+    path: 'quizzes/:quizId/review/:studentId',
+    component: QuizReview,
+    canActivate: [authGuard, consentGuard],
+  },
   { path: 'quizzes', component: QuizPage, canActivate: [authGuard, consentGuard] },
   { path: 'login', component: Login },
   { path: 'consent', component: ConsentPage, canActivate: [authGuard] },
@@ -43,6 +49,11 @@ export const routes: Routes = [
   {
     path: 'subject/:id',
     component: SubjectOverview,
+    canActivate: [authGuard, consentGuard],
+  },
+  {
+    path: 'progress/students/:studentId/subjects/:subjectId',
+    loadComponent: () => import('./features/progression/progression').then((m) => m.Progression),
     canActivate: [authGuard, consentGuard],
   },
   {
