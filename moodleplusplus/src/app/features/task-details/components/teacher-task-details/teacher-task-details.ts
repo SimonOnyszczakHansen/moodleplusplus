@@ -1,14 +1,15 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { IObjective } from '../../../../core/models/educationgoal.model';
-import { Objectives as ObjectivesService } from '../../../objectives/services/objectives';
 import { DatePipe } from '@angular/common';
-import { Task as TaskService } from '../../../task-page/services/task';
-import { ICreateTaskRequest, ITaskAssignmentRow, ITeacherTaskDetail, ReviewStatus, TaskStatus } from '../../../task-page/models/task.model';
-import { ISubject } from '../../../task-page/models/subject.model';
-import { IAssignee } from '../../../task-page/models/assignee.model';
+import { FormsModule } from '@angular/forms';
+
+// Services
+import { Objectives as ObjectivesService } from '../../../objectives/services/objectives';
+import { TasksService } from '../../../../core/services/tasks/tasks.service';
+
+// Shared
 import { Button } from '../../../../shared/button/button';
 import { StatusBadge } from '../../../../shared/status-badge/status-badge';
 import { Table, TableCellTemplate, TableColumn } from '../../../../shared/table/table';
@@ -16,364 +17,437 @@ import { Modal } from '../../../../shared/modal/modal';
 import { Input } from '../../../../shared/input/input';
 import { Dropdown, DropdownOption } from '../../../../shared/dropdown/dropdown';
 import { ActionMenu } from '../../../../shared/action-menu/action-menu';
-import { FormsModule } from '@angular/forms';
+
+// Models
+import { IObjective } from '../../../../core/models/educationgoal.model';
+import {
+  ICreateTaskRequest,
+  ITaskAssignmentRow,
+  ITeacherTaskDetail,
+  ReviewStatus,
+  TaskStatus,
+} from '../../../../core/models/tasks.model';
+import { ISubject } from '../../../../core/models/subjects.model';
+import { IAssignee } from '../../../../core/models/assignee.model';
+import { SubjectsService } from '../../../../core/services/subjects/subjects.service';
 
 // Flattened roster row for the shared Table component - feedback is a dummy key, only used to place the buttons column.
 interface RosterRow {
-	assignmentId: string;
-	studentId?: string;
-	name: string;
-	submittedAt: string | null;
-	status: TaskStatus;
-	fileName: string | null;
-	comment: string | null;
-	feedback: null;
+  assignmentId: string;
+  studentId?: string;
+  name: string;
+  submittedAt: string | null;
+  status: TaskStatus;
+  fileName: string | null;
+  comment: string | null;
+  feedback: null;
 }
 
 @Component({
-	selector: 'app-teacher-task-details',
-	imports: [DatePipe, FormsModule, Button, StatusBadge, Table, TableCellTemplate, Modal, Input, Dropdown, ActionMenu],
-	templateUrl: './teacher-task-details.html',
-	styleUrl: './teacher-task-details.css',
+  selector: 'app-teacher-task-details',
+  imports: [
+    DatePipe,
+    FormsModule,
+    Button,
+    StatusBadge,
+    Table,
+    TableCellTemplate,
+    Modal,
+    Input,
+    Dropdown,
+    ActionMenu,
+  ],
+  templateUrl: './teacher-task-details.html',
+  styleUrl: './teacher-task-details.css',
 })
 export class TeacherTaskDetails implements OnInit {
-	teacherTask = signal<ITeacherTaskDetail | null>(null);
+  teacherTask = signal<ITeacherTaskDetail | null>(null);
 
-	feedbackVisible = false;
-	addObjectiveVisible = false;
-	updateVisible = false;
+  feedbackVisible = false;
+  addObjectiveVisible = false;
+  updateVisible = false;
 
-	// description/deadline are always real strings here (populated from ITask), unlike the create-flow's optional fields.
-	taskEditModel: Required<ICreateTaskRequest> = { subjectId: '', title: '', description: '', deadline: '' };
-	subjects = signal<ISubject[]>([]);
-	groups = signal<IAssignee[]>([]);
-	students = signal<IAssignee[]>([]);
-	objectives = signal<IObjective[]>([]);
-	reviewingAssignmentId = signal<string | null>(null);
-	reviewError = signal<string | null>(null);
-	downloadingAssignmentId = signal<string | null>(null);
-	selectedObjectiveIds: string[] = [];
-	selectedRosterRow = signal<RosterRow | null>(null);
-	feedbackError = signal<string | null>(null);
-	readonly reviewStatusOptions: DropdownOption[] = [
-		{ value: 'Godkendt', label: 'Godkend' },
-		{ value: 'Ikke godkendt', label: 'Afvis' },
-	];
-	selectedReviewStatus = '';
+  // description/deadline are always real strings here (populated from ITask), unlike the create-flow's optional fields.
+  taskEditModel: Required<ICreateTaskRequest> = {
+    subjectId: '',
+    title: '',
+    description: '',
+    deadline: '',
+  };
+  subjects = signal<ISubject[]>([]);
+  groups = signal<IAssignee[]>([]);
+  students = signal<IAssignee[]>([]);
+  objectives = signal<IObjective[]>([]);
+  reviewingAssignmentId = signal<string | null>(null);
+  reviewError = signal<string | null>(null);
+  downloadingAssignmentId = signal<string | null>(null);
+  selectedObjectiveIds: string[] = [];
+  selectedRosterRow = signal<RosterRow | null>(null);
+  feedbackError = signal<string | null>(null);
+  readonly reviewStatusOptions: DropdownOption[] = [
+    { value: 'Godkendt', label: 'Godkend' },
+    { value: 'Ikke godkendt', label: 'Afvis' },
+  ];
+  selectedReviewStatus = '';
 
+  studentSearchQuery = '';
+  selectedAssignees: IAssignee[] = [];
+  existingAssignments = signal<ITaskAssignmentRow[]>([]);
 
-	studentSearchQuery = '';
-	selectedAssignees: IAssignee[] = [];
-	existingAssignments = signal<ITaskAssignmentRow[]>([]);
+  feedbackText = '';
 
-	feedbackText = '';
+  readonly rosterColumns: TableColumn<RosterRow>[] = [
+    { key: 'name', label: 'Elever' },
+    { key: 'submittedAt', label: 'Afleveringsdato' },
+    { key: 'status', label: 'Status' },
+    { key: 'fileName', label: 'Aflevering' },
+    { key: 'comment', label: 'Kommentar' },
+    { key: 'feedback', label: '  ' },
+  ];
 
-	readonly rosterColumns: TableColumn<RosterRow>[] = [
-		{ key: 'name', label: 'Elever' },
-		{ key: 'submittedAt', label: 'Afleveringsdato' },
-		{ key: 'status', label: 'Status' },
-		{ key: 'fileName', label: 'Aflevering' },
-		{ key: 'comment', label: 'Kommentar' },
-		{ key: 'feedback', label: '  ' },
-	];
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private tasksService: TasksService,
+    private subjectsServive: SubjectsService,
+    private objectivesService: ObjectivesService,
+  ) {}
 
-	constructor(private route: ActivatedRoute, private taskService: TaskService, private objectivesService: ObjectivesService, private router: Router) { }
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id') ?? '';
+    this.tasksService.getTask(id).subscribe({
+      next: (task) => {
+        this.teacherTask.set(task);
+        this.loadSubmissions(task.assignments);
+      },
+      error: () => {
+        this.teacherTask.set(null);
+      },
+    });
 
-	ngOnInit(): void {
-		const id = this.route.snapshot.paramMap.get('id') ?? '';
-		this.taskService.getTask(id).subscribe({
-			next: (task) => {
-				this.teacherTask.set(task);
-				this.loadSubmissions(task.assignments);
-			},
-			error: () => { this.teacherTask.set(null); },
-		});
+    this.subjectsServive.getMySubjects().subscribe({
+      next: (subjects) => this.subjects.set(subjects),
+    });
 
-		this.taskService.getSubjects().subscribe({ next: (subjects) => { this.subjects.set(subjects); } });
-		this.taskService.getGroups().subscribe({ next: (groups) => { this.groups.set(groups); } });
-		this.taskService.getStudents().subscribe({ next: (students) => { this.students.set(students); } });
-	}
+    this.tasksService.getGroups().subscribe({
+      next: (groups) => {
+        this.groups.set(groups);
+      },
+    });
+    this.tasksService.getStudents().subscribe({
+      next: (students) => {
+        this.students.set(students);
+      },
+    });
+  }
 
-	// /tasks/{id} doesn't embed submissions - fetch each non-empty assignment's submission separately.
-	private loadSubmissions(assignments: ITaskAssignmentRow[]): void {
-		const submitted = assignments.filter((a) => a.status !== 'Ikke afleveret');
-		if (!submitted.length) return;
+  // /tasks/{id} doesn't embed submissions - fetch each non-empty assignment's submission separately.
+  private loadSubmissions(assignments: ITaskAssignmentRow[]): void {
+    const submitted = assignments.filter((a) => a.status !== 'Ikke afleveret');
+    if (!submitted.length) return;
 
-		const requests = submitted.map((assignment) =>
-			this.taskService.getSubmission(assignment.assignmentId).pipe(
-				map((submission) => ({ assignmentId: assignment.assignmentId, submission })),
-				catchError(() => of({ assignmentId: assignment.assignmentId, submission: null })),
-			),
-		);
+    const requests = submitted.map((assignment) =>
+      this.tasksService.getSubmission(assignment.assignmentId).pipe(
+        map((submission) => ({ assignmentId: assignment.assignmentId, submission })),
+        catchError(() => of({ assignmentId: assignment.assignmentId, submission: null })),
+      ),
+    );
 
-		forkJoin(requests).subscribe((results) => {
-			const current = this.teacherTask();
-			if (!current) return;
+    forkJoin(requests).subscribe((results) => {
+      const current = this.teacherTask();
+      if (!current) return;
 
-			const submissionByAssignmentId = new Map(results.map((r) => [r.assignmentId, r.submission]));
-			this.teacherTask.set({
-				...current,
-				assignments: current.assignments.map((a) => ({
-					...a,
-					submission: submissionByAssignmentId.get(a.assignmentId) ?? a.submission,
-				})),
-			});
-		});
-	}
+      const submissionByAssignmentId = new Map(results.map((r) => [r.assignmentId, r.submission]));
+      this.teacherTask.set({
+        ...current,
+        assignments: current.assignments.map((a) => ({
+          ...a,
+          submission: submissionByAssignmentId.get(a.assignmentId) ?? a.submission,
+        })),
+      });
+    });
+  }
 
-	get subjectOptions(): DropdownOption[] {
-		return this.subjects().map((subject) => ({ value: subject.id, label: subject.name }));
-	}
+  get subjectOptions(): DropdownOption[] {
+    return this.subjects().map((subject) => ({
+      value: subject.id.toString(),
+      label: subject.name,
+    }));
+  }
 
-	isLikelyUrl(value: string): boolean {
-		return /^https?:\/\//i.test(value.trim());
-	}
+  isLikelyUrl(value: string): boolean {
+    return /^https?:\/\//i.test(value.trim());
+  }
 
-	get filteredAssignees(): IAssignee[] {
-		const query = this.studentSearchQuery.trim().toLowerCase();
-		if (!query) return [];
+  get filteredAssignees(): IAssignee[] {
+    const query = this.studentSearchQuery.trim().toLowerCase();
+    if (!query) return [];
 
-		return [...this.students(), ...this.groups()].filter(
-			(assignee) =>
-				assignee.name.toLowerCase().includes(query) &&
-				!this.selectedAssignees.some((selected) => selected.id === assignee.id),
-		);
-	}
+    return [...this.students(), ...this.groups()].filter(
+      (assignee) =>
+        assignee.name.toLowerCase().includes(query) &&
+        !this.selectedAssignees.some((selected) => selected.id === assignee.id),
+    );
+  }
 
-	get rosterRows(): RosterRow[] {
-		const teacherTask = this.teacherTask();
-		if (!teacherTask) return [];
+  get rosterRows(): RosterRow[] {
+    const teacherTask = this.teacherTask();
+    if (!teacherTask) return [];
 
-		return teacherTask.assignments.map((row) => ({
-			assignmentId: row.assignmentId,
-			studentId: row.studentId,
-			name: row.studentName ?? row.groupName ?? '—',
-			submittedAt: row.submission?.submittedAt ?? null,
-			status: row.status,
-			fileName: row.submission?.file?.fileName ?? null,
-			comment: row.submission?.comment ?? null,
-			feedback: null,
-		}));
-	}
+    return teacherTask.assignments.map((row) => ({
+      assignmentId: row.assignmentId,
+      studentId: row.studentId,
+      name: row.studentName ?? row.groupName ?? '—',
+      submittedAt: row.submission?.submittedAt ?? null,
+      status: row.status,
+      fileName: row.submission?.file?.fileName ?? null,
+      comment: row.submission?.comment ?? null,
+      feedback: null,
+    }));
+  }
 
-	onViewHistory(row: RosterRow): void {
-		const teacherTask = this.teacherTask();
-		if (!teacherTask) return;
+  onViewHistory(row: RosterRow): void {
+    const teacherTask = this.teacherTask();
+    if (!teacherTask) return;
 
-		this.router.navigate(['/tasks', teacherTask.id, 'assignments', row.assignmentId, 'history'], {
-			queryParams: { name: row.name, studentId: row.studentId ?? null, returnTo: `/tasks/${teacherTask.id}` },
-		});
-	}
+    this.router.navigate(['/tasks', teacherTask.id, 'assignments', row.assignmentId, 'history'], {
+      queryParams: {
+        name: row.name,
+        studentId: row.studentId ?? null,
+        returnTo: `/tasks/${teacherTask.id}`,
+      },
+    });
+  }
 
-	onViewFeedback(): void {
-		this.feedbackVisible = true;
-		console.log(this.reviewingAssignmentId());
-	}
+  onViewFeedback(): void {
+    this.feedbackVisible = true;
+    console.log(this.reviewingAssignmentId());
+  }
 
-	onViewAddObjective(): void {
-		const teacherTask = this.teacherTask();
-		if (!teacherTask) return;
+  onViewAddObjective(): void {
+    const teacherTask = this.teacherTask();
+    if (!teacherTask) return;
 
-		const attachedIds = new Set(teacherTask.objectives.map((o) => o.objectiveId));
+    const attachedIds = new Set(teacherTask.objectives.map((o) => o.objectiveId));
 
-		this.objectivesService.getObjectivesBySubject(teacherTask.subjectId).subscribe({
-			next: (objectives) => {
-				this.objectives.set(objectives.filter((o) => !attachedIds.has(o.objectiveId)));
-			},
-		});
+    this.objectivesService.getObjectivesBySubject(teacherTask.subjectId).subscribe({
+      next: (objectives) => {
+        this.objectives.set(objectives.filter((o) => !attachedIds.has(o.objectiveId)));
+      },
+    });
 
-		this.selectedObjectiveIds = [];
-		this.addObjectiveVisible = true;
-	}
+    this.selectedObjectiveIds = [];
+    this.addObjectiveVisible = true;
+  }
 
-	isObjectiveSelected(objectiveId: string): boolean {
-		return this.selectedObjectiveIds.includes(objectiveId);
-	}
+  isObjectiveSelected(objectiveId: string): boolean {
+    return this.selectedObjectiveIds.includes(objectiveId);
+  }
 
-	onToggleObjective(objectiveId: string): void {
-		this.selectedObjectiveIds = this.isObjectiveSelected(objectiveId)
-			? this.selectedObjectiveIds.filter((id) => id !== objectiveId)
-			: [...this.selectedObjectiveIds, objectiveId];
-	}
+  onToggleObjective(objectiveId: string): void {
+    this.selectedObjectiveIds = this.isObjectiveSelected(objectiveId)
+      ? this.selectedObjectiveIds.filter((id) => id !== objectiveId)
+      : [...this.selectedObjectiveIds, objectiveId];
+  }
 
-	onViewUpdate(): void {
-		const teacherTask = this.teacherTask();
-		if (!teacherTask) return;
+  onViewUpdate(): void {
+    const teacherTask = this.teacherTask();
+    if (!teacherTask) return;
 
-		this.taskEditModel = {
-			subjectId: teacherTask.subjectId,
-			title: teacherTask.title,
-			description: teacherTask.description,
-			deadline: teacherTask.deadline,
-		};
-		this.existingAssignments.set(teacherTask.assignments);
-		this.studentSearchQuery = '';
-		this.selectedAssignees = [];
-		this.updateVisible = true;
-	}
+    this.taskEditModel = {
+      subjectId: teacherTask.subjectId,
+      title: teacherTask.title,
+      description: teacherTask.description,
+      deadline: teacherTask.deadline,
+    };
+    this.existingAssignments.set(teacherTask.assignments);
+    this.studentSearchQuery = '';
+    this.selectedAssignees = [];
+    this.updateVisible = true;
+  }
 
-	onAddAssignee(assignee: IAssignee): void {
-		this.selectedAssignees = [...this.selectedAssignees, assignee];
-		this.studentSearchQuery = '';
-	}
+  onAddAssignee(assignee: IAssignee): void {
+    this.selectedAssignees = [...this.selectedAssignees, assignee];
+    this.studentSearchQuery = '';
+  }
 
-	onRemoveAssignee(assignee: IAssignee): void {
-		this.selectedAssignees = this.selectedAssignees.filter((selected) => selected.id !== assignee.id);
-	}
+  onRemoveAssignee(assignee: IAssignee): void {
+    this.selectedAssignees = this.selectedAssignees.filter(
+      (selected) => selected.id !== assignee.id,
+    );
+  }
 
-	onRemoveExistingAssignment(assignment: ITaskAssignmentRow): void {
-		this.taskService.removeAssignment(assignment.assignmentId).subscribe({
-			next: () => {
-				this.existingAssignments.update((assignments) => assignments.filter((a) => a.assignmentId !== assignment.assignmentId));
-			},
-		});
-	}
+  onRemoveExistingAssignment(assignment: ITaskAssignmentRow): void {
+    this.tasksService.removeAssignment(assignment.assignmentId).subscribe({
+      next: () => {
+        this.existingAssignments.update((assignments) =>
+          assignments.filter((a) => a.assignmentId !== assignment.assignmentId),
+        );
+      },
+    });
+  }
 
-	onSubmitUpdate(): void {
-		const teacherTask = this.teacherTask();
-		if (!teacherTask) return;
-		const taskId = teacherTask.id;
+  onSubmitUpdate(): void {
+    const teacherTask = this.teacherTask();
+    if (!teacherTask) return;
+    const taskId = teacherTask.id;
 
-		this.taskService.updateTask(taskId, this.taskEditModel).subscribe({
-			next: (task) => {
-				const current = this.teacherTask();
-				if (!current) return;
-				this.teacherTask.set({ ...current, ...task });
+    this.tasksService.updateTask(taskId, this.taskEditModel).subscribe({
+      next: (task) => {
+        const current = this.teacherTask();
+        if (!current) return;
+        this.teacherTask.set({ ...current, ...task });
 
-				const students = this.selectedAssignees.filter((a) => a.type === 'student');
-				const groups = this.selectedAssignees.filter((a) => a.type === 'group');
+        const students = this.selectedAssignees.filter((a) => a.type === 'student');
+        const groups = this.selectedAssignees.filter((a) => a.type === 'group');
 
-				if (!students.length && !groups.length) {
-					this.updateVisible = false;
-					return;
-				}
+        if (!students.length && !groups.length) {
+          this.updateVisible = false;
+          return;
+        }
 
-				const studentIds = students.map((a) => a.id);
-				const groupIds = groups.map((a) => a.id);
+        const studentIds = students.map((a) => a.id);
+        const groupIds = groups.map((a) => a.id);
 
-				this.taskService.assignTask(taskId, studentIds, groupIds).subscribe({
-					next: (assignments) => {
-						const current = this.teacherTask();
-						if (!current) return;
+        this.tasksService.assignTask(taskId, studentIds, groupIds).subscribe({
+          next: (assignments) => {
+            const current = this.teacherTask();
+            if (!current) return;
 
-						const orderedAssignees = [...students, ...groups];
-						const newRows: ITaskAssignmentRow[] = assignments.map((assignment, index) => ({
-							assignmentId: assignment.assignmentId,
-							studentId: orderedAssignees[index]?.type === 'student' ? orderedAssignees[index].id : undefined,
-							studentName: orderedAssignees[index]?.type === 'student' ? orderedAssignees[index].name : undefined,
-							groupId: assignment.groupId,
-							groupName: assignment.groupName,
-							status: assignment.status,
-							submission: null,
-							feedback: [],
-						}));
+            const orderedAssignees = [...students, ...groups];
+            const newRows: ITaskAssignmentRow[] = assignments.map((assignment, index) => ({
+              assignmentId: assignment.assignmentId,
+              studentId:
+                orderedAssignees[index]?.type === 'student'
+                  ? orderedAssignees[index].id
+                  : undefined,
+              studentName:
+                orderedAssignees[index]?.type === 'student'
+                  ? orderedAssignees[index].name
+                  : undefined,
+              groupId: assignment.groupId,
+              groupName: assignment.groupName,
+              status: assignment.status,
+              submission: null,
+              feedback: [],
+            }));
 
-						this.teacherTask.set({ ...current, assignments: [...this.existingAssignments(), ...newRows] });
-						this.updateVisible = false;
-					},
-				});
-			},
-		});
-	}
-	onSubmitAddObjective(): void {
-		const teacherTask = this.teacherTask();
-		if (!teacherTask) return;
+            this.teacherTask.set({
+              ...current,
+              assignments: [...this.existingAssignments(), ...newRows],
+            });
+            this.updateVisible = false;
+          },
+        });
+      },
+    });
+  }
+  onSubmitAddObjective(): void {
+    const teacherTask = this.teacherTask();
+    if (!teacherTask) return;
 
-		const newObjectives = this.objectives().filter((o) => this.selectedObjectiveIds.includes(o.objectiveId));
-		const allObjectiveIds = [...teacherTask.objectives.map((o) => o.objectiveId), ...this.selectedObjectiveIds];
+    const newObjectives = this.objectives().filter((o) =>
+      this.selectedObjectiveIds.includes(o.objectiveId),
+    );
+    const allObjectiveIds = [
+      ...teacherTask.objectives.map((o) => o.objectiveId),
+      ...this.selectedObjectiveIds,
+    ];
 
-		this.taskService.linkTaskGoals(teacherTask.id, allObjectiveIds).subscribe({
-			next: () => {
-				const current = this.teacherTask();
-				if (!current) return;
-				this.teacherTask.set({ ...current, objectives: [...current.objectives, ...newObjectives] });
-				this.addObjectiveVisible = false;
-			},
-		});
-	}
+    this.tasksService.linkTaskGoals(teacherTask.id, allObjectiveIds).subscribe({
+      next: () => {
+        const current = this.teacherTask();
+        if (!current) return;
+        this.teacherTask.set({ ...current, objectives: [...current.objectives, ...newObjectives] });
+        this.addObjectiveVisible = false;
+      },
+    });
+  }
 
-	onApproveSubmission(row: RosterRow): void {
-		this.onReviewSubmission(row, 'Godkendt');
-	}
+  onApproveSubmission(row: RosterRow): void {
+    this.onReviewSubmission(row, 'Godkendt');
+  }
 
-	onRejectSubmission(row: RosterRow): void {
-		this.onReviewSubmission(row, 'Ikke godkendt');
-	}
+  onRejectSubmission(row: RosterRow): void {
+    this.onReviewSubmission(row, 'Ikke godkendt');
+  }
 
-	onReviewSubmission(row: RosterRow, status: ReviewStatus): void {
-		this.reviewError.set(null);
-		this.reviewingAssignmentId.set(row.assignmentId);
+  onReviewSubmission(row: RosterRow, status: ReviewStatus): void {
+    this.reviewError.set(null);
+    this.reviewingAssignmentId.set(row.assignmentId);
 
-		this.taskService.reviewSubmission(row.assignmentId, status).subscribe({
-			next: () => {
-				this.reviewingAssignmentId.set(null);
-				const current = this.teacherTask();
-				if (!current) return;
+    this.tasksService.reviewSubmission(row.assignmentId, status).subscribe({
+      next: () => {
+        this.reviewingAssignmentId.set(null);
+        const current = this.teacherTask();
+        if (!current) return;
 
-				this.teacherTask.set({
-					...current,
-					assignments: current.assignments.map((assignment) =>
-						assignment.assignmentId === row.assignmentId ? { ...assignment, status } : assignment,
-					),
-				});
-			},
-			error: () => {
-				this.reviewingAssignmentId.set(null);
-				this.reviewError.set('Kunne ikke opdatere status. Prøv igen.');
-			},
-		});
-	}
+        this.teacherTask.set({
+          ...current,
+          assignments: current.assignments.map((assignment) =>
+            assignment.assignmentId === row.assignmentId ? { ...assignment, status } : assignment,
+          ),
+        });
+      },
+      error: () => {
+        this.reviewingAssignmentId.set(null);
+        this.reviewError.set('Kunne ikke opdatere status. Prøv igen.');
+      },
+    });
+  }
 
-	onGiveFeedback(row: RosterRow): void {
-		this.selectedRosterRow.set(row);
-		this.feedbackText = '';
-		this.selectedReviewStatus = '';
-		this.feedbackError.set(null);
-		this.feedbackVisible = true;
-	}
+  onGiveFeedback(row: RosterRow): void {
+    this.selectedRosterRow.set(row);
+    this.feedbackText = '';
+    this.selectedReviewStatus = '';
+    this.feedbackError.set(null);
+    this.feedbackVisible = true;
+  }
 
-	onSubmitFeedback(): void {
-		const teacherTask = this.teacherTask();
-		const row = this.selectedRosterRow();
-		if (!teacherTask || !row || !row.studentId || !this.feedbackText.trim()) return;
+  onSubmitFeedback(): void {
+    const teacherTask = this.teacherTask();
+    const row = this.selectedRosterRow();
+    if (!teacherTask || !row || !row.studentId || !this.feedbackText.trim()) return;
 
-		this.feedbackError.set(null);
-		this.taskService.addFeedback(row.studentId, teacherTask.id, this.feedbackText, row.assignmentId).subscribe({
-			next: () => {
-				const status = this.selectedReviewStatus as ReviewStatus | '';
-				if (status) {
-					this.onReviewSubmission(row, status);
-				}
-				this.feedbackVisible = false;
-				this.feedbackText = '';
-				this.selectedReviewStatus = '';
-				this.selectedRosterRow.set(null);
-			},
-			error: () => {
-				this.feedbackError.set('Kunne ikke sende feedback. Prøv igen.');
-			},
-		});
-	}
+    this.feedbackError.set(null);
+    this.tasksService
+      .addFeedback(row.studentId, teacherTask.id, this.feedbackText, row.assignmentId)
+      .subscribe({
+        next: () => {
+          const status = this.selectedReviewStatus as ReviewStatus | '';
+          if (status) {
+            this.onReviewSubmission(row, status);
+          }
+          this.feedbackVisible = false;
+          this.feedbackText = '';
+          this.selectedReviewStatus = '';
+          this.selectedRosterRow.set(null);
+        },
+        error: () => {
+          this.feedbackError.set('Kunne ikke sende feedback. Prøv igen.');
+        },
+      });
+  }
 
-	onDownloadFile(row: RosterRow): void {
-		if (!row.fileName) return;
+  onDownloadFile(row: RosterRow): void {
+    if (!row.fileName) return;
 
-		this.downloadingAssignmentId.set(row.assignmentId);
-		this.taskService.downloadSubmissionFile(row.assignmentId).subscribe({
-			next: (blob) => {
-				this.downloadingAssignmentId.set(null);
-				const url = URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = url;
-				a.download = row.fileName!;
-				a.click();
-				URL.revokeObjectURL(url);
-			},
-			error: () => this.downloadingAssignmentId.set(null),
-		});
-	}
+    this.downloadingAssignmentId.set(row.assignmentId);
+    this.tasksService.downloadSubmissionFile(row.assignmentId).subscribe({
+      next: (blob) => {
+        this.downloadingAssignmentId.set(null);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = row.fileName!;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.downloadingAssignmentId.set(null),
+    });
+  }
 
-	goBack(): void {
-		this.router.navigate(['/tasks']);
-	}
+  goBack(): void {
+    this.router.navigate(['/tasks']);
+  }
 }

@@ -1,12 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { SubjectList } from './components/subject-list/subject-list';
+
+// Services
 import { AuthService } from '../../core/services/auth.service';
+import { SubjectsService } from '../../core/services/subjects/subjects.service';
+
+// Shared
 import { Button } from '../../shared/button/button';
-import { ICreateSubjectRequest } from './models/subjects.model';
-import { SubjectsService } from './services/subjects';
 import { Modal } from '../../shared/modal/modal';
 import { Input } from '../../shared/input/input';
 import { Router } from '@angular/router';
+
+// Models
+import { ICreateSubjectRequest } from '../../core/models/subjects.model';
 
 @Component({
   selector: 'app-subject-page',

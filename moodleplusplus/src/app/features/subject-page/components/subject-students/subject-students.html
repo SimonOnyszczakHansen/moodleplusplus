@@ -1,0 +1,9 @@
+<div class="container">
+    <header class="page-header">
+        <div class="breadcrumb">Mine Fag / {{ subjectTitle }} / Elever</div>
+    </header>
+
+    <app-table [columns]="columns" [rows]="rows()" [actions]="actions" emptyMessage="Ingen elever fundet."
+        (actionClick)="onActionClick($event)">
+    </app-table>
+</div>

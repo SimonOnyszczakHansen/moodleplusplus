@@ -1,7 +1,3 @@
-@if (userRole === 'student') {
-    <app-student-task></app-student-task>
-}
-
-@if (userRole === 'teacher') {
-    <app-teacher-task></app-teacher-task>
-}
+<div class="container">
+    <app-tasks-list [headerTitle]="'Mine Opgaver'"></app-tasks-list>
+</div>

@@ -1,4 +1,4 @@
-<section class="subject-overview">
+<div class="container">
     <header class="page-header">
         <div class="breadcrumb">Mine Fag / {{ subjectTitle }}</div>
     </header>
@@ -23,53 +23,67 @@
         }
     </div>
 
-    <nav class="tab-bar" aria-label="Emne navigation">
-        <button type="button" class="tab active">Overblik</button>
-        <button type="button" class="tab">Opgaver</button>
-        <button type="button" class="tab">Quizzer</button>
-    </nav>
-
     <div class="overview-grid">
-        <section class="panel tasks-panel">
+        <section class="panel">
             <div class="panel-header">
                 <h2>Opgaver</h2>
-                <a (click)="viewAllTasks()">Se alle &#8594;</a>
+                <a (click)="viewSubjectTasks()">Se alle &#8594;</a>
             </div>
 
-            <div class="task-list">
-                @if (tasks().length) {
+            @if (tasks().length) {
+            <div class="panel-content">
                 @for (task of tasks(); track task.id) {
                 <article class="task-item">
-                    <div>
-                        <!-- <span class="task-status">{{ task.status }}</span> -->
+                    <div class="task-test">
                         <h3>{{ task.title }}</h3>
-                        <span>{{ task.description }}</span>
+                        <div class="hide-overflow">{{ task.description }}</div>
                     </div>
                     <span class="task-deadline">{{ task.deadline }}</span>
                 </article>
                 }
-                } @else {
-                <li class="no-data">Ingen mål er oprettet for dette fag endnu.</li>
-                }
             </div>
+            } @else {
+            <li class="no-data">Ingen opgaver er oprettet for dette fag endnu.</li>
+            }
         </section>
 
-        <section class="panel goals-panel">
+        <section class="panel">
             <div class="panel-header">
                 <h2>Målpinde</h2>
-                <a (click)="viewAllGoals()">Se alle &#8594;</a>
+                <a (click)="viewSubjectGoals()">Se alle &#8594;</a>
             </div>
 
             @if (goals().length) {
-            <ul class="goal-list">
+            <div class="panel-content">
                 @for (goal of goals(); track goal.id) {
                 <li>{{ goal.content }}</li>
                 }
-            </ul>
+            </div>
             } @else {
             <li class="no-data">Ingen mål er oprettet for dette fag endnu.</li>
             }
         </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Elever</h2>
+                <a (click)="viewSubjectStudents()">Se alle &#8594;</a>
+            </div>
+
+            @if (students().length) {
+            <div class="panel-content">
+                @for (student of students(); track student.id) {
+                <li class="student-row">
+                    <div class="student-name">{{ student.name }}</div>
+                    <div class="student-email">{{ student.email }}</div>
+                </li>
+                }
+            </div>
+            } @else {
+            <li class="no-data">Ingen elever er tilknyttet til dette fag endnu.</li>
+            }
+        </section>
+
     </div>
     <app-modal [(open)]="showEditSubject" [title]="'Rediger Fag'">
         <app-input label="Navn" placeholder="Navn" [(value)]="subjectName"></app-input>
@@ -89,4 +103,4 @@
             <app-button variant="danger" [disabled]="isConfirmed" (click)="onSubmitDeleteSubject()">Fjern</app-button>
         </div>
     </app-modal>
-</section>
+</div>

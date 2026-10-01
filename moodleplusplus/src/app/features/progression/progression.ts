@@ -9,7 +9,11 @@ import {
 } from '../../core/models/allstudentsprogress.model';
 import { ProgressBar } from '../../shared/progress-bar/progress-bar';
 import { Table, TableCellTemplate } from '../../shared/table/table';
-import { StatusBadge, StatusVariantTask, StatusVariantQuiz } from '../../shared/status-badge/status-badge';
+import {
+  StatusBadge,
+  StatusVariantTask,
+  StatusVariantQuiz,
+} from '../../shared/status-badge/status-badge';
 import { DecimalPipe } from '@angular/common';
 
 const STATUS_BADGE_TASK: Record<ProgressionTaskStatus, StatusVariantTask> = {
@@ -54,6 +58,9 @@ export class Progression implements OnInit {
   }
 
   private loadProgressionData(studentId: any, subjectId: string): void {
+    if (this.authService.isTeacher) {
+      studentId = this.route.snapshot.paramMap.get('studentId');
+    }
     this.progressionService
       .getStudentSubjectProgress(studentId, subjectId)
       .subscribe((data: IStudentSubjectProgress) => {

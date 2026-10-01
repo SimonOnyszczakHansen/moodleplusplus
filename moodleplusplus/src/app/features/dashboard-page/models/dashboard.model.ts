@@ -1,7 +1,7 @@
 import { IDashboardTask, ITeacherDashboardAssignment } from './task.model';
 import { IDashboardQuiz } from './quiz.model';
-import { ISubject } from '../../subject-page/models/subjects.model';
-import { ITask } from '../../task-page/models/task.model';
+import { ISubject } from '../../../core/models/subjects.model';
+import { ITask } from '../../../core/models/tasks.model';
 
 export interface IPagedResult<T> {
   items: T[];

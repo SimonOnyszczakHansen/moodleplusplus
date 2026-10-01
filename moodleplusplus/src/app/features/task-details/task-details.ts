@@ -10,7 +10,7 @@ import { StudentTaskDetails } from './components/student-task-details/student-ta
   styleUrl: './task-details.css',
 })
 export class TaskDetails {
-    private readonly authService = inject(AuthService);
+  private readonly authService = inject(AuthService);
 
-    userRole = this.authService.currentUser?.role;
+  userRole = this.authService.currentUser?.role;
 }

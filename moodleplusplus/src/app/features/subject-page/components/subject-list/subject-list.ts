@@ -1,11 +1,17 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { SubjectsService } from '../../services/subjects';
 import { Router } from '@angular/router';
-import { Card } from '../../../../shared/card/card';
 import { CommonModule } from '@angular/common';
+
+// Services
+import { SubjectsService } from '../../../../core/services/subjects/subjects.service';
+
+// Shared
+import { Card } from '../../../../shared/card/card';
 import { ProgressBar } from '../../../../shared/progress-bar/progress-bar';
 import { Button } from '../../../../shared/button/button';
-import { ISubject } from '../../models/subjects.model';
+
+// Models
+import { ISubject } from '../../../../core/models/subjects.model';
 
 @Component({
   selector: 'app-subject-list',
