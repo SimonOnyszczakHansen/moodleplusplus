@@ -20,7 +20,7 @@ frontend-staging-build:
     - echo "Frontend image built successfully"
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "pre-production" && $CI_PIPELINE_SOURCE == "push"'
 
 
 frontend-staging-deploy:
@@ -30,13 +30,13 @@ frontend-staging-deploy:
 
   variables:
     STAGING_IMAGE: "lmsfrontend-staging:$CI_COMMIT_SHORT_SHA"
-    RELEASE_PATH: "/var/www/lms-frontend/releases/$CI_COMMIT_SHORT_SHA"
+    RELEASE_PATH: "/var/www/lms-frontend/staging/releases/$CI_COMMIT_SHORT_SHA"
 
   script:
     - echo "Recording previous frontend release"
 
     - |
-      PREVIOUS_RELEASE="$(readlink -f /var/www/lms-frontend/current 2>/dev/null || true)"
+      PREVIOUS_RELEASE="$(readlink -f /var/www/lms-frontend/staging/current 2>/dev/null || true)"
 
       if [ -n "$PREVIOUS_RELEASE" ]; then
         echo "Previous release: $PREVIOUS_RELEASE"
@@ -64,7 +64,7 @@ frontend-staging-deploy:
 
     - echo "Activating frontend release"
 
-    - ln -sfn "$RELEASE_PATH" /var/www/lms-frontend/current
+    - ln -sfn "$RELEASE_PATH" /var/www/lms-frontend/staging/current
 
     - echo "Frontend release activated"
 
@@ -74,7 +74,7 @@ frontend-staging-deploy:
     expire_in: 1 hour
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "pre-production" && $CI_PIPELINE_SOURCE == "push"'
 
 
 frontend-staging-configure:
@@ -147,7 +147,7 @@ frontend-staging-configure:
       echo "Staging Nginx configuration deployed successfully"
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "pre-production" && $CI_PIPELINE_SOURCE == "push"'
 
 
 frontend-staging-verify:
@@ -180,7 +180,7 @@ frontend-staging-verify:
         if [ -n "$PREVIOUS_RELEASE" ] && [ -d "$PREVIOUS_RELEASE" ]; then
           echo "Rolling back to $PREVIOUS_RELEASE"
 
-          ln -sfn "$PREVIOUS_RELEASE" /var/www/lms-frontend/current
+          ln -sfn "$PREVIOUS_RELEASE" /var/www/lms-frontend/staging/current
 
           docker exec nginx nginx -s reload
 
@@ -193,4 +193,4 @@ frontend-staging-verify:
       fi
 
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging" && $CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH == "pre-production" && $CI_PIPELINE_SOURCE == "push"'
