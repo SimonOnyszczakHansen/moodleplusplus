@@ -1,0 +1,12 @@
+<div class="student-task-container">
+	<h1>Mine Opgaver</h1>
+	<app-table [columns]="columns" [rows]="rows()" [actions]="actions" emptyMessage="Ingen opgaver fundet."
+		(actionClick)="onActionClick($event)">
+		<ng-template appTableCell="status" let-row>
+			<app-status-badge [label]="row.status" [variant]="row.status" />
+		</ng-template>
+		<ng-template appTableCell="deadline" let-row>
+			{{ row.deadline | date: 'dd/MM/yyyy' }}
+		</ng-template>
+	</app-table>
+</div>
