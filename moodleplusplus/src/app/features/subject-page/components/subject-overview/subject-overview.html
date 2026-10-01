@@ -1,0 +1,92 @@
+<section class="subject-overview">
+    <header class="page-header">
+        <div class="breadcrumb">Mine Fag / {{ subjectTitle }}</div>
+    </header>
+
+    <div class="hero-card">
+        <div class="hero-content">
+            <p class="eyebrow">Fag</p>
+            <h1>{{ subjectTitle }}</h1>
+            <div class="meta-row">
+                <div class="meta-item">
+                    <span class="meta-label">Underviser</span>
+                    <strong>David Svarrer</strong>
+                </div>
+            </div>
+        </div>
+
+        @if (isTeacher) {
+        <div class="action-row">
+            <app-button variant="secondary" (click)="onEditSubject()">Rediger fag</app-button>
+            <app-button variant="danger" (click)="onDeleteSubject()">Slet fag</app-button>
+        </div>
+        }
+    </div>
+
+    <nav class="tab-bar" aria-label="Emne navigation">
+        <button type="button" class="tab active">Overblik</button>
+        <button type="button" class="tab">Opgaver</button>
+        <button type="button" class="tab">Quizzer</button>
+    </nav>
+
+    <div class="overview-grid">
+        <section class="panel tasks-panel">
+            <div class="panel-header">
+                <h2>Opgaver</h2>
+                <a (click)="viewAllTasks()">Se alle &#8594;</a>
+            </div>
+
+            <div class="task-list">
+                @if (tasks().length) {
+                @for (task of tasks(); track task.id) {
+                <article class="task-item">
+                    <div>
+                        <!-- <span class="task-status">{{ task.status }}</span> -->
+                        <h3>{{ task.title }}</h3>
+                        <span>{{ task.description }}</span>
+                    </div>
+                    <span class="task-deadline">{{ task.deadline }}</span>
+                </article>
+                }
+                } @else {
+                <li class="no-data">Ingen mål er oprettet for dette fag endnu.</li>
+                }
+            </div>
+        </section>
+
+        <section class="panel goals-panel">
+            <div class="panel-header">
+                <h2>Målpinde</h2>
+                <a (click)="viewAllGoals()">Se alle &#8594;</a>
+            </div>
+
+            @if (goals().length) {
+            <ul class="goal-list">
+                @for (goal of goals(); track goal.id) {
+                <li>{{ goal.content }}</li>
+                }
+            </ul>
+            } @else {
+            <li class="no-data">Ingen mål er oprettet for dette fag endnu.</li>
+            }
+        </section>
+    </div>
+    <app-modal [(open)]="showEditSubject" [title]="'Rediger Fag'">
+        <app-input label="Navn" placeholder="Navn" [(value)]="subjectName"></app-input>
+
+        <div class="modal-actions">
+            <app-button label="Annuller" variant="secondary" (click)="onCancelEditSubject()">Anuller</app-button>
+            <app-button label="Opret" variant="primary" (click)="onSubmitEditSubject()">Gem</app-button>
+        </div>
+    </app-modal>
+
+    <app-modal [(open)]="showDeleteSubject" [title]="'Fjern Fag'">
+        <app-input label="Skriv 'CONFIRM' for at slette faget" placeholder="CONFIRM"
+            [(value)]="deleteConfirm"></app-input>
+
+        <div class="modal-actions">
+            <app-button variant="secondary" (click)="onCancelDeleteSubject()">Anuller</app-button>
+            <app-button variant="danger" [disabled]="isConfirmed" (click)="onSubmitDeleteSubject()">Fjern</app-button>
+        </div>
+    </app-modal>
+</section>

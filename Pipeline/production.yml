@@ -6,8 +6,8 @@ frontend-production-merge-sanity:
   script:
     - |
       if [ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" = "main" ] &&
-         [ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" != "pre-production" ]; then
-        echo "ERROR: main only accepts merge requests from pre-production."
+         [ "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" != "staging" ]; then
+        echo "ERROR: main only accepts merge requests from staging."
         echo "Source: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
         echo "Target: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
         exit 1

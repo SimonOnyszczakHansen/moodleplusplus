@@ -2,16 +2,18 @@
 <p>Kunne ikke hente opgaven.</p>
 } @else if (assignment(); as assignment) {
 <div class="task-details-container">
-	<a routerLink="/tasks" class="back-link">← Mine Opgaver</a>
-	<h1>{{ assignment.title }}</h1>
-	<p class="description">{{ assignment.description }}</p>
+	<app-button class="back-link" variant="secondary" (click)="goBack()">← Mine Opgaver</app-button>
+	<div class="header-card">
+		<h1>{{ assignment.title }}</h1>
+		<p class="description">{{ assignment.description }}</p>
+	</div>
 
 	<div class="panels">
 		<div class="status-card">
 			<h2>Afleveringsstatus</h2>
 			<dl>
 				<dt>Deadline</dt>
-				<dd>{{ assignment.deadline | date: 'dd/MM/yyyy' }}</dd>
+				<dd>{{ assignment.deadline | date: 'dd-MM-yyyy' }}</dd>
 
 				<dt>Status</dt>
 				<dd><app-status-badge [label]="assignment.status" [variant]="assignment.status" /></dd>
@@ -24,7 +26,7 @@
 				<dt>Aflevering</dt>
 				<dd>
 					@if (assignment.submission?.file; as file) {
-					<a [href]="submissionFileUrl" target="_blank">{{ file.fileName }}</a>
+					<p>{{ file.fileName }}</p>
 					<app-button (click)="onDownloadFile(file.fileName)" type="button">Download</app-button>
 					} @else {
 					Ingen fil afleveret
@@ -36,11 +38,14 @@
 					@if (assignment.feedback.length) {
 					<ul>
 						@for (entry of assignment.feedback; track entry.createdAt) {
-						<li>{{ entry.text }} — {{ entry.teacherName }} ({{ entry.createdAt | date: 'dd/MM/yyyy' }})</li>
+						<li>{{ entry.text }} - <span class="feedback-teacher">{{ entry.teacherName }} ({{ entry.createdAt | date: 'dd-MM-yyyy' }})</span></li>
 						}
 					</ul>
 					} @else {
 					Ingen feedback endnu
+					}
+					@if (assignment.submission) {
+					<app-button variant="primary" (click)="onViewHistory(assignment.assignmentId)" class="history-button">Se Historik</app-button>
 					}
 				</dd>
 			</dl>
@@ -61,12 +66,13 @@
 				@if (submitError()) {
 				<p class="submit-error">Aflevering fejlede. Prøv igen.</p>
 				}
+
 			</form>
 			} @else {
 			<p class="already-submitted">Denne opgave er allerede afleveret.</p>
 			}
-		</div>
 
+		</div>
 		<div class="goals-card">
 			<h2>Målpinde</h2>
 			@if (assignment.objectives.length) {

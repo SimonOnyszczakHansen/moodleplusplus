@@ -77,4 +77,18 @@ describe('Modal', () => {
 
 		expect(component.open()).toBe(false);
 	});
+
+	it('prevents dismissal while an operation is pending', async () => {
+		fixture.componentRef.setInput('open', true);
+		fixture.componentRef.setInput('dismissible', false);
+		await fixture.whenStable();
+		fixture.nativeElement.querySelector('button').click();
+		dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
+		await fixture.whenStable();
+		expect(component.open()).toBe(true);
+		expect(dialog.open).toBe(true);
+		fixture.componentRef.setInput('open', false);
+		await fixture.whenStable();
+		expect(dialog.open).toBe(false);
+	});
 });

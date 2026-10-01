@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
@@ -26,23 +26,30 @@ export class App {
   get isAdmin(): boolean {
     return this.authService.isAdmin;
   }
+  
+  get isTeacher(): boolean {
+    return this.authService.isTeacher;
+  }
+  readonly mobileNavOpen = signal(false);
+
+  toggleMobileNav(): void {
+    this.mobileNavOpen.update((open) => !open);
+  }
+
+  closeMobileNav(): void {
+    this.mobileNavOpen.set(false);
+  }
 
   get currentUserRole(): string {
-    // UI-facing Danish label; AuthService/User.role stays in its original casing for logic checks.
+    // UI-facing Danish label; AuthService.currentUser.role is already normalized to lowercase.
     const roleLabels: Record<string, string> = {
       student: 'Elev',
       teacher: 'Underviser',
-	  admin: 'Administrator',
+      administrator: 'Administrator',
     };
 
     const role = this.authService.currentUser?.role;
-    const roleNames: Record<string, string> = {
-      '1': 'admin',
-      '2': 'teacher',
-      '3': 'student',
-    };
-    const normalizedRole = role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase();
-    return (normalizedRole && roleLabels[normalizedRole]) ?? 'Ukendt';
+    return (role ? roleLabels[role] : undefined) ?? 'Ukendt';
   }
 
   logout(): void {

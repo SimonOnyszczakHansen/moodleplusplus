@@ -1,38 +1,112 @@
-import { Component, OnInit } from '@angular/core';
-import { StudentContent } from './components/student-content/student-content';
-import { TeacherContent } from './components/teacher-content/teacher-content';
-import { IDashboard } from './models/dashboard.model';
+import { Component, OnInit, computed, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { DashboardResponse } from './models/dashboard.model';
 import { DashboardService } from './services/dashboard';
-import { AuthService } from '../../core/services/auth.service';
-import { User } from '../../core/models/user.interface';
+import { RouterLink } from '@angular/router';
+import { Observable, catchError, combineLatest, map, of, switchMap } from 'rxjs';
+import { SubjectsService } from '../subject-page/services/subjects';
+import { ISubject } from '../subject-page/models/subjects.model';
+import { IDashboardTaskPreview } from './models/task.model';
+import { ProgressBar } from '../../shared/progress-bar/progress-bar';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StudentContent, TeacherContent],
+  imports: [ProgressBar, DatePipe, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-
 export class Dashboard implements OnInit {
-  userRole?: string;
-  dashboard?: IDashboard;
+  dashboard = signal<DashboardResponse | undefined>(undefined);
+  isTeacherDashboard = computed(() => {
+    const data = this.dashboard();
+    return !!data && 'assignments' in data;
+  });
+  userName = computed(() => {
+    const data = this.dashboard();
+    return data && ('teacherName' in data ? data.teacherName : data.studentName);
+  });
+  hasMoreAssignments = computed(() => {
+    const data = this.dashboard();
+    return !!data && 'assignments' in data
+      && data.assignments.totalCount > data.assignments.items.length;
+  });
+  subjects = signal<ISubject[]>([]);
+  tasks = signal<IDashboardTaskPreview[]>([]);
+  loading = signal(true);
+  error = signal(false);
+  subjectsError = signal(false);
+  pendingTasks = computed(() =>
+    this.tasks()
+      .filter((task) => task.status === 'NotSubmitted' || task.status === 'Rejected')
+      .sort((a, b) => {
+        const first = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+        const second = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+        return first - second;
+      }),
+  );
+  subjectCards = computed(() =>
+    this.subjects().map((subject) => {
+      const tasks = this.tasks().filter((task) => task.subjectId === String(subject.id));
+      const approved = tasks.filter((task) => task.status === 'Approved').length;
+      return {
+        ...subject,
+        assigned: tasks.length,
+        approved,
+        progress: tasks.length ? Math.round((approved / tasks.length) * 100) : 0,
+      };
+    }),
+  );
+  subjectNames = computed(() =>
+    new Map(this.subjects().map((subject) => [String(subject.id), subject.name])),
+  );
 
   constructor(
     private dashboardService: DashboardService,
-    private auth: AuthService,
+    private subjectsService: SubjectsService,
   ) {}
 
   ngOnInit(): void {
-    const role = this.auth.currentUser?.role;
-    const roleNames: Record<string, string> = {
-      '1': 'administrator',
-      '2': 'teacher',
-      '3': 'student',
-    };
-    this.userRole = role === undefined ? undefined : roleNames[String(role).toLowerCase()] ?? String(role).toLowerCase();
+    this.loadDashboard();
+  }
 
-    this.dashboardService.getDashboardData().subscribe((data) => {
-      this.dashboard = data;
-    });
+  loadDashboard(): void {
+    this.loading.set(true);
+    this.error.set(false);
+    this.subjectsError.set(false);
+    combineLatest({
+      data: this.dashboardService.getDashboardData(),
+      subjects: this.subjectsService.getMySubjects().pipe(
+        catchError(() => {
+          // A subject permission error must not abort the in-flight dashboard request.
+          this.subjectsError.set(true);
+          return of<ISubject[]>([]);
+        }),
+      ),
+    })
+      .pipe(
+        switchMap(({ data, subjects }) => {
+          // Teacher tasks are definitions; submission statuses belong to assignments.
+          // Keep teacher pagination separate from the student's /task-assignments/me fallback.
+          if ('assignments' in data) {
+            return of({ data, subjects, tasks: data.assignments.items });
+          }
+          const tasks: Observable<IDashboardTaskPreview[]> = data.tasks.totalCount > data.tasks.items.length
+            ? this.dashboardService.getAllTasks()
+            : of(data.tasks.items);
+          return tasks.pipe(map((tasks) => ({ data, subjects, tasks })));
+        }),
+      )
+      .subscribe({
+        next: ({ data, subjects, tasks }) => {
+          this.dashboard.set(data);
+          this.subjects.set(subjects);
+          this.tasks.set(tasks);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.error.set(true);
+          this.loading.set(false);
+        },
+      });
   }
 }

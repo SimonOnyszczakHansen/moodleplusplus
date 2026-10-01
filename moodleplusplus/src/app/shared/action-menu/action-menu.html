@@ -1,0 +1,8 @@
+<div class="action-menu">
+	<button #toggleButton type="button" class="action-menu-toggle" aria-label="Flere handlinger" (click)="toggle()">⋮</button>
+	@if (open()) {
+		<div class="action-menu-panel" [style.top.px]="panelTop()" [style.right.px]="panelRight()" (click)="close()">
+			<ng-content />
+		</div>
+	}
+</div>

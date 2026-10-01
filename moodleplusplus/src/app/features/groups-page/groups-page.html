@@ -1,0 +1,95 @@
+<section class="groups-page" aria-labelledby="groups-heading">
+  <header class="page-header">
+    <div>
+      <h1 id="groups-heading">Grupper</h1>
+      <p>Opret grupper, og administrer deres medlemmer.</p>
+    </div>
+    <button type="button" class="primary" [disabled]="loading() || !!pageError()" (click)="openEditor()">+ Opret gruppe</button>
+  </header>
+
+  @if (success()) { <p class="success" role="status">{{ success() }}</p> }
+  @if (pageError()) {
+    <div class="notice" role="alert">
+      <p>{{ pageError() }}</p>
+      <button type="button" [disabled]="loading()" (click)="load()">Prøv igen</button>
+    </div>
+  }
+  @if (loading()) {
+    <p role="status">Henter grupper…</p>
+  } @else if (!pageError() && groups().length === 0) {
+    <p class="page-message">Der er ingen grupper endnu.</p>
+  } @else if (!pageError()) {
+    <div class="group-grid">
+      @for (group of groups(); track group.id) {
+        <article class="group-card">
+          <header class="card-header">
+            <h2>{{ group.name }}</h2>
+            <button type="button" class="delete-button" [attr.aria-label]="'Slet ' + group.name" (click)="requestDelete(group)">
+              <span aria-hidden="true">×</span>
+            </button>
+          </header>
+          <p class="member-count">{{ group.students.length }} {{ group.students.length === 1 ? 'medlem' : 'medlemmer' }}</p>
+          <ul class="member-list" tabindex="0" [attr.aria-label]="'Medlemmer i ' + group.name">
+            @for (student of group.students; track student.id) {
+              <li><span>{{ student.name }}</span><small>{{ studentEmails().get(student.id) }}</small></li>
+            } @empty {
+              <li class="muted">Ingen medlemmer endnu.</li>
+            }
+          </ul>
+          <button type="button" class="edit-button" [attr.aria-label]="'Rediger ' + group.name" (click)="openEditor(group)">Rediger</button>
+        </article>
+      }
+    </div>
+  }
+</section>
+
+<app-modal [title]="editingId() ? 'Rediger gruppe' : 'Opret gruppe'" [(open)]="editorOpen" [dismissible]="!saving()">
+  <form (ngSubmit)="save()">
+    <fieldset [disabled]="saving()">
+      <label for="group-name">Gruppenavn</label>
+      <input id="group-name" name="groupName" [ngModel]="name()" (ngModelChange)="name.set($event)" required maxlength="200" autofocus placeholder="Skriv et gruppenavn" />
+
+      <label for="student-search">Tilføj medlemmer</label>
+      <input id="student-search" name="studentSearch" type="search" [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Søg efter navn eller e-mail" autocomplete="off" />
+      <p class="picker-hint">Markér de elever, der skal være med i gruppen. Du kan vælge flere ad gangen.</p>
+      <ul class="search-results" aria-label="Vælg elever">
+        @for (student of filteredStudents(); track student.id) {
+          <li>
+            <label class="search-result">
+              <input type="checkbox" [checked]="selectedStudentIds().has(student.id)" (change)="toggleStudent(student)" />
+              <span>{{ student.name }}<small>{{ student.email }}</small></span>
+            </label>
+          </li>
+        } @empty {
+          <li class="no-results" role="status">{{ search().trim() ? 'Ingen elever matcher din søgning.' : 'Der er ingen elever at tilføje.' }}</li>
+        }
+      </ul>
+
+      <h3>Medlemmer ({{ selectedStudents().length }})</h3>
+      <ul class="selected-members member-list">
+        @for (student of selectedStudents(); track student.id) {
+          <li>
+            <span>{{ student.name }}<small>{{ student.email }}</small></span>
+            <button type="button" [attr.aria-label]="'Fjern ' + student.name" (click)="removeStudent(student.id)">Fjern</button>
+          </li>
+        } @empty {
+          <li class="muted">Vælg elever fra listen ovenfor.</li>
+        }
+      </ul>
+    </fieldset>
+    @if (formError()) { <p class="error" role="alert">{{ formError() }}</p> }
+    <footer class="modal-actions">
+      <button type="button" [disabled]="saving()" (click)="editorOpen.set(false)">Annuller</button>
+      <button type="submit" class="primary" [disabled]="saving() || !name().trim()">{{ saving() ? 'Gemmer…' : editingId() ? 'Gem ændringer' : 'Opret' }}</button>
+    </footer>
+  </form>
+</app-modal>
+
+<app-modal title="Slet gruppe" [open]="!!deletingGroup()" (openChange)="!$event && deletingGroup.set(null)" [dismissible]="!saving()">
+  <p>Vil du slette gruppen <strong>{{ deletingGroup()?.name }}</strong>?</p>
+  @if (deleteError()) { <p class="error" role="alert">{{ deleteError() }}</p> }
+  <footer class="modal-actions">
+    <button type="button" [disabled]="saving()" (click)="deletingGroup.set(null)">Annuller</button>
+    <button type="button" class="danger" [disabled]="saving()" (click)="deleteGroup()">{{ saving() ? 'Sletter…' : 'Slet gruppe' }}</button>
+  </footer>
+</app-modal>

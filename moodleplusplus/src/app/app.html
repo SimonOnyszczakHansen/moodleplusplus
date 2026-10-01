@@ -1,24 +1,36 @@
-
 <div class="app-shell">
   <aside class="sidebar" *ngIf="showNavigation">
-    <div class="brand">Moodle<span class="p1">+</span><span class="p2">+</span></div>
-    <span class="role-tag">{{ currentUserRole }}</span>
+    <div class="sidebar-header">
+      <div class="brand">Moodle<span class="p1">+</span><span class="p2">+</span></div>
+      <button type="button" class="nav-toggle" (click)="toggleMobileNav()" [attr.aria-expanded]="mobileNavOpen()"
+        aria-label="Menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+    </div>
 
-    <nav class="nav-menu" aria-label="Main navigation">
-      @if (isAdmin) {
-        <a routerLink="/admin/users">Brugere</a>
-      } @else {
-        <a routerLink="/dashboard">Dashboard</a>
-        <a routerLink="/dashboard">Fag</a>
-        <a routerLink="/dashboard">Grupper</a>
-        <a routerLink="/dashboard">Opgaver</a>
-        <a routerLink="/quizzes">Quizzer</a>
-      }
-	  <span class="spacer"></span>
-      <button type="button" class="logout-button" (click)="logout()">Log ud</button>
-    </nav>
+    <div class="sidebar-body" [class.open]="mobileNavOpen()">
+      <span class="role-tag">{{ currentUserRole }}</span>
 
-    <div class="user-chip">{{ currentUserName }}</div>
+      <nav class="nav-menu" aria-label="Main navigation">
+        @if (isAdmin) {
+        <a routerLink="/admin/users" (click)="closeMobileNav()">Brugere</a>
+        } @else {
+        <a routerLink="/dashboard" (click)="closeMobileNav()">Dashboard</a>
+        <a routerLink="/subjects" (click)="closeMobileNav()">Fag</a>
+          @if (isTeacher) {
+            <a routerLink="/groups" (click)="closeMobileNav()">Grupper</a>
+          }        
+        <a routerLink="/tasks" (click)="closeMobileNav()">Opgaver</a>
+        <a routerLink="/quizzes" (click)="closeMobileNav()">Quizzer</a>
+        }
+        <span class="spacer"></span>
+        <button type="button" class="logout-button" (click)="logout()">Log ud</button>
+      </nav>
+
+      <div class="user-chip">{{ currentUserName }}</div>
+    </div>
   </aside>
 
   <main class="content-area">

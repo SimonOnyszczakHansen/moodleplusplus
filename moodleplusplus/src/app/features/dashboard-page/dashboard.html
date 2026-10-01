@@ -1,10 +1,87 @@
 <div class="dashboard-container">
-	<h1>Velkommen, {{ dashboard?.username }} </h1>
+  <h1>Velkommen@if (userName()) {, {{ userName() }}}</h1>
 
-	@if (userRole === 'student') {
-	<app-student-content></app-student-content>
-	}
-	@if (userRole === 'teacher') {
-	<app-teacher-content></app-teacher-content>
-	}
+  @if (loading()) {
+    <p role="status">Indlæser dashboard...</p>
+  } @else if (error()) {
+    <div role="alert">
+      <p>Dashboardet kunne ikke indlæses.</p>
+      <button type="button" (click)="loadDashboard()">Prøv igen</button>
+    </div>
+  } @else {
+    <div class="content">
+      <section class="subjects-container" aria-labelledby="subjects-heading">
+        <div class="panel-heading">
+          <h2 id="subjects-heading">Mine fag</h2>
+          <a routerLink="/subjects" class="view-all">Se alle &#8594;</a>
+        </div>
+        <div class="subject-cards">
+          @if (subjectsError()) {
+            <div role="alert">
+              <p>Fagene kunne ikke indlæses.</p>
+              <button type="button" (click)="loadDashboard()">Prøv igen</button>
+            </div>
+          } @else {
+            @for (subject of subjectCards(); track subject.id) {
+              <article class="subject-card">
+                <div class="subject-cover" aria-hidden="true"></div>
+                <div class="subject-content">
+                  <h3>{{ subject.name }}</h3>
+                  @if (!hasMoreAssignments()) {
+                    <app-progress-bar
+                      [value]="subject.progress"
+                      [label]="'Opgaver i ' + subject.name"
+                    ></app-progress-bar>
+                    <p class="progress-details">
+                      @if (subject.assigned) {
+                        {{ subject.approved }} af {{ subject.assigned }} godkendt
+                      } @else {
+                        Ingen opgaver endnu
+                      }
+                    </p>
+                  } @else {
+                    <p class="progress-details">Progression ikke tilgængelig.</p>
+                  }
+                  <a class="subject-link" [routerLink]="['/subject', subject.id]">Gå til fag</a>
+                </div>
+              </article>
+            } @empty {
+              <p class="empty-state">Du har ingen fag endnu.</p>
+            }
+          }
+        </div>
+      </section>
+
+      <section class="deadlines-container" aria-labelledby="deadlines-heading">
+        <h2 id="deadlines-heading">Kommende afleveringer</h2>
+        <div class="deadline-cards">
+          @for (task of pendingTasks().slice(0, 5); track task.assignmentId) {
+            <a class="deadline-card" [routerLink]="['/tasks', isTeacherDashboard() ? task.taskId : task.assignmentId]">
+              <p class="deadline-title">{{ task.title }}</p>
+              <p class="deadline-subject">{{ subjectNames().get(task.subjectId) }}</p>
+              @if (task.recipientName) {
+                <p class="deadline-subject">{{ task.recipientName }}</p>
+              }
+              <div class="deadline-meta">
+                <span class="deadline-status">
+                  {{ task.status === 'Rejected' ? 'Ikke godkendt' : 'Ikke afleveret' }}
+                </span>
+                <span class="deadline-date">
+                  {{ task.deadline ? (task.deadline | date: 'dd-MM-yyyy') : 'Ingen deadline' }}
+                </span>
+              </div>
+            </a>
+          } @empty {
+            <p class="empty-state">
+              {{ hasMoreAssignments() ? 'Ingen afventende afleveringer på denne side.' : 'Ingen afventende afleveringer.' }}
+            </p>
+          }
+        </div>
+        @if (hasMoreAssignments()) {
+          <p class="empty-state">Se alle opgaver for flere afleveringer.</p>
+        }
+        <a routerLink="/tasks" class="view-all deadlines-link">Se alle &#8594;</a>
+      </section>
+    </div>
+  }
 </div>

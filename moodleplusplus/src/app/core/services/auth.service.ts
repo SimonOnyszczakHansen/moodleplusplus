@@ -4,6 +4,14 @@ import { BehaviorSubject, Observable, catchError, finalize, map, of, shareReplay
 import { LoginResponse, User } from '../models/user.interface';
 import { environment } from '../../../environments/environment';
 
+// Backend returns role as a numeric enum on /auth/login (JWT cookie claim has it as a string,
+// but that cookie is HttpOnly and unreadable from JS). Confirmed mapping from backend Swagger:
+const ROLE_MAP: Record<number, string> = {
+  1: 'Administrator',
+  2: 'Teacher',
+  3: 'Student',
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -22,6 +30,8 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${environment.apiHost}/auth/login`, credentials).pipe(
       map((response) => {
         const token = response.jwt ?? response.accessToken ?? '';
+        const rawRole = response.role;
+        const role = typeof rawRole === 'number' ? (ROLE_MAP[rawRole] ?? 'Student') : (rawRole ?? 'Student');
         const user: User = {
           id: response.userId ?? response.id ?? null,
           email: credentials.email,
@@ -78,6 +88,10 @@ export class AuthService {
 
   get isAdmin(): boolean {
     return this.isAuthenticated && ['1', 'administrator', 'admin'].includes(String(this.currentUser?.role).toLowerCase());
+  }
+
+  get isTeacher(): boolean {
+    return this.isAuthenticated && ['2', 'teacher'].includes(String(this.currentUser?.role).toLowerCase());
   }
 
   get hasAcceptedConsent(): boolean {

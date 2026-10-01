@@ -1,0 +1,86 @@
+.history-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	padding: 2rem;
+	max-width: 90%;
+	margin: 0 auto;
+}
+
+h1 {
+	margin: 0;
+	color: var(--color-text);
+	font-size: 1.75rem;
+}
+
+.history-entry {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	background-color: var(--color-surface);
+	padding: 1.5rem;
+	border-radius: 1rem;
+	box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+.history-entry h2 {
+	margin: 0 0 0.5rem;
+	font-size: 1.25rem;
+	color: var(--color-text);
+}
+
+.history-entry h3 {
+	margin: 1rem 0 0.25rem;
+	font-size: 1rem;
+	color: var(--color-text-secondary);
+}
+
+.history-entry p {
+	margin: 0;
+	color: var(--color-text);
+}
+
+.feedback-round {
+	padding: 0.75rem 0;
+	border-bottom: 1px solid var(--color-border);
+}
+
+.feedback-round:last-child {
+	border-bottom: none;
+	padding-bottom: 0;
+}
+
+.feedback-round h3 {
+	margin: 0 0 0.25rem;
+	font-size: 1rem;
+	color: var(--color-text-secondary);
+}
+
+.feedback-round p {
+	margin: 0;
+	color: var(--color-text);
+	font-style: italic;
+}
+
+.feedback-teacher {
+	font-weight: bold;
+	font-size: 0.85rem;
+}
+
+.no-content-text {
+	color: var(--color-text-muted);
+	font-style: italic;
+	margin: 0;
+	font-size: 0.85rem;
+}
+
+.error-message {
+	color: var(--color-danger);
+}
+
+@media (max-width: 768px) {
+	.history-container {
+		padding: 1rem;
+		max-width: 100%;
+	}
+}

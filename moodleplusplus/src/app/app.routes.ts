@@ -5,6 +5,8 @@ import { adminGuard } from './core/guards/admin-guard';
 import { Dashboard } from './features/dashboard-page/dashboard';
 import { ConsentPage } from './features/consent-page/consent-page';
 import { Login } from './features/login-page/login';
+import { SubjectPage } from './features/subject-page/subject-page';
+import { SubjectOverview } from './features/subject-page/components/subject-overview/subject-overview';
 import { Task } from './features/task-page/task';
 import { TaskDetails } from './features/task-details/task-details';
 import { Objectives } from './features/objectives/objectives';
@@ -12,12 +14,23 @@ import { QuizPage } from './features/quiz.page/quiz-page';
 import { CreateQuiz } from './features/quiz.page/components/create-quiz/create-quiz';
 import { AnswerQuiz } from './features/quiz.page/components/answer-quiz/answer-quiz';
 import { QuizReview } from './features/quiz.page/components/quiz-review/quiz-review';
+import { teacherGuard } from './core/guards/teacher-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, consentGuard] },
+  {
+    path: 'groups',
+    loadComponent: () => import('./features/groups-page/groups-page').then((m) => m.GroupsPage),
+    canActivate: [authGuard, consentGuard, teacherGuard],
+  },
   { path: 'tasks', component: Task, canActivate: [authGuard, consentGuard] },
   { path: 'tasks/:id', component: TaskDetails, canActivate: [authGuard, consentGuard] },
+  {
+    path: 'tasks/:taskId/assignments/:assignmentId/history',
+    loadComponent: () => import('./features/submission-history/submission-history').then((m) => m.SubmissionHistory),
+    canActivate: [authGuard, consentGuard],
+  },
   { path: 'objectives/:subjectId', component: Objectives, canActivate: [authGuard, consentGuard] },
   { path: 'quizzes/create', component: CreateQuiz, canActivate: [authGuard, consentGuard] },
   { path: 'quizzes/:quizId/answer', component: AnswerQuiz, canActivate: [authGuard, consentGuard] },
@@ -26,6 +39,12 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'consent', component: ConsentPage, canActivate: [authGuard] },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, consentGuard] },
+  { path: 'subjects', component: SubjectPage, canActivate: [authGuard, consentGuard] },
+  {
+    path: 'subject/:id',
+    component: SubjectOverview,
+    canActivate: [authGuard, consentGuard],
+  },
   {
     path: 'admin/users',
     loadComponent: () => import('./features/admin-page/admin-page').then((m) => m.AdminPage),
