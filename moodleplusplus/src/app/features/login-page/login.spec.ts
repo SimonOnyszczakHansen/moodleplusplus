@@ -10,12 +10,12 @@ describe('Login', () => {
   let component: Login;
   let fixture: ComponentFixture<Login>;
   let request: Subject<User>;
-  let auth: { login: ReturnType<typeof vi.fn>; hasAcceptedConsent: boolean };
+  let auth: { login: ReturnType<typeof vi.fn>; hasAcceptedConsent: boolean; isAdmin: boolean };
   let navigate: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
     request = new Subject<User>();
-    auth = { login: vi.fn(() => request), hasAcceptedConsent: true };
+    auth = { login: vi.fn(() => request), hasAcceptedConsent: true, isAdmin: false };
     navigate = vi.fn();
     await TestBed.configureTestingModule({
       imports: [Login],
@@ -68,13 +68,16 @@ describe('Login', () => {
   });
 
   it.each([
-    [true, '/dashboard'],
-    [false, '/consent'],
-  ])('navigates after a successful login with consent=%s', async (consent, destination) => {
+    [false, true, '/dashboard'],
+    [false, false, '/consent'],
+    [true, true, '/admin/users'],
+    [true, false, '/consent'],
+  ])('navigates after login with admin=%s and consent=%s', async (isAdmin, consent, destination) => {
+    auth.isAdmin = isAdmin;
     auth.hasAcceptedConsent = consent;
     component.loginForm.setValue({ email: 'student@example.com', password: 'test-password' });
     component.onSubmit();
-    request.next({ id: 'student', name: 'Student', email: 'student@example.com', role: 'student' });
+    request.next({ name: 'User', role: isAdmin ? 'administrator' : 'student' });
     request.complete();
     await fixture.whenStable();
     expect(navigate).toHaveBeenCalledWith([destination]);

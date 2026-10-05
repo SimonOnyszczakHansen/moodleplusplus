@@ -53,7 +53,8 @@ export class Login {
       finalize(() => this.isLoggingIn.set(false)),
     ).subscribe({
       next: () => {
-        const destination = this.authService.hasAcceptedConsent ? '/dashboard' : '/consent';
+        const home = this.authService.isAdmin ? '/admin/users' : '/dashboard';
+        const destination = this.authService.hasAcceptedConsent ? home : '/consent';
         this.router.navigate([destination]);
       },
       error: (err: { status: number; error?: { message?: string } }) => {

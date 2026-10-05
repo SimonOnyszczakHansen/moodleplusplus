@@ -15,6 +15,7 @@ import { CreateQuiz } from './features/quiz.page/components/create-quiz/create-q
 import { AnswerQuiz } from './features/quiz.page/components/answer-quiz/answer-quiz';
 import { QuizReview } from './features/quiz.page/components/quiz-review/quiz-review';
 import { teacherGuard } from './core/guards/teacher-guard';
+import { nonAdminGuard } from './core/guards/non-admin-guard';
 import { SubjectTasks } from './features/subject-page/components/subject-tasks/subject-tasks';
 import { SubjectStudents } from './features/subject-page/components/subject-students/subject-students';
 import { SubjectGoals } from './features/subject-page/components/subject-goals/subject-goals';
@@ -24,44 +25,43 @@ import { SubmissionHistory } from './features/submission-history/submission-hist
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: Dashboard, canActivate: [authGuard, consentGuard] },
+  { path: 'dashboard', component: Dashboard, canActivate: [authGuard, nonAdminGuard, consentGuard] },
   {
     path: 'groups',
     loadComponent: () => import('./features/groups-page/groups-page').then((m) => m.GroupsPage),
-    canActivate: [authGuard, consentGuard, teacherGuard],
+    canActivate: [authGuard, nonAdminGuard, consentGuard, teacherGuard],
   },
-  { path: 'tasks', component: Task, canActivate: [authGuard, consentGuard] },
-  { path: 'tasks/:id', component: TaskDetails, canActivate: [authGuard, consentGuard] },
+  { path: 'tasks', component: Task, canActivate: [authGuard, nonAdminGuard, consentGuard] },
+  { path: 'tasks/:id', component: TaskDetails, canActivate: [authGuard, nonAdminGuard, consentGuard] },
   {
     path: 'tasks/:taskId/assignments/:assignmentId/history',
     component: SubmissionHistory,
-    canActivate: [authGuard, consentGuard],
+    canActivate: [authGuard, nonAdminGuard, consentGuard],
   },
-  { path: 'objectives/:subjectId', component: Objectives, canActivate: [authGuard, consentGuard] },
-  { path: 'quizzes/create', component: CreateQuiz, canActivate: [authGuard, consentGuard] },
-  { path: 'quizzes/:quizId/answer', component: AnswerQuiz, canActivate: [authGuard, consentGuard] },
+  { path: 'objectives/:subjectId', component: Objectives, canActivate: [authGuard, nonAdminGuard, consentGuard] },
+  { path: 'quizzes/create', component: CreateQuiz, canActivate: [authGuard, nonAdminGuard, consentGuard] },
+  { path: 'quizzes/:quizId/answer', component: AnswerQuiz, canActivate: [authGuard, nonAdminGuard, consentGuard] },
   {
     path: 'quizzes/:quizId/review/:studentId',
     component: QuizReview,
-    canActivate: [authGuard, consentGuard],
+    canActivate: [authGuard, nonAdminGuard, consentGuard],
   },
-  { path: 'quizzes', component: QuizPage, canActivate: [authGuard, consentGuard] },
+  { path: 'quizzes', component: QuizPage, canActivate: [authGuard, nonAdminGuard, consentGuard] },
   { path: 'login', component: Login },
   { path: 'consent', component: ConsentPage, canActivate: [authGuard] },
-  { path: 'dashboard', component: Dashboard, canActivate: [authGuard, consentGuard] },
-  { path: 'subjects', component: SubjectPage, canActivate: [authGuard, consentGuard] },
-  { path: 'subject/:id', component: SubjectOverview, canActivate: [authGuard, consentGuard] },
-  { path: 'subject/:id/tasks', component: SubjectTasks, canActivate: [authGuard, consentGuard] },
+  { path: 'subjects', component: SubjectPage, canActivate: [authGuard, nonAdminGuard, consentGuard] },
+  { path: 'subject/:id', component: SubjectOverview, canActivate: [authGuard, nonAdminGuard, consentGuard] },
+  { path: 'subject/:id/tasks', component: SubjectTasks, canActivate: [authGuard, nonAdminGuard, consentGuard] },
   {
     path: 'subject/:id/students',
     component: SubjectStudents,
-    canActivate: [authGuard, consentGuard],
+    canActivate: [authGuard, nonAdminGuard, consentGuard],
   },
-  { path: 'subject/:id/goals', component: SubjectGoals, canActivate: [authGuard, consentGuard] },
+  { path: 'subject/:id/goals', component: SubjectGoals, canActivate: [authGuard, nonAdminGuard, consentGuard] },
   {
     path: 'progress/students/:studentId/subjects/:subjectId',
     component: Progression,
-    canActivate: [authGuard, consentGuard],
+    canActivate: [authGuard, nonAdminGuard, consentGuard],
   },
   {
     path: 'admin/users',
