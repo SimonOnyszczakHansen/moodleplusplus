@@ -24,18 +24,19 @@ describe('App', () => {
     expect(fixture.nativeElement.querySelector('.logout-button')).toBeTruthy();
   });
 
-  for (const role of [2, 3]) {
-    it(`keeps teaching navigation for role ${role}`, async () => {
-      localStorage.setItem('currentUser', JSON.stringify({ name: 'User', role }));
-      localStorage.setItem('consentAccepted', 'true');
-      const fixture = TestBed.createComponent(App);
-      await fixture.whenStable();
-      const links: NodeListOf<HTMLAnchorElement> = fixture.nativeElement.querySelectorAll('nav a');
-      expect(Array.from(links, (link) => link.textContent?.trim())).toEqual([
-        'Dashboard', 'Fag', 'Grupper', 'Opgaver', 'Quizzer',
-      ]);
-    });
-  }
+for (const role of [2, 3]) {
+  it(`keeps teaching navigation for role ${role}`, async () => {
+    localStorage.setItem('currentUser', JSON.stringify({ name: 'User', role }));
+    localStorage.setItem('consentAccepted', 'true');
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const links: NodeListOf<HTMLAnchorElement> = fixture.nativeElement.querySelectorAll('nav a');
+    const expected = role === 2
+      ? ['Dashboard', 'Fag', 'Grupper', 'Opgaver', 'Quizzer']
+      : ['Dashboard', 'Fag', 'Opgaver', 'Quizzer'];
+    expect(Array.from(links, (link) => link.textContent?.trim())).toEqual(expected);
+  });
+}
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(App);

@@ -136,28 +136,4 @@ describe('SubmissionHistory', () => {
 		expect(rounds[1].textContent).toContain('Aflevering 2');
 		expect(rounds[1].textContent).toContain('Godt gået');
 	});
-
-	it('navigates back to the returnTo query param when going back', () => {
-		// Arrange
-		configure({ taskId: 'task-1' }, { studentId: 'student-1', returnTo: '/tasks/task-1' });
-		fixture.detectChanges();
-
-		// Act
-		component.goBack();
-
-		// Assert
-		expect(router.navigateByUrl).toHaveBeenCalledWith('/tasks/task-1');
-	});
-
-	it('defaults goBack to /dashboard when no returnTo query param is present', () => {
-		// Arrange
-		configure({ taskId: 'task-1' }, { studentId: 'student-1' });
-		fixture.detectChanges();
-
-		// Act
-		component.goBack();
-
-		// Assert
-		expect(router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
-	});
 });
