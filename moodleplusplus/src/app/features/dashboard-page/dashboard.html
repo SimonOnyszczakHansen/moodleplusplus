@@ -23,7 +23,7 @@
             </div>
           } @else {
             @for (subject of subjectCards().slice(0, 4); track subject.id) {
-              <app-card [title]="subject.name">
+              <app-card class="subject-card" [title]="subject.name">
                 @if (!hasMoreAssignments()) {
                   <app-progress-bar
                     [value]="subject.progress"

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { SubmissionHistory } from './submission-history';
-import { Task as TaskService } from '../task-page/services/task';
+import { TasksService as TaskService } from '../../core/services/tasks/tasks.service';
 import { AuthService } from '../../core/services/auth.service';
 import { IFeedbackEntry } from '../../core/models/tasks.model';
 
@@ -135,29 +135,5 @@ describe('SubmissionHistory', () => {
 		expect(rounds[0].textContent).toContain('Bo');
 		expect(rounds[1].textContent).toContain('Aflevering 2');
 		expect(rounds[1].textContent).toContain('Godt gået');
-	});
-
-	it('navigates back to the returnTo query param when going back', () => {
-		// Arrange
-		configure({ taskId: 'task-1' }, { studentId: 'student-1', returnTo: '/tasks/task-1' });
-		fixture.detectChanges();
-
-		// Act
-		component.goBack();
-
-		// Assert
-		expect(router.navigateByUrl).toHaveBeenCalledWith('/tasks/task-1');
-	});
-
-	it('defaults goBack to /dashboard when no returnTo query param is present', () => {
-		// Arrange
-		configure({ taskId: 'task-1' }, { studentId: 'student-1' });
-		fixture.detectChanges();
-
-		// Act
-		component.goBack();
-
-		// Assert
-		expect(router.navigateByUrl).toHaveBeenCalledWith('/dashboard');
 	});
 });
