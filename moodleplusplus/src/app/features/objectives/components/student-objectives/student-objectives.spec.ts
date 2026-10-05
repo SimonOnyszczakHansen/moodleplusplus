@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { of } from 'rxjs';
+import { Objectives as ObjectivesService } from '../../services/objectives';
 
 import { StudentObjectives } from './student-objectives';
 
@@ -8,7 +11,17 @@ describe('StudentObjectives', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [StudentObjectives]
+      imports: [StudentObjectives],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: convertToParamMap({ subjectId: 'subject-1' }) } },
+        },
+        {
+          provide: ObjectivesService,
+          useValue: { getObjectivesBySubject: () => of([]) },
+        },
+      ],
     })
     .compileComponents();
 

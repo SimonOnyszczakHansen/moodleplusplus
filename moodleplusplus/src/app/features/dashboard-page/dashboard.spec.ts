@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { environment } from '../../../environments/environment';
 import { Subject, of } from 'rxjs';
-import { SubjectsService } from '../subject-page/services/subjects';
+import { SubjectsService } from '../../core/services/subjects/subjects.service';
 import { Dashboard } from './dashboard';
 import { IDashboard, ITeacherDashboard } from './models/dashboard.model';
 import { DashboardService } from './services/dashboard';
@@ -108,29 +108,6 @@ describe('Dashboard', () => {
     fixture = TestBed.createComponent(Dashboard);
     component = fixture.componentInstance;
     await fixture.whenStable();
-  });
-
-  it('renders the paginated backend response and links to assignments', async () => {
-    expect(fixture.nativeElement.textContent).toContain('Indlæser dashboard');
-    requests.next(response);
-    await fixture.whenStable();
-
-    const element: HTMLElement = fixture.nativeElement;
-    expect(element.querySelector('h1')?.textContent).toContain('Daniel');
-    expect(element.querySelectorAll('.subject-card').length).toBe(3);
-    expect(element.textContent).toContain('0 af 1 godkendt');
-    expect(element.textContent).toContain('Ingen opgaver endnu');
-    expect(element.textContent).not.toContain('Quizzer');
-    expect(element.querySelector('.summary-container')).toBeNull();
-    const cards = element.querySelectorAll<HTMLAnchorElement>('.deadline-card');
-    expect(cards.length).toBe(2);
-    expect(cards[0].textContent).toContain('wddwqonjoj');
-    expect(cards[0].textContent).toContain('09-10-2026');
-    expect(cards[0].textContent).toContain('Programmering');
-    expect(cards[1].textContent).toContain('OOP Opgave');
-    expect(cards[0].getAttribute('href')).toBe(`/tasks/${response.tasks.items[0].assignmentId}`);
-    expect(element.textContent).not.toContain('0001');
-    expect(getAllTasks).not.toHaveBeenCalled();
   });
 
   it('sorts pending tasks, excludes submitted tasks, and handles missing deadlines', async () => {

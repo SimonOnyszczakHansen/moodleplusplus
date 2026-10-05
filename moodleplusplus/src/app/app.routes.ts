@@ -22,6 +22,8 @@ import { SubjectGoals } from './features/subject-page/components/subject-goals/s
 import { Progression } from './features/progression/progression';
 import { AdminPage } from './features/admin-page/admin-page';
 import { SubmissionHistory } from './features/submission-history/submission-history';
+import { nonAuthGuard } from './core/guards/non-auth-guard';
+import { nonConsentGuard } from './core/guards/non-consent-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -47,8 +49,8 @@ export const routes: Routes = [
     canActivate: [authGuard, nonAdminGuard, consentGuard],
   },
   { path: 'quizzes', component: QuizPage, canActivate: [authGuard, nonAdminGuard, consentGuard] },
-  { path: 'login', component: Login },
-  { path: 'consent', component: ConsentPage, canActivate: [authGuard] },
+  { path: 'login', component: Login, canActivate: [nonAuthGuard] },
+  { path: 'consent', component: ConsentPage, canActivate: [authGuard, nonConsentGuard] },
   { path: 'subjects', component: SubjectPage, canActivate: [authGuard, nonAdminGuard, consentGuard] },
   { path: 'subject/:id', component: SubjectOverview, canActivate: [authGuard, nonAdminGuard, consentGuard] },
   { path: 'subject/:id/tasks', component: SubjectTasks, canActivate: [authGuard, nonAdminGuard, consentGuard] },
