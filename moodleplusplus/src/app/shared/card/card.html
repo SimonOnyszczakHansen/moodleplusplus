@@ -1,4 +1,7 @@
 <div class="card">
-	<h2>{{ title() }}</h2>
-	<ng-content />
+    <div class="card-cover" aria-hidden="true"></div>
+    <div class="card-body">
+        <h2>{{ title() }}</h2>
+        <ng-content />
+    </div>
 </div>

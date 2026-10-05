@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type StatusVariantTask = 'Ikke afleveret' | 'Afleveret' | 'Godkendt' | 'Ikke godkendt';
+export type StatusVariantTask = 'Ikke afleveret' | 'Afleveret' | 'Godkendt' | 'Afvist';
 export type StatusVariantQuiz = 'Tilgængelig' | 'Bestået' | 'Fejlet';
 export type StatusVariant = StatusVariantTask | StatusVariantQuiz;
 

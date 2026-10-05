@@ -37,10 +37,13 @@ h2 {
 }
 
 .view-all {
-  flex-shrink: 0;
-  color: var(--color-text-secondary);
-  font-size: 0.85rem;
+  color: var(--color-primary);
   text-decoration: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .view-all:hover,
@@ -49,32 +52,16 @@ h2 {
 }
 
 .subject-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1rem;
 }
 
-.subject-card {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: 1rem;
-}
-
-.subject-cover {
-  height: 4rem;
-  background: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.subject-content {
-  padding: 0.75rem;
-}
-
-h3 {
-  margin: 0 0 0.75rem;
-  font-size: 1rem;
-  overflow-wrap: anywhere;
+.subject-cards > app-card {
+  flex: 1 1 11rem;
+  min-width: 8rem;
+  max-width: 15rem;
 }
 
 .progress-details,
@@ -85,18 +72,8 @@ h3 {
 
 .subject-link {
   display: block;
-  padding: 0.5rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
-  color: var(--color-text);
-  text-align: center;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.subject-link:hover,
-.subject-link:focus-visible {
-  background: var(--color-background);
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .deadlines-container {

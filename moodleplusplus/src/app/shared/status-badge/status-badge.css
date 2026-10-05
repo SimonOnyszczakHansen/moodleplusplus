@@ -28,7 +28,7 @@
   color: var(--color-text-light);
 }
 
-.badge[data-status="Ikke godkendt"], 
+.badge[data-status="Afvist"], 
 .badge[data-status="Fejlet"] {
   background: color-mix(in srgb, var(--color-danger) 70%, white);
   border: 2px solid var(--color-danger);

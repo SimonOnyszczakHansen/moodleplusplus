@@ -1,8 +1,8 @@
 import { IObjective } from './educationgoal.model';
 
-export type TaskStatus = 'Ikke afleveret' | 'Afleveret' | 'Godkendt' | 'Ikke godkendt';
+export type TaskStatus = 'Ikke afleveret' | 'Afleveret' | 'Godkendt' | 'Afvist';
 
-export type ReviewStatus = 'Godkendt' | 'Ikke godkendt';
+export type ReviewStatus = 'Godkendt' | 'Afvist';
 
 export interface ITask {
   id: string;
@@ -61,7 +61,7 @@ const ASSIGNMENT_STATUS_BY_ORDINAL: TaskStatus[] = [
   'Ikke afleveret',
   'Afleveret',
   'Godkendt',
-  'Ikke godkendt',
+  'Afvist',
 ];
 
 export function mapAssignmentStatus(status: number): TaskStatus {

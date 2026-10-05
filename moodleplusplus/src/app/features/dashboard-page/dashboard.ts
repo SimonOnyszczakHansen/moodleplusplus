@@ -8,10 +8,12 @@ import { SubjectsService } from '../../core/services/subjects/subjects.service';
 import { ISubject } from '../../core/models/subjects.model';
 import { IDashboardTaskPreview } from './models/task.model';
 import { ProgressBar } from '../../shared/progress-bar/progress-bar';
+import { Card } from '../../shared/card/card';
+import { Button } from '../../shared/button/button';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ProgressBar, DatePipe, RouterLink],
+  imports: [ProgressBar, DatePipe, RouterLink, Card, Button],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

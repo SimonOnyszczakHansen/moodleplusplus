@@ -25,6 +25,14 @@
 	position: relative;
 }
 
+.error-message {
+	color: var(--color-danger);
+}
+
+::ng-deep .teacher-task-container dialog {
+	overflow: visible !important;
+}
+
 .assignee-suggestions {
 	position: absolute;
 	z-index: 1;

@@ -5,7 +5,7 @@ import { vi } from 'vitest';
 import { SubmissionHistory } from './submission-history';
 import { Task as TaskService } from '../task-page/services/task';
 import { AuthService } from '../../core/services/auth.service';
-import { IFeedbackEntry } from '../task-page/models/task.model';
+import { IFeedbackEntry } from '../../core/models/tasks.model';
 
 describe('SubmissionHistory', () => {
 	let component: SubmissionHistory;

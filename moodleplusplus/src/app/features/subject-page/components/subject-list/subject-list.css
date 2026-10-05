@@ -33,9 +33,13 @@
   gap: 2rem;
 }
 
+.subject-cards app-card {
+  width: 15rem;
+}
+
 .card-content {
   font-size: 0.9rem;
-  min-height: 10rem;
+  min-height: 6rem;
   display: flex;
   flex-direction: column;
 }

@@ -39,7 +39,7 @@ export class StudentTaskDetails implements OnInit {
 
   get canSubmit(): boolean {
     const status = this.assignment()?.status;
-    return status === 'Ikke afleveret' || status === 'Ikke godkendt';
+    return status === 'Ikke afleveret' || status === 'Afvist';
   }
 
   get hasNothingToSubmit(): boolean {
@@ -64,7 +64,9 @@ export class StudentTaskDetails implements OnInit {
         const a = document.createElement('a');
         a.href = url;
         a.download = fileName;
+        document.body.appendChild(a);
         a.click();
+        a.remove();
         URL.revokeObjectURL(url);
       },
       error: () => this.downloadingFile.set(false),
