@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import { SubmissionHistory } from './submission-history';
-import { Task as TaskService } from '../task-page/services/task';
+import { TasksService as TaskService } from '../../core/services/tasks/tasks.service';
 import { AuthService } from '../../core/services/auth.service';
 import { IFeedbackEntry } from '../../core/models/tasks.model';
 

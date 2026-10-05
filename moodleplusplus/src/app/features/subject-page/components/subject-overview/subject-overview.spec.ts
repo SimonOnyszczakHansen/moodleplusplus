@@ -13,15 +13,15 @@ describe('SubjectOverview', () => {
 
     fixture = TestBed.createComponent(SubjectOverview);
     component = fixture.componentInstance;
-    component.subject = {
+    component.subject.set({
       id: 'subject-1',
       name: 'Programmering',
       createdAt: '2026-01-01T12:00:00Z',
       createdBy: 'teacher-1',
-    };
-    component.goals = [
+    });
+    component.goals.set([
       { id: 'goal-1', subjectId: 'subject-1', content: 'Kan forklare API-design' },
-    ];
+    ]);
     fixture.detectChanges();
   });
 

@@ -4,7 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { environment } from '../../../environments/environment';
 import { Subject, of } from 'rxjs';
-import { SubjectsService } from '../subject-page/services/subjects';
+import { SubjectsService } from '../../core/services/subjects/subjects.service';
 import { Dashboard } from './dashboard';
 import { IDashboard, ITeacherDashboard } from './models/dashboard.model';
 import { DashboardService } from './services/dashboard';
