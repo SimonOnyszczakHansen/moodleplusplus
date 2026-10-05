@@ -33,7 +33,7 @@
     </div>
   </aside>
 
-  <main class="content-area">
+  <main class="content-area" [class.no-sidebar]="!showNavigation">
     <router-outlet />
   </main>
 </div>

@@ -22,29 +22,25 @@
               <button type="button" (click)="loadDashboard()">Prøv igen</button>
             </div>
           } @else {
-            @for (subject of subjectCards(); track subject.id) {
-              <article class="subject-card">
-                <div class="subject-cover" aria-hidden="true"></div>
-                <div class="subject-content">
-                  <h3>{{ subject.name }}</h3>
-                  @if (!hasMoreAssignments()) {
-                    <app-progress-bar
-                      [value]="subject.progress"
-                      [label]="'Opgaver i ' + subject.name"
-                    ></app-progress-bar>
-                    <p class="progress-details">
-                      @if (subject.assigned) {
-                        {{ subject.approved }} af {{ subject.assigned }} godkendt
-                      } @else {
-                        Ingen opgaver endnu
-                      }
-                    </p>
-                  } @else {
-                    <p class="progress-details">Progression ikke tilgængelig.</p>
-                  }
-                  <a class="subject-link" [routerLink]="['/subject', subject.id]">Gå til fag</a>
-                </div>
-              </article>
+            @for (subject of subjectCards().slice(0, 4); track subject.id) {
+              <app-card [title]="subject.name">
+                @if (!hasMoreAssignments()) {
+                  <app-progress-bar
+                    [value]="subject.progress"
+                    [label]="'Opgaver i ' + subject.name"
+                  ></app-progress-bar>
+                  <p class="progress-details">
+                    @if (subject.assigned) {
+                      {{ subject.approved }} af {{ subject.assigned }} godkendt
+                    } @else {
+                      Ingen opgaver endnu
+                    }
+                  </p>
+                } @else {
+                  <p class="progress-details">Progression ikke tilgængelig.</p>
+                }
+                <app-button class="subject-link" [routerLink]="['/subject', subject.id]">Gå til fag</app-button>
+              </app-card>
             } @empty {
               <p class="empty-state">Du har ingen fag endnu.</p>
             }

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 import { TasksService } from '../../core/services/tasks/tasks.service';
 import { IFeedbackEntry } from '../../core/models/tasks.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -8,7 +8,7 @@ import { Button } from '../../shared/button/button';
 
 @Component({
   selector: 'app-submission-history',
-  imports: [DatePipe, Button],
+  imports: [DatePipe],
   templateUrl: './submission-history.html',
   styleUrl: './submission-history.css',
 })
@@ -17,6 +17,7 @@ export class SubmissionHistory implements OnInit {
   private readonly router = inject(Router);
   private readonly taskService = inject(TasksService);
   private readonly authService = inject(AuthService);
+  private readonly location = inject(Location);
 
   name = '';
   feedback = signal<IFeedbackEntry[]>([]);
@@ -52,6 +53,6 @@ export class SubmissionHistory implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigateByUrl(this.returnTo);
+    this.location.back();
   }
 }

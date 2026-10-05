@@ -86,7 +86,7 @@ export class TeacherTaskDetails implements OnInit {
   feedbackError = signal<string | null>(null);
   readonly reviewStatusOptions: DropdownOption[] = [
     { value: 'Godkendt', label: 'Godkend' },
-    { value: 'Ikke godkendt', label: 'Afvis' },
+    { value: 'Afvist', label: 'Afvis' },
   ];
   selectedReviewStatus = '';
 
@@ -369,7 +369,7 @@ export class TeacherTaskDetails implements OnInit {
   }
 
   onRejectSubmission(row: RosterRow): void {
-    this.onReviewSubmission(row, 'Ikke godkendt');
+    this.onReviewSubmission(row, 'Afvist');
   }
 
   onReviewSubmission(row: RosterRow, status: ReviewStatus): void {
@@ -429,7 +429,7 @@ export class TeacherTaskDetails implements OnInit {
       });
   }
 
-  onDownloadFile(row: RosterRow): void {
+    onDownloadFile(row: RosterRow): void {
     if (!row.fileName) return;
 
     this.downloadingAssignmentId.set(row.assignmentId);
@@ -440,7 +440,9 @@ export class TeacherTaskDetails implements OnInit {
         const a = document.createElement('a');
         a.href = url;
         a.download = row.fileName!;
+        document.body.appendChild(a);
         a.click();
+        a.remove();
         URL.revokeObjectURL(url);
       },
       error: () => this.downloadingAssignmentId.set(null),

@@ -31,6 +31,12 @@ export class TeacherTask implements OnInit {
 	showCreateTask = false;
 	editingTaskId: string | null = null;
 
+	showDeleteTask = false;
+	deleteConfirm = '';
+	pendingDeleteTaskId: string | null = null;
+
+	taskFormError = signal<string | null>(null);
+
 	taskTitle = '';
 	taskSubjectId = '';
 	taskDescription = '';
@@ -95,6 +101,7 @@ export class TeacherTask implements OnInit {
 
 	onCreateTask(): void {
 		this.resetCreateTaskForm();
+		this.taskFormError.set(null);
 		this.showCreateTask = true;
 	}
 
@@ -106,6 +113,7 @@ export class TeacherTask implements OnInit {
 		this.taskDeadline = row.deadline;
 		this.studentSearchQuery = '';
 		this.selectedAssignees = [];
+		this.taskFormError.set(null);
 		this.showCreateTask = true;
 
 		this.taskService.getTask(row.id).subscribe({
@@ -155,7 +163,11 @@ export class TeacherTask implements OnInit {
 	}
 
 	onSubmitTask(): void {
-		if (!this.taskTitle || !this.taskSubjectId) return;
+		if (!this.taskTitle.trim() || !this.taskSubjectId || !this.taskDeadline.trim() || !this.taskDescription.trim()) {
+			this.taskFormError.set('Udfyld venligst titel, fag, deadline og beskrivelse.');
+			return;
+		}
+		this.taskFormError.set(null);
 
 		const request: ICreateTaskRequest = {
 			subjectId: this.taskSubjectId,
@@ -207,9 +219,29 @@ export class TeacherTask implements OnInit {
 	}
 
 	onDeleteTask(taskId: string): void {
+		this.pendingDeleteTaskId = taskId;
+		this.deleteConfirm = '';
+		this.showDeleteTask = true;
+	}
+
+	onCancelDeleteTask(): void {
+		this.showDeleteTask = false;
+		this.pendingDeleteTaskId = null;
+	}
+
+	get isConfirmed(): boolean {
+		return this.deleteConfirm.trim() !== 'CONFIRM';
+	}
+
+	onSubmitDeleteTask(): void {
+		if (this.deleteConfirm.trim() !== 'CONFIRM' || !this.pendingDeleteTaskId) return;
+
+		const taskId = this.pendingDeleteTaskId;
 		this.taskService.deleteTask(taskId).subscribe({
 			next: () => {
 				this.rows.update((rows) => rows.filter((row) => row.id !== taskId));
+				this.showDeleteTask = false;
+				this.pendingDeleteTaskId = null;
 			},
 		});
 	}

@@ -142,7 +142,7 @@ describe('Progression', () => {
     );
 
     // Assert
-    expect(labels).toEqual(['Ikke afleveret', 'Afleveret', 'Godkendt', 'Ikke godkendt']);
+    expect(labels).toEqual(['Ikke afleveret', 'Afleveret', 'Godkendt', 'Afvist']);
   });
 
   it('maps each quiz status to the correct Danish badge label', () => {

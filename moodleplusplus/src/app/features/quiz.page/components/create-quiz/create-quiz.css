@@ -5,7 +5,6 @@
 .create-quiz-page {
 	min-height: 100vh;
 	padding: 1.5rem clamp(1.25rem, 3vw, 2.5rem) 3rem;
-	background: var(--color-background);
 }
 
 .breadcrumb {
@@ -85,6 +84,11 @@
 	color: var(--color-text);
 	font: inherit;
 	font-weight: 400;
+	
+}
+
+.quiz-form textarea {
+    resize: vertical;
 }
 
 .quiz-form input:focus,

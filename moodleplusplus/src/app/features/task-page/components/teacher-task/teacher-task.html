@@ -13,6 +13,9 @@
 		<app-dropdown label="Vælg Fag" placeholder="Vælg et fag" [options]="subjectOptions" [(value)]="taskSubjectId"></app-dropdown>
 		<app-input label="Deadline" placeholder="Vælg en dato" type="datetime-local" [(value)]="taskDeadline"></app-input>
 		<app-input label="Beskrivelse" placeholder="Beskrivelse" [(value)]="taskDescription"></app-input>
+		@if (taskFormError()) {
+		<p class="error-message">{{ taskFormError() }}</p>
+		}
 
 		<div class="assignee-search">
 			@if (existingAssignments().length) {
@@ -56,6 +59,15 @@
 		<div class="modal-actions">
 			<app-button label="Annuller" variant="secondary" (click)="onCancelCreateTask()">Anuller</app-button>
 			<app-button label="Opret" variant="primary" (click)="onSubmitTask()">{{ editingTaskId ? 'Gem' : 'Opret' }}</app-button>
+		</div>
+	</app-modal>
+
+	<app-modal [(open)]="showDeleteTask" [title]="'Slet Opgave'">
+		<app-input label="Skriv 'CONFIRM' for at slette opgaven" placeholder="CONFIRM" [(value)]="deleteConfirm"></app-input>
+
+		<div class="modal-actions">
+			<app-button variant="secondary" (click)="onCancelDeleteTask()">Anuller</app-button>
+			<app-button variant="danger" [disabled]="isConfirmed" (click)="onSubmitDeleteTask()">Slet</app-button>
 		</div>
 	</app-modal>
 </div>

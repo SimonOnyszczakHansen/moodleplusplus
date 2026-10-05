@@ -20,7 +20,7 @@ const STATUS_BADGE_TASK: Record<ProgressionTaskStatus, StatusVariantTask> = {
   NotSubmitted: 'Ikke afleveret',
   Submitted: 'Afleveret',
   Approved: 'Godkendt',
-  Rejected: 'Ikke godkendt',
+  Rejected: 'Afvist',
 };
 
 const STATUS_BADGE_QUIZ: Record<ProgressionQuizStatus, StatusVariantQuiz> = {
