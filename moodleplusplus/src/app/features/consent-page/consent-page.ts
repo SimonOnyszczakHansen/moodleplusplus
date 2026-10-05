@@ -30,7 +30,7 @@ export class ConsentPage {
 			.subscribe({
 				next: () => {
 					this.authService.markConsentAccepted();
-					this.router.navigate(['/dashboard']);
+					this.router.navigate([this.authService.isAdmin ? '/admin/users' : '/dashboard']);
 				},
 				error: (err) => console.error('Consent submission failed', err),
 			});
