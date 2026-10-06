@@ -98,3 +98,7 @@
   cursor: pointer;
   line-height: 1;
 }
+
+:host ::ng-deep dialog {
+	overflow: visible !important;
+}
