@@ -1,9 +1,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 // Services
+import { AuthService } from '../../../../core/services/auth.service';
 import { SubjectsService } from '../../../../core/services/subjects/subjects.service';
+import { ProgressionService } from '../../../../core/services/Progression/progression-service';
 
 // Shared
 import { Card } from '../../../../shared/card/card';
@@ -12,6 +16,11 @@ import { Button } from '../../../../shared/button/button';
 
 // Models
 import { ISubject } from '../../../../core/models/subjects.model';
+import { IStudentSubjectProgress } from '../../../../core/models/allstudentsprogress.model';
+
+interface SubjectWithProgress extends ISubject {
+  subjectProgress: number;
+}
 
 @Component({
   selector: 'app-subject-list',
@@ -20,11 +29,13 @@ import { ISubject } from '../../../../core/models/subjects.model';
   styleUrl: './subject-list.css',
 })
 export class SubjectList implements OnInit {
-  subjects = signal<ISubject[]>([]);
+  subjects = signal<SubjectWithProgress[]>([]);
 
   constructor(
-    private subjectsService: SubjectsService,
     private router: Router,
+    private authService: AuthService,
+    private subjectsService: SubjectsService,
+    private progressionService: ProgressionService,
   ) {}
 
   ngOnInit() {
@@ -35,33 +46,65 @@ export class SubjectList implements OnInit {
   private loadSubjects() {
     this.subjectsService.getMySubjects().subscribe({
       next: (subjects) => {
-        this.subjects.set(subjects);
+        this.loadSubjectsWithProgress(subjects);
       },
-      error: (err) => console.error('Subjects fetch failed:', err),
+      error: (err) => {
+        console.error('Subjects fetch failed:', err);
+      },
+    });
+  }
+
+  private loadSubjectsWithProgress(subjects: ISubject[]) {
+    const studentId = this.authService.currentUser?.id;
+
+    if (!studentId) {
+      console.error('No logged-in student found');
+
+      this.subjects.set(
+        subjects.map((subject) => ({
+          ...subject,
+          subjectProgress: 0,
+        })),
+      );
+
+      return;
+    }
+
+    if (subjects.length === 0) {
+      this.subjects.set([]);
+      return;
+    }
+
+    const progressRequests = subjects.map((subject) =>
+      this.progressionService
+        .getStudentSubjectProgress(studentId.toString(), subject.id.toString())
+        .pipe(
+          map((progress: IStudentSubjectProgress) => ({
+            ...subject,
+            subjectProgress: progress.completionPercentage,
+          })),
+          catchError((err) => {
+            console.error(`Failed to load progress for subject ${subject.id}:`, err);
+
+            return of({
+              ...subject,
+              subjectProgress: 0,
+            });
+          }),
+        ),
+    );
+
+    forkJoin(progressRequests).subscribe({
+      next: (subjectsWithProgress) => {
+        this.subjects.set(subjectsWithProgress);
+      },
+      error: (err) => {
+        console.error('Failed to load subject progress:', err);
+      },
     });
   }
 
   viewSubject(subjectId: string | number) {
     this.router.navigate(['/subject', subjectId]);
-  }
-
-  // getSubjectName(subjectId: string | number): string {
-  //   return this.subjects.find((s) => s.id === subjectId)?.name ?? '';
-  // }
-
-  getSubjectProgress(subjectId: string | number): number {
-    return 40;
-    // const subjectQuizzes = this.quizzes.filter((q) => q.subjectId === subjectId);
-    // const subjectTasks = this.tasks.filter((t) => t.subjectId === subjectId);
-
-    // const quizRatio = subjectQuizzes.length
-    //   ? subjectQuizzes.filter((q) => q.passed).length / subjectQuizzes.length
-    //   : 0;
-
-    // const taskRatio = subjectTasks.length
-    //   ? subjectTasks.filter((t) => t.status === 'godkendt').length / subjectTasks.length
-    //   : 0;
-
-    // return Math.round(((quizRatio + taskRatio) / 2) * 100);
   }
 }

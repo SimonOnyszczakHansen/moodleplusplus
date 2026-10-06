@@ -24,12 +24,13 @@ describe('SubjectOverview', () => {
         {
           provide: SubjectsService,
           useValue: {
-            getSubjectById: () => of({
-              id: 'subject-1',
-              name: 'Programmering',
-              createdAt: '2026-01-01T12:00:00Z',
-              createdBy: 'teacher-1',
-            }),
+            getSubjectById: () =>
+              of({
+                id: 'subject-1',
+                name: 'Programmering',
+                createdAt: '2026-01-01T12:00:00Z',
+                createdBy: 'teacher-1',
+              }),
             getGoalsBySubjectId: () => of([]),
             getStudentsBySubjectId: () => of([]),
           },

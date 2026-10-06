@@ -24,15 +24,18 @@
     </div>
 
     <div class="overview-grid">
-        <section class="panel">
+        <section class="panel panel-tasks">
             <div class="panel-header">
                 <h2>Opgaver</h2>
+                @if (taskCountText()) {
+                <div class="panel-count">{{ taskCountText() }}</div>
+                }
                 <a (click)="viewSubjectTasks()">Se alle &#8594;</a>
             </div>
 
             @if (tasks().length) {
             <div class="panel-content">
-                @for (task of tasks(); track task.id) {
+                @for (task of taskItems(); track task.id) {
                 <article class="task-item">
                     <div class="task-test">
                         <h3>{{ task.title }}</h3>
@@ -42,37 +45,45 @@
                 </article>
                 }
             </div>
+
             } @else {
             <li class="no-data">Ingen opgaver er oprettet for dette fag endnu.</li>
             }
         </section>
 
-        <section class="panel">
+        <section class="panel panel-goals">
             <div class="panel-header">
                 <h2>Målpinde</h2>
+                @if (goalCountText()) {
+                <div class="panel-count">{{ goalCountText() }}</div>
+                }
                 <a (click)="viewSubjectGoals()">Se alle &#8594;</a>
             </div>
 
             @if (goals().length) {
             <div class="panel-content">
-                @for (goal of goals(); track goal.id) {
+                @for (goal of goalItems(); track goal.id) {
                 <li>{{ goal.content }}</li>
                 }
             </div>
+
             } @else {
             <li class="no-data">Ingen mål er oprettet for dette fag endnu.</li>
             }
         </section>
 
-        <section class="panel">
+        <section class="panel panel-students">
             <div class="panel-header">
                 <h2>Elever</h2>
+                @if (studentCountText()) {
+                <div class="panel-count">{{ studentCountText() }}</div>
+                }
                 <a (click)="viewSubjectStudents()">Se alle &#8594;</a>
             </div>
 
             @if (students().length) {
             <div class="panel-content">
-                @for (student of students(); track student.id) {
+                @for (student of studentItems(); track student.id) {
                 <li class="student-row">
                     <div class="student-name">{{ student.name }}</div>
                     <div class="student-email">{{ student.email }}</div>
@@ -83,24 +94,22 @@
             <li class="no-data">Ingen elever er tilknyttet til dette fag endnu.</li>
             }
         </section>
-
     </div>
-    <app-modal [(open)]="showEditSubject" [title]="'Rediger Fag'">
-        <app-input label="Navn" placeholder="Navn" [(value)]="subjectName"></app-input>
-
-        <div class="modal-actions">
-            <app-button label="Annuller" variant="secondary" (click)="onCancelEditSubject()">Anuller</app-button>
-            <app-button label="Opret" variant="primary" (click)="onSubmitEditSubject()">Gem</app-button>
-        </div>
-    </app-modal>
-
-    <app-modal [(open)]="showDeleteSubject" [title]="'Fjern Fag'">
-        <app-input label="Skriv 'CONFIRM' for at slette faget" placeholder="CONFIRM"
-            [(value)]="deleteConfirm"></app-input>
-
-        <div class="modal-actions">
-            <app-button variant="secondary" (click)="onCancelDeleteSubject()">Anuller</app-button>
-            <app-button variant="danger" [disabled]="isConfirmed" (click)="onSubmitDeleteSubject()">Fjern</app-button>
-        </div>
-    </app-modal>
 </div>
+<app-modal [(open)]="showEditSubject" [title]="'Rediger Fag'">
+    <app-input label="Navn" placeholder="Navn" [(value)]="subjectName"></app-input>
+
+    <div class="modal-actions">
+        <app-button label="Annuller" variant="secondary" (click)="onCancelEditSubject()">Anuller</app-button>
+        <app-button label="Opret" variant="primary" (click)="onSubmitEditSubject()">Gem</app-button>
+    </div>
+</app-modal>
+
+<app-modal [(open)]="showDeleteSubject" [title]="'Fjern Fag'">
+    <app-input label="Skriv 'CONFIRM' for at slette faget" placeholder="CONFIRM" [(value)]="deleteConfirm"></app-input>
+
+    <div class="modal-actions">
+        <app-button variant="secondary" (click)="onCancelDeleteSubject()">Anuller</app-button>
+        <app-button variant="danger" [disabled]="isConfirmed" (click)="onSubmitDeleteSubject()">Fjern</app-button>
+    </div>
+</app-modal>

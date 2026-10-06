@@ -6,12 +6,25 @@
         }
     </header>
 
+    @if (isTeacher) {
     <app-table [columns]="columns" [rows]="rows()" [actions]="actions" emptyMessage="Ingen opgaver fundet."
         (actionClick)="onActionClick($event)">
         <ng-template appTableCell="deadline" let-row>
             {{ row.deadline | date: 'dd/MM/yyyy' }}
         </ng-template>
     </app-table>
+    } @else {
+    <app-table [columns]="studentColumns" [rows]="studentRows()" [actions]="actions"
+        emptyMessage="Ingen opgaver fundet." (actionClick)="onStudentActionClick($event)">
+        <ng-template appTableCell="deadline" let-row>
+            {{ row.deadline | date: 'dd/MM/yyyy' }}
+        </ng-template>
+    </app-table>
+    }
+
+</div>
+<div>
+
     <app-modal [(open)]="showCreateTask" [title]="editingTaskId ? 'Rediger Opgave' : 'Opret Opgave'">
         <app-input label="Titel" placeholder="Titel" [(value)]="taskTitle"></app-input>
         <app-dropdown label="Vælg Fag" placeholder="Vælg et fag" [options]="subjectOptions"
@@ -64,8 +77,8 @@
 
         <div class="modal-actions">
             <app-button label="Annuller" variant="secondary" (click)="onCancelCreateTask()">Anuller</app-button>
-            <app-button label="Opret" variant="primary" (click)="onSubmitTask()">{{ editingTaskId ? 'Gem' : 'Opret'
-                }}</app-button>
+            <app-button label="Opret" variant="primary" (click)="onSubmitTask()">{{ editingTaskId ? 'Gem' :
+                'Opret'}}</app-button>
         </div>
     </app-modal>
 </div>

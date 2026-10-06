@@ -221,7 +221,6 @@ export class TeacherTaskDetails implements OnInit {
 
   onViewFeedback(): void {
     this.feedbackVisible = true;
-    console.log(this.reviewingAssignmentId());
   }
 
   onViewAddObjective(): void {

@@ -94,6 +94,14 @@ export class TasksService {
       .pipe(map((assignments) => assignments.map(tasksUtils.mapApiAssignment)));
   }
 
+  getMyAssignmentsBySubjectId(subjectId: string): Observable<tasksModels.ITaskAssignmentSummary[]> {
+    return this.http
+      .get<
+        tasksModels.IApiTaskAssignment[]
+      >(`${this.base}/task-assignments/me/subjectid/${subjectId}`)
+      .pipe(map((assignments) => assignments.map(tasksUtils.mapApiAssignment)));
+  }
+
   getAssignment(assignmentId: string): Observable<tasksModels.ITaskAssignmentDetail> {
     return this.http
       .get<tasksModels.IApiTaskAssignment>(`${this.base}/task-assignments/${assignmentId}`)

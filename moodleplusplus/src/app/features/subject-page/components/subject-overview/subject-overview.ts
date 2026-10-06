@@ -28,6 +28,10 @@ import { TasksService } from '../../../../core/services/tasks/tasks.service';
   styleUrl: './subject-overview.css',
 })
 export class SubjectOverview implements OnInit {
+  private readonly taskLimit = 2;
+  private readonly goalLimit = 10;
+  private readonly studentLimit = 5;
+
   subject = signal<ISubject | undefined>(undefined);
   goals = signal<ISubjectGoal[]>([]);
   tasks = signal<ITask[]>([]);
@@ -80,6 +84,35 @@ export class SubjectOverview implements OnInit {
 
   get isTeacher(): boolean {
     return this.authService.currentUser?.role === 'teacher';
+  }
+
+  taskItems(): ITask[] {
+    return this.tasks().slice(0, this.taskLimit);
+  }
+
+  goalItems(): ISubjectGoal[] {
+    return this.goals().slice(0, this.goalLimit);
+  }
+
+  studentItems(): User[] {
+    return this.students().slice(0, this.studentLimit);
+  }
+
+  taskCountText(): string {
+    const total = this.tasks().length;
+    return total > this.taskLimit ? `Viser ${this.taskItems().length} af ${total} opgaver` : '';
+  }
+
+  goalCountText(): string {
+    const total = this.goals().length;
+    return total > this.goalLimit ? `Viser ${this.goalItems().length} af ${total} mål` : '';
+  }
+
+  studentCountText(): string {
+    const total = this.students().length;
+    return total > this.studentLimit
+      ? `Viser ${this.studentItems().length} af ${total} elever`
+      : '';
   }
 
   viewSubjectTasks() {
