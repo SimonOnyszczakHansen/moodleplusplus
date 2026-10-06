@@ -77,7 +77,7 @@ export class CreateQuiz implements OnInit {
       passingPercentage > 100
     ) {
       this.createErrorMessage.set(
-        'Udfyld alle felter. Beståelsesprocenten skal være et helt tal mellem 0 og 100.',
+        'Udfyld alle felter før du kan oprette en quiz.',
       );
       return;
     }
