@@ -50,12 +50,32 @@ export class Dashboard implements OnInit {
   subjectCards = computed(() =>
     this.subjects().map((subject) => {
       const tasks = this.tasks().filter((task) => task.subjectId === String(subject.id));
-      const approved = tasks.filter((task) => task.status === 'Approved').length;
+
+      if (!this.isTeacherDashboard()) {
+        const approved = tasks.filter((task) => task.status === 'Approved').length;
+        return {
+          ...subject,
+          assigned: tasks.length,
+          approved,
+          progress: tasks.length ? Math.round((approved / tasks.length) * 100) : 0,
+        };
+      }
+
+      // Teacher assignments fan out one row per student - dedupe by taskId so "assigned" counts tasks, not rows.
+      const approvedByTaskId = new Map<string, boolean>();
+      for (const task of tasks) {
+        approvedByTaskId.set(
+          task.taskId,
+          (approvedByTaskId.get(task.taskId) ?? true) && task.status === 'Approved',
+        );
+      }
+      const assigned = approvedByTaskId.size;
+      const approved = Array.from(approvedByTaskId.values()).filter(Boolean).length;
       return {
         ...subject,
-        assigned: tasks.length,
+        assigned,
         approved,
-        progress: tasks.length ? Math.round((approved / tasks.length) * 100) : 0,
+        progress: assigned ? Math.round((approved / assigned) * 100) : 0,
       };
     }),
   );
