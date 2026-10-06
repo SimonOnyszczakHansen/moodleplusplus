@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { DatePipe } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 // Services
@@ -111,6 +111,7 @@ export class TeacherTaskDetails implements OnInit {
     private tasksService: TasksService,
     private subjectsServive: SubjectsService,
     private objectivesService: ObjectivesService,
+	private location: Location,
   ) {}
 
   ngOnInit(): void {
@@ -449,6 +450,6 @@ export class TeacherTaskDetails implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/tasks']);
+    this.location.back();
   }
 }
