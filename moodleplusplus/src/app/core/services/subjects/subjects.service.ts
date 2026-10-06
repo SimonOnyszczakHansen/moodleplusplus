@@ -13,6 +13,7 @@ import {
   IEditSubjectRequest,
   ISubject,
   ISubjectGoal,
+  ISubjectTeacher,
 } from '../../models/subjects.model';
 import { ITask } from '../../models/tasks.model';
 import { AuthService } from '../../../core/services/auth.service';
@@ -77,6 +78,10 @@ export class SubjectsService {
 
   getStudentsBySubjectId(subjectId: string): Observable<User[]> {
     return this.http.get<User[]>(`${environment.apiHost}/user/subjectid/${subjectId}`);
+  }
+
+  getTeacherBySubjectId(subjectId: string): Observable<ISubjectTeacher> {
+    return this.http.get<ISubjectTeacher>(`${environment.apiHost}/subject/${subjectId}/teacher`);
   }
 
   // Subject Goals
