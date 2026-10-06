@@ -51,6 +51,10 @@ export class SubjectTasks implements OnInit {
   showCreateTask = false;
   editingTaskId: string | null = null;
 
+  showDeleteTask = false;
+  deleteConfirm = '';
+  pendingDeleteTaskId: string | null = null;
+
   taskTitle = '';
   taskSubjectId = '';
   taskDescription = '';
@@ -308,9 +312,29 @@ export class SubjectTasks implements OnInit {
   }
 
   onDeleteTask(taskId: string): void {
+    this.pendingDeleteTaskId = taskId;
+    this.deleteConfirm = '';
+    this.showDeleteTask = true;
+  }
+
+  onCancelDeleteTask(): void {
+    this.showDeleteTask = false;
+    this.pendingDeleteTaskId = null;
+  }
+
+  get isConfirmed(): boolean {
+    return this.deleteConfirm.trim() !== 'CONFIRM';
+  }
+
+  onSubmitDeleteTask(): void {
+    if (this.deleteConfirm.trim() !== 'CONFIRM' || !this.pendingDeleteTaskId) return;
+
+    const taskId = this.pendingDeleteTaskId;
     this.tasksService.deleteTask(taskId).subscribe({
       next: () => {
         this.rows.update((rows) => rows.filter((row) => row.id !== taskId));
+        this.showDeleteTask = false;
+        this.pendingDeleteTaskId = null;
       },
     });
   }
