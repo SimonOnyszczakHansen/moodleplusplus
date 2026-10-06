@@ -14,7 +14,7 @@ import {
   StatusVariantTask,
   StatusVariantQuiz,
 } from '../../shared/status-badge/status-badge';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, Location } from '@angular/common';
 
 const STATUS_BADGE_TASK: Record<ProgressionTaskStatus, StatusVariantTask> = {
   NotSubmitted: 'Ikke afleveret',
@@ -41,7 +41,7 @@ export class Progression implements OnInit {
 
   readonly progress = signal<IStudentSubjectProgress | null>(null);
 
-  constructor(private progressionService: ProgressionService) {}
+  constructor(private progressionService: ProgressionService, private location: Location) {}
 
   ngOnInit(): void {
     const studentId = this.authService.currentUser?.id ?? '';
@@ -66,5 +66,9 @@ export class Progression implements OnInit {
       .subscribe((data: IStudentSubjectProgress) => {
         this.progress.set(data);
       });
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

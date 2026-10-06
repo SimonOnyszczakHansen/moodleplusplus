@@ -1,6 +1,8 @@
 <div class="progression-container">
+	<a class="back-link" (click)="goBack()">← Tilbage</a>
 	<div class="header-card">
 		<h1 class="header-title">Progression - {{ progress()!.subject.name }}</h1>
+		<p class="header-subtitle">{{ progress()!.studentName }}</p>
 		<div class="header-row">
 			<div class="stat-card">
 				<span class="stat-label">Samlet Progression</span>
