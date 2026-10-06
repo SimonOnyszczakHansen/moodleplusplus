@@ -34,6 +34,9 @@
         <app-input label="Beskrivelse" placeholder="Beskrivelse" [(value)]="taskDescription"></app-input>
 
         <div class="assignee-search">
+            @if (assigneeError()) {
+            <p class="error-message">{{ assigneeError() }}</p>
+            }
             @if (existingAssignments().length) {
             <ul class="assignee-chips">
                 @for (assignment of existingAssignments(); track assignment.assignmentId) {
@@ -79,6 +82,16 @@
             <app-button label="Annuller" variant="secondary" (click)="onCancelCreateTask()">Anuller</app-button>
             <app-button label="Opret" variant="primary" (click)="onSubmitTask()">{{ editingTaskId ? 'Gem' :
                 'Opret'}}</app-button>
+        </div>
+    </app-modal>
+
+    <app-modal [(open)]="showDeleteTask" [title]="'Slet Opgave'">
+        <app-input label="Skriv 'CONFIRM' for at slette opgaven" placeholder="CONFIRM"
+            [(value)]="deleteConfirm"></app-input>
+
+        <div class="modal-actions">
+            <app-button variant="secondary" (click)="onCancelDeleteTask()">Anuller</app-button>
+            <app-button variant="danger" [disabled]="isConfirmed" (click)="onSubmitDeleteTask()">Slet</app-button>
         </div>
     </app-modal>
 </div>
