@@ -30,6 +30,10 @@
   position: relative;
 }
 
+.error-message {
+  color: var(--color-danger);
+}
+
 .assignee-suggestions {
   position: absolute;
   z-index: 1;

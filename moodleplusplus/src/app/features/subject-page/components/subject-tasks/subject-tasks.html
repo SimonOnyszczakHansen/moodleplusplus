@@ -34,6 +34,9 @@
         <app-input label="Beskrivelse" placeholder="Beskrivelse" [(value)]="taskDescription"></app-input>
 
         <div class="assignee-search">
+            @if (assigneeError()) {
+            <p class="error-message">{{ assigneeError() }}</p>
+            }
             @if (existingAssignments().length) {
             <ul class="assignee-chips">
                 @for (assignment of existingAssignments(); track assignment.assignmentId) {

@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 
 // Services
 import { AuthService } from '../../../../core/services/auth.service';
@@ -63,6 +64,7 @@ export class SubjectTasks implements OnInit {
   studentSearchQuery = '';
   selectedAssignees: IAssignee[] = [];
   existingAssignments = signal<ITaskAssignmentRow[]>([]);
+  assigneeError = signal<string | null>(null);
 
   currentSubject = signal<ISubject | undefined>(undefined);
   subjects = signal<ISubject[]>([]);
@@ -214,10 +216,18 @@ export class SubjectTasks implements OnInit {
   }
 
   onRemoveExistingAssignment(assignment: ITaskAssignmentRow): void {
+    this.assigneeError.set(null);
     this.tasksService.removeAssignment(assignment.assignmentId).subscribe({
       next: () => {
         this.existingAssignments.update((list) =>
           list.filter((a) => a.assignmentId !== assignment.assignmentId),
+        );
+      },
+      error: (err: HttpErrorResponse) => {
+        this.assigneeError.set(
+          err.status === 409
+            ? 'Kan ikke fjerne eleven, da opgaven allerede er afleveret.'
+            : 'Kunne ikke fjerne eleven. Prøv igen.',
         );
       },
     });
@@ -303,12 +313,13 @@ export class SubjectTasks implements OnInit {
   private resetCreateTaskForm(): void {
     this.editingTaskId = null;
     this.taskTitle = '';
-    this.taskSubjectId = '';
+    this.taskSubjectId = this.currentSubject()?.id?.toString() ?? '';
     this.taskDescription = '';
     this.taskDeadline = '';
     this.studentSearchQuery = '';
     this.selectedAssignees = [];
     this.existingAssignments.set([]);
+    this.assigneeError.set(null);
   }
 
   onDeleteTask(taskId: string): void {
