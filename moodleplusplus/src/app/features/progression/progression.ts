@@ -46,7 +46,7 @@ export class Progression implements OnInit {
   ngOnInit(): void {
     const studentId = this.authService.currentUser?.id ?? '';
     const subjectId = this.route.snapshot.paramMap.get('subjectId') ?? '';
-    this.loadProgressionData(studentId, subjectId);
+    this.loadProgressionData(studentId.toString(), subjectId);
   }
 
   statusLabelTask(status: ProgressionTaskStatus): StatusVariantTask {
@@ -57,15 +57,14 @@ export class Progression implements OnInit {
     return STATUS_BADGE_QUIZ[status];
   }
 
-  private loadProgressionData(studentId: any, subjectId: string): void {
+  private loadProgressionData(studentId: string, subjectId: string): void {
     if (this.authService.isTeacher) {
-      studentId = this.route.snapshot.paramMap.get('studentId');
+      studentId = this.route.snapshot.paramMap.get('studentId') ?? '';
     }
     this.progressionService
       .getStudentSubjectProgress(studentId, subjectId)
       .subscribe((data: IStudentSubjectProgress) => {
         this.progress.set(data);
-        console.log(data);
       });
   }
 }

@@ -24,11 +24,21 @@ import { Dropdown, DropdownOption } from '../../../../shared/dropdown/dropdown';
 // Models
 import { IAssignee } from '../../../../core/models/assignee.model';
 import { ISubject } from '../../../../core/models/subjects.model';
-import { ITask, ICreateTaskRequest, ITaskAssignmentRow } from '../../../../core/models/tasks.model';
+import {
+  ITask,
+  ICreateTaskRequest,
+  ITaskAssignmentRow,
+  ITaskAssignmentSummary,
+} from '../../../../core/models/tasks.model';
 
 interface TaskRow extends ITask {
   index: number;
 }
+
+interface AssignmentRow extends ITaskAssignmentSummary {
+  index: number;
+}
+
 @Component({
   selector: 'app-subject-tasks',
   imports: [CommonModule, Table, TableCellTemplate, DatePipe, Button, Modal, Input, Dropdown],
@@ -61,7 +71,14 @@ export class SubjectTasks implements OnInit {
     { key: 'deadline', label: 'Deadline' },
   ];
 
+  readonly studentColumns: TableColumn<AssignmentRow>[] = [
+    { key: 'index', label: '#' },
+    { key: 'title', label: 'Titel' },
+    { key: 'deadline', label: 'Deadline' },
+  ];
+
   rows = signal<TaskRow[]>([]);
+  studentRows = signal<AssignmentRow[]>([]);
 
   constructor(
     private router: Router,
@@ -77,6 +94,19 @@ export class SubjectTasks implements OnInit {
   }
 
   private loadSubjectDetails(subjectId: string): void {
+    this.subjectsService.getSubjectById(subjectId).subscribe({
+      next: (subject) => this.currentSubject.set(subject),
+      error: (err) => console.error('Subject fetch failed:', err),
+    });
+
+    if (this.isTeacher) {
+      this.loadForTeacher(subjectId);
+    } else {
+      this.loadForStudent(subjectId);
+    }
+  }
+
+  private loadForTeacher(subjectId: string): void {
     this.subjectsService.getTasksBySubjectId(subjectId).subscribe({
       next: (tasks) => {
         this.rows.set(tasks.map((task, index) => ({ ...task, index: index + 1 })));
@@ -84,27 +114,31 @@ export class SubjectTasks implements OnInit {
       error: (err) => console.error('Tasks fetch failed:', err),
     });
 
-    this.subjectsService.getSubjectById(subjectId).subscribe({
-      next: (subject) => this.currentSubject.set(subject),
-      error: (err) => console.error('Subject fetch failed:', err),
+    this.subjectsService.getSubjectsData().subscribe({
+      next: (subjects) => this.subjects.set(subjects),
+      error: (err) => console.error('Subjects fetch failed:', err),
     });
 
-    if (this.isTeacher) {
-      this.subjectsService.getSubjectsData().subscribe({
-        next: (subjects) => this.subjects.set(subjects),
-        error: (err) => console.error('Subjects fetch failed:', err),
-      });
+    this.tasksService.getGroups().subscribe({
+      next: (groups) => this.groups.set(groups),
+      error: (err) => console.error('Groups fetch failed:', err),
+    });
 
-      this.tasksService.getGroups().subscribe({
-        next: (groups) => this.groups.set(groups),
-        error: (err) => console.error('Groups fetch failed:', err),
-      });
+    this.tasksService.getStudents().subscribe({
+      next: (students) => this.students.set(students),
+      error: (err) => console.error('Students fetch failed:', err),
+    });
+  }
 
-      this.tasksService.getStudents().subscribe({
-        next: (students) => this.students.set(students),
-        error: (err) => console.error('Students fetch failed:', err),
-      });
-    }
+  private loadForStudent(subjectId: string): void {
+    this.tasksService.getMyAssignmentsBySubjectId(subjectId).subscribe({
+      next: (assignments) => {
+        this.studentRows.set(
+          assignments.map((assignment, index) => ({ ...assignment, index: index + 1 })),
+        );
+      },
+      error: (err) => console.error('Assignments fetch failed:', err),
+    });
   }
 
   get subjectTitle(): string {
@@ -143,6 +177,12 @@ export class SubjectTasks implements OnInit {
     }
     if (event.action === 'delete') {
       this.onDeleteTask(event.row.id);
+    }
+  }
+
+  onStudentActionClick(event: TableActionEvent<AssignmentRow>): void {
+    if (event.action === 'view') {
+      this.router.navigate(['/tasks', event.row.assignmentId]);
     }
   }
 

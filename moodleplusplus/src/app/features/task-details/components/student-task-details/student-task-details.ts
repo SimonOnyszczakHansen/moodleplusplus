@@ -37,6 +37,37 @@ export class StudentTaskDetails implements OnInit {
     this.load();
   }
 
+  private load(): void {
+    this.error.set(false);
+
+    this.taskService.getAssignment(this.id).subscribe({
+      next: (assignment) => {
+        this.assignment.set({ ...assignment, submission: null, feedback: [], objectives: [] });
+        this.error.set(false);
+
+        this.taskService.getSubmission(this.id).subscribe({
+          next: (submission) => {
+            const current = this.assignment();
+            if (current) this.assignment.set({ ...current, submission });
+          },
+        });
+
+        const studentId = this.authService.currentUser?.id;
+        if (studentId) {
+          this.taskService.getFeedback(String(studentId), assignment.taskId).subscribe({
+            next: (feedback) => {
+              const current = this.assignment();
+              if (current) this.assignment.set({ ...current, feedback });
+            },
+          });
+        }
+      },
+      error: () => {
+        this.error.set(true);
+      },
+    });
+  }
+
   get canSubmit(): boolean {
     const status = this.assignment()?.status;
     return status === 'Ikke afleveret' || status === 'Afvist';
@@ -112,37 +143,6 @@ export class StudentTaskDetails implements OnInit {
         name: 'dig',
         studentId: currentUserId ? String(currentUserId) : null,
         returnTo: `/tasks/${this.id}`,
-      },
-    });
-  }
-
-  private load(): void {
-    this.error.set(false);
-
-    this.taskService.getAssignment(this.id).subscribe({
-      next: (assignment) => {
-        this.assignment.set({ ...assignment, submission: null, feedback: [], objectives: [] });
-        this.error.set(false);
-
-        this.taskService.getSubmission(this.id).subscribe({
-          next: (submission) => {
-            const current = this.assignment();
-            if (current) this.assignment.set({ ...current, submission });
-          },
-        });
-
-        const studentId = this.authService.currentUser?.id;
-        if (studentId) {
-          this.taskService.getFeedback(String(studentId), assignment.taskId).subscribe({
-            next: (feedback) => {
-              const current = this.assignment();
-              if (current) this.assignment.set({ ...current, feedback });
-            },
-          });
-        }
-      },
-      error: () => {
-        this.error.set(true);
       },
     });
   }
