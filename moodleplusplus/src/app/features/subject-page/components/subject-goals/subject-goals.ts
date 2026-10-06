@@ -35,6 +35,8 @@ export class SubjectGoals implements OnInit {
 
   goalId: string | null = null;
   formContent = '';
+  goalDraft = '';
+  goalEntries: string[] = [];
   deleteConfirm = '';
 
   readonly columns: TableColumn<ISubjectGoalRow>[] = [
@@ -107,7 +109,21 @@ export class SubjectGoals implements OnInit {
   onCreateGoal(): void {
     this.goalId = null;
     this.formContent = '';
+    this.goalDraft = '';
+    this.goalEntries = [];
     this.showCreateGoal = true;
+  }
+
+  addGoalToList(): void {
+    const content = this.goalDraft.trim();
+    if (!content) return;
+
+    this.goalEntries.push(content);
+    this.goalDraft = '';
+  }
+
+  removeGoalFromList(index: number): void {
+    this.goalEntries.splice(index, 1);
   }
 
   onEditGoal(row: ISubjectGoalRow): void {
@@ -123,30 +139,42 @@ export class SubjectGoals implements OnInit {
   }
 
   onCancelGoal(): void {
+    this.goalDraft = '';
+    this.goalEntries = [];
     this.showCreateGoal = false;
     this.showDeleteGoal = false;
   }
 
   onSubmitGoal(): void {
-    if (!this.formContent) return;
-
-    const subjectId = this.route.snapshot.paramMap.get('id')!;
-    const request: ICreateGoalRequest = {
-      subjectId: subjectId,
-      content: this.formContent,
-    };
-
     if (this.goalId) {
+      if (!this.formContent.trim()) return;
+
       const editRequest: IEditGoalRequest = {
-        content: this.formContent,
+        content: this.formContent.trim(),
       };
-      this.subjectsService.editGoalById(this.goalId, editRequest).subscribe();
-      this.showCreateGoal = false;
+      this.subjectsService.editGoalById(this.goalId, editRequest).subscribe({
+        next: () => (this.showCreateGoal = false),
+        error: (err) => console.error('Edit goal failed:', err),
+      });
       return;
     }
 
-    this.subjectsService.createGoal(request).subscribe();
-    this.showCreateGoal = false;
+    if (this.goalEntries.length === 0) return;
+
+    const subjectId = this.route.snapshot.paramMap.get('id')!;
+    const requests: ICreateGoalRequest[] = this.goalEntries.map((content) => ({
+      subjectId,
+      content,
+    }));
+
+    this.subjectsService.createGoals(requests).subscribe({
+      next: () => {
+        this.goalEntries = [];
+        this.goalDraft = '';
+        this.showCreateGoal = false;
+      },
+      error: (err) => console.error('Create goals failed:', err),
+    });
   }
 
   onSubmitDeleteGoal(): void {

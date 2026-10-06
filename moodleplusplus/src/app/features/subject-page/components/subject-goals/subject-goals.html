@@ -11,12 +11,31 @@
     </app-table>
 
     <app-modal [(open)]="showCreateGoal" [title]="goalId ? 'Rediger Målpind' : 'Opret Målpind'">
-        <app-input placeholder="Content" [(value)]="formContent"></app-input>
+        @if (goalId) {
+        <app-input label="Målpind" placeholder="Skriv målpind" [(value)]="formContent"></app-input>
+        } @else {
+        <div class="goal-input-row">
+            <app-input placeholder="Skriv målpind" [(value)]="goalDraft"></app-input>
+            <app-button variant="secondary" (click)="addGoalToList()">Tilføj</app-button>
+        </div>
+
+        @if (goalEntries.length) {
+        <ul class="goal-entry-list">
+            @for (goal of goalEntries; track goal; let i = $index) {
+            <li class="goal-entry-item">
+                <span>{{ goal }}</span>
+                <button type="button" aria-label="Fjern {{ goal }}" (click)="removeGoalFromList(i)">&times;</button>
+            </li>
+            }
+        </ul>
+        }
+        }
 
         <div class="modal-actions">
-            <app-button label="Annuller" variant="secondary" (click)="onCancelGoal()">Anuller</app-button>
-            <app-button label="Opret" variant="primary" (click)="onSubmitGoal()">{{ goalId ? 'Gem' :
-                'Opret'}}</app-button>
+            <app-button variant="secondary" (click)="onCancelGoal()">Anuller</app-button>
+            <app-button variant="primary" (click)="onSubmitGoal()"
+                [disabled]="goalId ? !formContent.trim() : !goalEntries.length">{{ goalId ? 'Gem' : 'Opret'
+                }}</app-button>
         </div>
     </app-modal>
 

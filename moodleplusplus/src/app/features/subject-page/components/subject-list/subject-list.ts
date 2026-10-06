@@ -38,6 +38,10 @@ export class SubjectList implements OnInit {
     private progressionService: ProgressionService,
   ) {}
 
+  get isTeacher(): boolean {
+    return this.authService.currentUser?.role === 'teacher';
+  }
+
   ngOnInit() {
     this.loadSubjects();
     this.subjectsService.refresh$.subscribe(() => this.loadSubjects());
