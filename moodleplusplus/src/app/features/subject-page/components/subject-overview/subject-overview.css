@@ -1,18 +1,21 @@
 .container {
-  height: 100vh;
-  min-height: 0;
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 2rem;
+  gap: clamp(0.75rem, 1.4vw, 1.5rem);
+  padding: clamp(1rem, 2vw, 2rem);
   color: var(--color-text);
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 2.5rem;
+  min-height: 2.5rem;
+  flex-shrink: 0;
 }
 
 .breadcrumb {
@@ -24,12 +27,14 @@
 .hero-card {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1.5rem 1.75rem;
+  align-items: flex-start;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  padding: clamp(1rem, 2vw, 1.75rem);
   border: 1px solid var(--color-border);
   border-radius: 1.5rem;
   background: rgba(255, 255, 255, 0.84);
   box-shadow: 0 12px 24px rgb(15 23 42 / 8%);
+  flex-shrink: 0;
 }
 
 .hero-content {
@@ -49,8 +54,9 @@
 
 .hero-content h1 {
   margin: 0;
-  font-size: clamp(2rem, 3vw, 3rem);
+  font-size: clamp(1.7rem, 2.5vw, 3rem);
   line-height: 1.1;
+  word-break: break-word;
 }
 
 .meta-row {
@@ -64,6 +70,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
 }
 
 .meta-label {
@@ -71,10 +78,17 @@
   font-size: 0.8rem;
 }
 
+.meta-email {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  word-break: break-word;
+}
+
 .action-row {
   display: flex;
   gap: 0.75rem;
   align-items: flex-end;
+  justify-content: flex-end;
   flex-wrap: wrap;
 }
 
@@ -82,20 +96,22 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(auto, 60%) 40%;
-  grid-template-rows: 1.5fr minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1.5rem;
-  /* overflow: hidden; */
+  grid-template-columns: minmax(0, 1.7fr) minmax(240px, 1fr);
+  grid-template-rows: auto auto auto;
+  gap: clamp(0.75rem, 1.4vw, 1.5rem);
+  align-items: start;
 }
 
 .panel {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  height: auto;
+  min-height: 180px;
   border: 1px solid var(--color-border);
   background: rgba(255, 255, 255, 0.84);
   border-radius: 1.5rem;
-  padding: 1.25rem 1.25rem 1rem;
+  padding: clamp(0.8rem, 1.4vw, 1rem) clamp(0.8rem, 1.4vw, 1rem) 0.75rem;
   box-shadow: 0 5px 25px rgba(15, 23, 42, 0.2);
   overflow: hidden;
 }
@@ -116,13 +132,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .panel-header h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: clamp(1.05rem, 1.4vw, 1.3rem);
 }
 
 .panel-header a,
@@ -147,6 +164,12 @@
   overflow: hidden;
 }
 
+.panel-content .student-row,
+.panel-content li,
+.task-item {
+  width: 100%;
+}
+
 .panel-content li {
   line-height: 1.5;
   color: var(--color-text-secondary);
@@ -160,10 +183,13 @@
   border: 1px solid var(--color-border);
   border-radius: 0.9rem;
   background: rgba(148, 163, 184, 0.08);
+  box-sizing: border-box;
+  flex-wrap: wrap;
 }
 
 .task-test {
-  max-width: 60%;
+  flex: 1 1 12rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -215,24 +241,43 @@
   margin-top: 1.5rem;
 }
 
-@media (max-width: 900px) {
-  .overview-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 1024px) {
+  .container {
+    min-height: 100vh;
+    padding: 1.5rem;
+    overflow-x: hidden;
   }
 
-  .goals-panel,
-  .tasks-panel {
-    grid-column: auto;
+  .overview-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+  }
+
+  .panel {
+    min-height: 0;
+    height: auto;
+  }
+
+  .panel-tasks,
+  .panel-goals,
+  .panel-students {
+    grid-area: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
   }
 
   .hero-card {
     flex-direction: column;
+    align-items: stretch;
   }
-}
 
-@media (max-width: 600px) {
-  .subject-overview {
-    padding: 1rem;
+  .page-header {
+    min-height: auto;
   }
 
   .meta-row {
@@ -240,7 +285,26 @@
     gap: 0.75rem;
   }
 
+  .panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .action-row {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .action-row app-button {
+    width: 100%;
+  }
+
   .task-item {
     flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .task-test {
+    max-width: 100%;
   }
 }

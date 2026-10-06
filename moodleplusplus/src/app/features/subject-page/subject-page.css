@@ -2,10 +2,17 @@
   padding: 2rem;
 }
 
-.header-container {
+.page-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  height: 2.5rem;
+}
+
+.breadcrumb {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .modal-actions {

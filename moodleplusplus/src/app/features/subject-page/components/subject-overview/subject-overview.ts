@@ -16,6 +16,7 @@ import {
   IEditSubjectRequest,
   ISubject,
   ISubjectGoal,
+  ISubjectTeacher,
 } from '../../../../core/models/subjects.model';
 import { ITask } from '../../../../core/models/tasks.model';
 import { User } from '../../../../core/models/user.interface';
@@ -33,6 +34,7 @@ export class SubjectOverview implements OnInit {
   private readonly studentLimit = 5;
 
   subject = signal<ISubject | undefined>(undefined);
+  teacher = signal<ISubjectTeacher | undefined>(undefined);
   goals = signal<ISubjectGoal[]>([]);
   tasks = signal<ITask[]>([]);
   students = signal<User[]>([]);
@@ -62,6 +64,11 @@ export class SubjectOverview implements OnInit {
       error: (err) => console.error('Subject fetch failed:', err),
     });
 
+    this.subjectsService.getTeacherBySubjectId(subjectId).subscribe({
+      next: (teacher) => this.teacher.set(teacher),
+      error: (err) => console.error('Teacher fetch failed:', err),
+    });
+
     this.subjectsService.getGoalsBySubjectId(subjectId).subscribe({
       next: (goals) => this.goals.set(goals),
       error: (err) => console.error('Goals fetch failed:', err),
@@ -82,8 +89,20 @@ export class SubjectOverview implements OnInit {
     return this.subject()?.name ?? '---';
   }
 
+  get teacherName(): string {
+    return this.teacher()?.name ?? this.teacher()?.Name ?? 'Ukendt underviser';
+  }
+
+  get teacherEmail(): string {
+    return this.teacher()?.email ?? this.teacher()?.Email ?? '';
+  }
+
   get isTeacher(): boolean {
     return this.authService.currentUser?.role === 'teacher';
+  }
+
+  get isStudent(): boolean {
+    return this.authService.currentUser?.role === 'student';
   }
 
   taskItems(): ITask[] {
@@ -118,6 +137,15 @@ export class SubjectOverview implements OnInit {
   viewSubjectTasks() {
     const subjectId = this.route.snapshot.paramMap.get('id')!;
     this.router.navigate([`/subject/${subjectId}/tasks`]);
+  }
+
+  viewStudentProgression(): void {
+    const subjectId = this.route.snapshot.paramMap.get('id')!;
+    const studentId = this.authService.currentUser?.id;
+
+    if (!studentId) return;
+
+    this.router.navigate([`/progress/students/${studentId}/subjects/${subjectId}`]);
   }
 
   viewSubjectGoals() {

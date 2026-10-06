@@ -1,10 +1,10 @@
 <div class="container">
-  <div class="header-container">
-    <h1>Mine Fag</h1>
+  <header class="page-header">
+    <div class="breadcrumb">Mine Fag</div>
     @if (userRole === 'teacher') {
     <app-button variant="primary" (click)="onCreateSubject()">Opret Fag</app-button>
     }
-  </div>
+  </header>
 
   <app-modal [(open)]="showCreateSubject" [title]="'Opret Opgave'">
     <app-input label="Navn" placeholder="Navn" [(value)]="subjectName"></app-input>

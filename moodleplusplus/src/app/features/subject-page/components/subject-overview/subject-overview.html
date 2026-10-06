@@ -10,7 +10,10 @@
             <div class="meta-row">
                 <div class="meta-item">
                     <span class="meta-label">Underviser</span>
-                    <strong>David Svarrer</strong>
+                    <strong>{{ teacherName }}</strong>
+                    @if (teacherEmail) {
+                    <span class="meta-email">{{ teacherEmail }}</span>
+                    }
                 </div>
             </div>
         </div>
@@ -19,6 +22,10 @@
         <div class="action-row">
             <app-button variant="secondary" (click)="onEditSubject()">Rediger fag</app-button>
             <app-button variant="danger" (click)="onDeleteSubject()">Slet fag</app-button>
+        </div>
+        } @else if (isStudent) {
+        <div class="action-row">
+            <app-button (click)="viewStudentProgression()">Se min progression</app-button>
         </div>
         }
     </div>

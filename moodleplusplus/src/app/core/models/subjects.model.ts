@@ -31,6 +31,15 @@ export interface ITeacherSubject {
   assigned_at?: string;
 }
 
+export interface ISubjectTeacher {
+  id?: string | number;
+  Id?: string | number;
+  name?: string;
+  Name?: string;
+  email?: string;
+  Email?: string;
+}
+
 export interface ICreateSubjectRequest {
   name: string;
 }
