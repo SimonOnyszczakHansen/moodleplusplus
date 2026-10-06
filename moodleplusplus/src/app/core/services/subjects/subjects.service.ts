@@ -89,10 +89,14 @@ export class SubjectsService {
     return this.http.get<ISubjectGoal[]>(`${environment.apiHost}/goal/subjectid/${subjectId}`);
   }
 
-  createGoal(request: ICreateGoalRequest): Observable<void> {
+  createGoals(requests: ICreateGoalRequest[]): Observable<void> {
     return this.http
-      .post<void>(`${environment.apiHost}/goal`, request)
+      .post<void>(`${environment.apiHost}/goal`, requests)
       .pipe(tap(() => this.refreshSubject.next()));
+  }
+
+  createGoal(request: ICreateGoalRequest): Observable<void> {
+    return this.createGoals([request]);
   }
 
   editGoalById(goalId: string, request: IEditGoalRequest): Observable<void> {
