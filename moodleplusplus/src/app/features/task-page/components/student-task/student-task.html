@@ -6,7 +6,7 @@
 			<app-status-badge [label]="row.status" [variant]="row.status" />
 		</ng-template>
 		<ng-template appTableCell="deadline" let-row>
-			{{ row.deadline | date: 'dd/MM/yyyy' }}
+			{{ row.deadline | date: 'dd-MM-yyyy' }}
 		</ng-template>
 	</app-table>
 </div>

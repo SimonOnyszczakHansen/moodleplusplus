@@ -5,7 +5,7 @@
 	<app-table [columns]="columns" [rows]="rows()" [actions]="actions" emptyMessage="Ingen opgaver fundet."
 		(actionClick)="onActionClick($event)">
 		<ng-template appTableCell="deadline" let-row>
-			{{ row.deadline | date: 'dd/MM/yyyy' }}
+			{{ row.deadline | date: 'dd-MM-yyyy' }}
 		</ng-template>
 	</app-table>
 	<app-modal [(open)]="showCreateTask" [title]="editingTaskId ? 'Rediger Opgave' : 'Opret Opgave'">

@@ -48,7 +48,7 @@
                         <h3>{{ task.title }}</h3>
                         <div class="hide-overflow">{{ task.description }}</div>
                     </div>
-                    <span class="task-deadline">{{ task.deadline }}</span>
+                    <span class="task-deadline">{{ task.deadline | date: 'dd-MM-yyyy' }}</span>
                 </article>
                 }
             </div>

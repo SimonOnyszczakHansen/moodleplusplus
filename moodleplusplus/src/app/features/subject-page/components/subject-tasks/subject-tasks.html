@@ -10,14 +10,14 @@
     <app-table [columns]="columns" [rows]="rows()" [actions]="actions" emptyMessage="Ingen opgaver fundet."
         (actionClick)="onActionClick($event)">
         <ng-template appTableCell="deadline" let-row>
-            {{ row.deadline | date: 'dd/MM/yyyy' }}
+            {{ row.deadline | date: 'dd-MM-yyyy' }}
         </ng-template>
     </app-table>
     } @else {
     <app-table [columns]="studentColumns" [rows]="studentRows()" [actions]="actions"
         emptyMessage="Ingen opgaver fundet." (actionClick)="onStudentActionClick($event)">
         <ng-template appTableCell="deadline" let-row>
-            {{ row.deadline | date: 'dd/MM/yyyy' }}
+            {{ row.deadline | date: 'dd-MM-yyyy' }}
         </ng-template>
     </app-table>
     }
