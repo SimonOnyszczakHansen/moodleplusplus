@@ -1,7 +1,8 @@
 .app-shell {
   display: flex;
   min-height: 100vh;
-  background: var(--color-background, #f8fafc);
+  /* Keep the application shell transparent so the global main background remains visible. */
+  background: transparent;
 }
 
 /* SIDEBAR */
