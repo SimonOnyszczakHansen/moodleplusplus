@@ -130,3 +130,68 @@
 .error-message {
 	color: var(--color-danger);
 }
+
+/* Modern responsive refinements */
+
+:host {
+	max-width: 100%;
+	vertical-align: middle;
+}
+
+.roster-button {
+	border-radius: .7rem;
+	transition: border-color .2s ease, background-color .2s ease;
+}
+
+.roster-button:hover {
+	border-color: var(--color-primary);
+}
+
+.roster-button:focus-visible,
+.student-list button:focus-visible,
+.student-actions a:focus-visible {
+	outline: 2px solid var(--color-focus);
+	outline-offset: 3px;
+}
+
+.roster-content {
+	box-sizing: border-box;
+	max-width: 100%;
+}
+
+.student-search input {
+	box-sizing: border-box;
+	min-width: 0;
+	border-radius: .7rem;
+}
+
+.student-list li {
+	min-width: 0;
+	padding: .75rem 0;
+}
+
+.student-actions {
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+
+.student-list button {
+	border-radius: .65rem;
+}
+
+@media (max-width: 600px) {
+	.roster-content {
+		min-width: 0;
+		width: min(27rem, calc(100vw - 2rem));
+	}
+
+	.student-list li {
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+
+	.student-actions {
+		width: 100%;
+		justify-content: flex-start;
+	}
+}

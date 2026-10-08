@@ -18,3 +18,44 @@
   font-size: 0.95rem;
   font-weight: 600;
 }
+
+/* Responsive polish */
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.container {
+  box-sizing: border-box;
+  padding: clamp(1rem, 3vw, 2rem);
+  gap: 1.25rem;
+}
+
+.page-header {
+  min-height: 2.5rem;
+  height: auto;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.breadcrumb {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .modal-actions {
+    flex-wrap: wrap;
+  }
+
+  .goal-input-row {
+    flex-wrap: wrap;
+  }
+
+  .goal-input-row app-input {
+    min-width: min(100%, 14rem);
+  }
+}
