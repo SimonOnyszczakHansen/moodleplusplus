@@ -128,3 +128,77 @@
 .error-message {
 	color: var(--color-danger);
 }
+
+/* Modern responsive refinements */
+
+.answer-quiz-page {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+}
+
+.page-header h1 {
+	font-size: clamp(1.5rem, 3vw, 2rem);
+	line-height: 1.2;
+}
+
+.question-block {
+	min-width: 0;
+	margin-bottom: 1.75rem;
+	padding-top: 1.25rem;
+}
+
+.question-block legend {
+	line-height: 1.45;
+}
+
+.answer-options {
+	max-width: 100%;
+	gap: .75rem;
+}
+
+.answer-option {
+	min-width: 0;
+	border-radius: .85rem;
+	padding: .8rem 1rem;
+	background: rgba(255, 255, 255, .93);
+	transition: border-color .2s ease, background-color .2s ease;
+}
+
+.answer-option:hover {
+	border-color: var(--color-primary);
+}
+
+.answer-option:focus-within {
+	outline: 2px solid var(--color-focus);
+	outline-offset: 2px;
+}
+
+.form-actions {
+	flex-wrap: wrap;
+}
+
+.form-actions button,
+.cancel-button {
+	border-radius: .7rem;
+}
+
+@media (max-width: 600px) {
+	.answer-quiz-page {
+		padding: 1rem;
+	}
+
+	.answer-option {
+		padding: .75rem;
+	}
+
+	.form-actions {
+		justify-content: stretch;
+	}
+
+	.form-actions button,
+	.cancel-button {
+		flex: 1 1 auto;
+		text-align: center;
+	}
+}

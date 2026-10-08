@@ -1,36 +1,41 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.4rem;
-  font-size: 0.8rem;
-  font-weight: bold;
+  justify-content: center;
+  gap: .3rem;
+  max-width: 100%;
+  padding: .35rem .7rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.25;
   white-space: nowrap;
 }
 
-.badge[data-status="Ikke afleveret"], 
+.badge[data-status="Ikke afleveret"],
 .badge[data-status="Tilgængelig"] {
-  background: color-mix(in srgb, var(--color-warning) 70%, white);
-  border: 2px solid var(--color-warning);
-  color: var(--color-text-light);
+  background: #fffbeb;
+  border-color: #fcd34d;
+  color: #92400e;
 }
 
 .badge[data-status="Afleveret"] {
-  background: color-mix(in srgb, var(--color-info) 70%, white);
-  border: 2px solid var(--color-info);
-  color: var(--color-text-light);
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
 }
 
-.badge[data-status="Godkendt"], 
+.badge[data-status="Godkendt"],
 .badge[data-status="Bestået"] {
-  background: color-mix(in srgb, var(--color-success) 70%, white);
-  border: 2px solid var(--color-success);
-  color: var(--color-text-light);
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
 }
 
-.badge[data-status="Afvist"], 
+.badge[data-status="Afvist"],
 .badge[data-status="Fejlet"] {
-  background: color-mix(in srgb, var(--color-danger) 70%, white);
-  border: 2px solid var(--color-danger);
-  color: var(--color-text-light);
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
 }

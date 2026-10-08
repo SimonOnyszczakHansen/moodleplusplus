@@ -84,11 +84,11 @@
 	color: var(--color-text);
 	font: inherit;
 	font-weight: 400;
-	
+
 }
 
 .quiz-form textarea {
-    resize: vertical;
+	resize: vertical;
 }
 
 .quiz-form input:focus,
@@ -197,5 +197,93 @@
 	.answer-number {
 		width: 3.8rem;
 		font-size: 0.8rem;
+	}
+}
+
+/* Modern responsive refinements */
+
+.create-quiz-page {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+}
+
+.page-header h1 {
+	font-size: clamp(1.5rem, 3vw, 2rem);
+	line-height: 1.2;
+	overflow-wrap: anywhere;
+}
+
+.quiz-form {
+	min-width: 0;
+	gap: 1.75rem;
+}
+
+.quiz-details>* {
+	min-width: 0;
+}
+
+.quiz-form input:not([type='radio']),
+.quiz-form select,
+.quiz-form textarea {
+	box-sizing: border-box;
+	border-radius: .7rem;
+	background: rgba(255, 255, 255, .96);
+}
+
+.question-editor {
+	min-width: 0;
+	width: 100%;
+	max-width: 42rem;
+	padding: 1.25rem;
+	border: 1px solid var(--color-border);
+	border-radius: 1.125rem;
+	background: rgba(255, 255, 255, .9);
+	box-sizing: border-box;
+}
+
+.question-heading {
+	flex-wrap: wrap;
+}
+
+.answer-row {
+	min-width: 0;
+}
+
+.answer-row input[type='text'] {
+	min-width: 0;
+}
+
+.add-quiz-button {
+	border-radius: .7rem;
+}
+
+.quiet-button:focus-visible,
+.text-button:focus-visible,
+.add-quiz-button:focus-visible {
+	outline: 2px solid var(--color-focus);
+	outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+	.create-quiz-page {
+		padding: 1rem 1rem 2rem;
+	}
+
+	.question-editor {
+		padding: 1rem;
+	}
+
+	.answer-row {
+		flex-wrap: wrap;
+	}
+
+	.answer-row input[type='text'] {
+		flex: 1 1 9rem;
+	}
+
+	.form-actions {
+		flex-wrap: wrap;
+		gap: .75rem;
 	}
 }

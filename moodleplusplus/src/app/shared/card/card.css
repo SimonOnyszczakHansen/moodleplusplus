@@ -10,21 +10,43 @@
   border-radius: 1rem;
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 0.9rem;
+  font-size: .9rem;
+  box-shadow: 0 5px 20px rgb(15 23 42 / 5%);
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+
+.card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 26px rgb(15 23 42 / 8%);
 }
 
 .card-cover {
   height: 4rem;
-  background: var(--color-background);
+  background: linear-gradient(120deg, #eff6ff, #e0f2fe);
   border-bottom: 1px solid var(--color-border);
 }
 
 .card-body {
-  padding: 0.75rem;
+  padding: 1.125rem;
 }
 
 h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1rem;
+  margin: 0 0 .75rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -.02em;
   overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
 }

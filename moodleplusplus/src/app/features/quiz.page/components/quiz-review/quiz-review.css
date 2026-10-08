@@ -79,3 +79,67 @@
 .error-message {
 	color: var(--color-danger);
 }
+
+/* Modern responsive refinements */
+
+.quiz-review-page {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+}
+
+.page-header h1 {
+	font-size: clamp(1.5rem, 3vw, 2rem);
+	line-height: 1.2;
+	overflow-wrap: anywhere;
+}
+
+.review-list {
+	gap: 1rem;
+}
+
+.review-list li {
+	min-width: 0;
+	padding: 1.25rem;
+	border: 1px solid var(--color-border);
+	border-left-width: 4px;
+	border-radius: .9rem;
+	background: rgba(255, 255, 255, .93);
+	box-shadow: 0 6px 20px rgba(15, 23, 42, .06);
+}
+
+.review-list li.correct-answer {
+	border-left-color: var(--color-success);
+}
+
+.review-list li.incorrect-answer {
+	border-left-color: var(--color-danger);
+}
+
+.review-list h2 {
+	line-height: 1.4;
+	overflow-wrap: anywhere;
+}
+
+.back-button {
+	border-radius: .7rem;
+}
+
+.back-button:hover {
+	border-color: var(--color-primary);
+}
+
+.back-button:focus-visible {
+	outline: 2px solid var(--color-focus);
+	outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+	.quiz-review-page {
+		padding: 1rem;
+	}
+
+	.review-list li {
+		padding: 1rem;
+	}
+}

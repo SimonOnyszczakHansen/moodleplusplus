@@ -1,72 +1,99 @@
 .app-shell {
   display: flex;
   min-height: 100vh;
+  /* Keep the application shell transparent so the global main background remains visible. */
+  background: transparent;
 }
 
+/* SIDEBAR */
 .sidebar {
- position: fixed;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  box-sizing: border-box;
   width: 18rem;
-  background: var(--color-sidebar);
-  color: var(--color-text-light);
-  padding: 2rem 1rem;
+  height: 100vh;
+  height: 100dvh;
+  padding: 2rem 1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  height: 100vh;
+  gap: 1.5rem;
+  overflow-y: auto;
+
+  background: var(--color-sidebar);
+  color: var(--color-text-light);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.06);
 }
 
+/* HEADER */
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.nav-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  width: 2.25rem;
-  height: 2.25rem;
-  padding: 0;
-  border: 0;
-  border-radius: 0.4rem;
-  background: transparent;
-  cursor: pointer;
-}
-
-.nav-toggle-bar {
-  display: block;
-  width: 1.5rem;
-  height: 2px;
-  background: var(--color-text-light);
-}
-
 .brand {
-  font-size: 2rem;
-  font-weight: bold;
-  letter-spacing: 0.02em;
-  padding: 1rem 0.5rem 0rem 0.5rem;
   align-self: center;
+  padding: 1rem 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.2;
 }
 
 .role-tag {
   align-self: center;
   margin-top: -0.5rem;
   color: var(--color-text-muted);
-  font-size: 0.9rem;
-  font-weight: bold;
-  text-transform: capitalize;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .p1 {
-	color: var(--color-primary);
-}
-.p2 {
-	color: var(--color-turquoise);
+  color: var(--color-primary);
 }
 
+.p2 {
+  color: var(--color-turquoise);
+}
+
+/* MOBILE NAVIGATION BUTTON */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-toggle-bar {
+  display: block;
+  width: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-text-light);
+}
+
+/* SIDEBAR CONTENT */
 .sidebar-body {
   display: flex;
   flex-direction: column;
@@ -75,48 +102,88 @@
   min-height: 0;
 }
 
+/* NAVIGATION */
 .nav-menu {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .nav-menu a,
 .logout-button {
   display: block;
+  box-sizing: border-box;
   width: 100%;
-  text-align: left;
-  padding: 12px 14px;
-  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+
   color: var(--color-text-light);
-  text-decoration: none;
   background: transparent;
-  border: 0;
-  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
   font: inherit;
-  transition: background 0.2s ease;
+  font-size: 0.925rem;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .nav-menu a:hover,
 .logout-button:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.06);
+  transform: translateX(3px);
 }
 
+/* ACTIVE NAVIGATION ITEM */
+.nav-menu a.active,
+.nav-menu a[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-light);
+  border-color: rgba(255, 255, 255, 0.08);
+  font-weight: 650;
+}
+
+/* KEYBOARD ACCESSIBILITY */
+.nav-menu a:focus-visible,
+.logout-button:focus-visible,
+.nav-toggle:focus-visible {
+  outline: 2px solid var(--color-turquoise);
+  outline-offset: 3px;
+}
+
+/* USER INFORMATION */
 .user-chip {
   margin-top: auto;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-  padding: 8px 12px;
+  padding: 0.8rem 1rem;
+  border-radius: 0.85rem;
+
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--color-text-light);
+
   text-align: center;
-  font-size: 0.9rem;
-}
-.spacer {
-  height: 1px;
-  margin: 1rem 0.5rem;
-  background-color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
+/* DIVIDER */
+.spacer {
+  height: 1px;
+  flex-shrink: 0;
+  margin: 1rem 0.5rem;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* MAIN CONTENT */
 .content-area {
   flex: 1;
   min-width: 0;
@@ -127,6 +194,7 @@
   margin-left: 0;
 }
 
+/* MOBILE */
 @media (max-width: 768px) {
   .app-shell {
     flex-direction: column;
@@ -135,26 +203,70 @@
   .sidebar {
     width: 100%;
     height: auto;
-  }
-
-  .nav-toggle {
-    display: flex;
-  }
-
-  .content-area {
-	margin-left: 0;
-	margin-top: 7rem;
+    max-height: 100dvh;
+    padding: 1rem 1.25rem;
+    gap: 0.75rem;
+    overflow-y: auto;
   }
 
   .sidebar-header {
     justify-content: space-between;
   }
 
+  .brand {
+    padding: 0;
+    font-size: 1.65rem;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
   .sidebar-body {
     display: none;
+    flex: initial;
+    min-height: auto;
+    padding: 0.5rem 0 0.75rem;
   }
 
   .sidebar-body.open {
     display: flex;
+  }
+
+  .nav-menu {
+    gap: 0.3rem;
+  }
+
+  .nav-menu a,
+  .logout-button {
+    padding: 0.85rem 1rem;
+  }
+
+  .user-chip {
+    margin-top: 0.5rem;
+  }
+
+  .content-area {
+    margin-left: 0;
+    margin-top: 7rem;
+  }
+
+  .content-area.no-sidebar {
+    margin-top: 0;
+  }
+}
+
+/* REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+
+  .nav-menu a,
+  .logout-button,
+  .nav-toggle {
+    transition: none;
+  }
+
+  .nav-menu a:hover,
+  .logout-button:hover {
+    transform: none;
   }
 }

@@ -4,18 +4,31 @@
 }
 
 .action-menu-toggle {
-	border: none;
-	background: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.5rem;
+	min-height: 2.5rem;
+	padding: .35rem .65rem;
+	border: 1px solid transparent;
+	border-radius: .65rem;
+	background: transparent;
+	color: var(--color-text);
 	cursor: pointer;
+	font: inherit;
 	font-size: 1.25rem;
 	line-height: 1;
-	padding: 0.25rem 0.625rem;
-	border-radius: 0.375rem;
-	color: var(--color-text);
+	transition: background .2s ease, border-color .2s ease;
 }
 
 .action-menu-toggle:hover {
 	background: var(--color-background);
+	border-color: var(--color-border);
+}
+
+.action-menu-toggle:focus-visible {
+	outline: 3px solid var(--color-focus);
+	outline-offset: 2px;
 }
 
 .action-menu-panel {
@@ -23,33 +36,51 @@
 	z-index: 50;
 	display: flex;
 	flex-direction: column;
-	gap: 0.25rem;
-	padding: 0.5rem;
+	gap: .25rem;
 	min-width: 10rem;
+	max-width: calc(100vw - 1rem);
+	padding: .45rem;
 	border: 1px solid var(--color-border);
-	border-radius: 0.5rem;
+	border-radius: .8rem;
 	background: var(--color-surface);
-	box-shadow: 0 0.5rem 1rem rgb(0 0 0 / 15%);
+	box-shadow: 0 12px 30px rgb(15 23 42 / 16%);
 }
 
 .action-menu-panel ::ng-deep button {
 	display: block;
 	width: 100%;
-	padding: 0.5rem 0.75rem;
-	border: none;
-	border-radius: 0.375rem;
-	background: none;
+	min-height: 2.5rem;
+	padding: .65rem .8rem;
+	border: 0;
+	border-radius: .5rem;
+	background: transparent;
 	color: var(--color-text);
 	font: inherit;
+	font-size: .9rem;
 	text-align: left;
 	cursor: pointer;
+	transition: background .18s ease;
 }
 
 .action-menu-panel ::ng-deep button:hover:not(:disabled) {
 	background: var(--color-background);
 }
 
+.action-menu-panel ::ng-deep button:focus-visible {
+	outline: 2px solid var(--color-focus);
+	outline-offset: -2px;
+}
+
 .action-menu-panel ::ng-deep button:disabled {
 	color: var(--color-text-muted);
+	opacity: .6;
 	cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.action-menu-toggle,
+	.action-menu-panel ::ng-deep button {
+		transition: none;
+	}
 }
