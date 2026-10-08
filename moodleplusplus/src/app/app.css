@@ -47,8 +47,10 @@
   font-size: 2rem;
   font-weight: bold;
   letter-spacing: 0.02em;
-  padding: 1rem 0.5rem 0rem 0.5rem;
+  margin: 1rem 0.5rem 0rem 0.5rem;
   align-self: center;
+  color: var(--color-text-light);
+  text-decoration: none;
 }
 
 .role-tag {

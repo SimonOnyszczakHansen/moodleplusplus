@@ -10,6 +10,7 @@ import { Table, TableAction, TableActionEvent, TableColumn } from '../../../../s
 import { Button } from '../../../../shared/button/button';
 import { Modal } from '../../../../shared/modal/modal';
 import { Input } from '../../../../shared/input/input';
+import { BackButton } from '../../../../shared/back-button/back-button';
 
 // Models
 import {
@@ -22,7 +23,7 @@ import {
 
 @Component({
   selector: 'app-subject-goals',
-  imports: [Button, Modal, Input, Table],
+  imports: [Button, Modal, Input, Table, BackButton],
   templateUrl: './subject-goals.html',
   styleUrl: './subject-goals.css',
 })

@@ -7,6 +7,7 @@ import { Observable, catchError, combineLatest, map, of, switchMap } from 'rxjs'
 import { SubjectsService } from '../../core/services/subjects/subjects.service';
 import { ISubject } from '../../core/models/subjects.model';
 import { IDashboardTaskPreview } from './models/task.model';
+import { IDashboardQuiz } from './models/quiz.model';
 import { ProgressBar } from '../../shared/progress-bar/progress-bar';
 import { Card } from '../../shared/card/card';
 import { Button } from '../../shared/button/button';
@@ -35,6 +36,7 @@ export class Dashboard implements OnInit {
   });
   subjects = signal<ISubject[]>([]);
   tasks = signal<IDashboardTaskPreview[]>([]);
+  quizzes = signal<IDashboardQuiz[]>([]);
   loading = signal(true);
   error = signal(false);
   subjectsError = signal(false);
@@ -52,12 +54,16 @@ export class Dashboard implements OnInit {
       const tasks = this.tasks().filter((task) => task.subjectId === String(subject.id));
 
       if (!this.isTeacherDashboard()) {
-        const approved = tasks.filter((task) => task.status === 'Approved').length;
+        const quizzes = this.quizzes().filter((quiz) => quiz.subjectId === String(subject.id));
+        const approvedTasks = tasks.filter((task) => task.status === 'Approved').length;
+        const passedQuizzes = quizzes.filter((quiz) => quiz.passed).length;
+        const assigned = tasks.length + quizzes.length;
+        const approved = approvedTasks + passedQuizzes;
         return {
           ...subject,
-          assigned: tasks.length,
+          assigned,
           approved,
-          progress: tasks.length ? Math.round((approved / tasks.length) * 100) : 0,
+          progress: assigned ? Math.round((approved / assigned) * 100) : 0,
         };
       }
 
@@ -125,6 +131,7 @@ export class Dashboard implements OnInit {
           this.dashboard.set(data);
           this.subjects.set(subjects);
           this.tasks.set(tasks);
+          this.quizzes.set('quizzes' in data ? data.quizzes?.items ?? [] : []);
           this.loading.set(false);
         },
         error: () => {

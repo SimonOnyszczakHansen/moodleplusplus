@@ -9,6 +9,7 @@ import { SubjectsService } from '../../../../core/services/subjects/subjects.ser
 
 // Shared Components
 import { Table, TableAction, TableActionEvent, TableColumn } from '../../../../shared/table/table';
+import { BackButton } from '../../../../shared/back-button/back-button';
 
 // Models
 import { ISubject } from '../../../../core/models/subjects.model';
@@ -20,7 +21,7 @@ interface Row extends User {
 
 @Component({
   selector: 'app-subject-students',
-  imports: [CommonModule, Table],
+  imports: [CommonModule, Table, BackButton],
   templateUrl: './subject-students.html',
   styleUrl: './subject-students.css',
 })

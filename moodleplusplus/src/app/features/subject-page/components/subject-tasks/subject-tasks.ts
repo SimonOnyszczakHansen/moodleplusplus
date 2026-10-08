@@ -21,6 +21,7 @@ import { Button } from '../../../../shared/button/button';
 import { Modal } from '../../../../shared/modal/modal';
 import { Input } from '../../../../shared/input/input';
 import { Dropdown, DropdownOption } from '../../../../shared/dropdown/dropdown';
+import { BackButton } from '../../../../shared/back-button/back-button';
 
 // Models
 import { IAssignee } from '../../../../core/models/assignee.model';
@@ -42,7 +43,7 @@ interface AssignmentRow extends ITaskAssignmentSummary {
 
 @Component({
   selector: 'app-subject-tasks',
-  imports: [CommonModule, Table, TableCellTemplate, DatePipe, Button, Modal, Input, Dropdown],
+  imports: [CommonModule, Table, TableCellTemplate, DatePipe, Button, Modal, Input, Dropdown, BackButton],
   templateUrl: './subject-tasks.html',
   styleUrl: './subject-tasks.css',
 })

@@ -1,7 +1,7 @@
 <div class="app-shell">
   <aside class="sidebar" *ngIf="showNavigation">
     <div class="sidebar-header">
-      <div class="brand">Moodle<span class="p1">+</span><span class="p2">+</span></div>
+      <a href="/dashboard" class="brand">Moodle<span class="p1">+</span><span class="p2">+</span></a>
       <button type="button" class="nav-toggle" (click)="toggleMobileNav()" [attr.aria-expanded]="mobileNavOpen()"
         aria-label="Menu">
         <span class="nav-toggle-bar"></span>

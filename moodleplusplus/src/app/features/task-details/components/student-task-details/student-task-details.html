@@ -2,7 +2,7 @@
 <p>Kunne ikke hente opgaven.</p>
 } @else if (assignment(); as assignment) {
 <div class="task-details-container">
-	<p class="back-link" (click)="goBack()">← Tilbage</p>
+	<app-back-button></app-back-button>
 	<div class="header-card">
 		<h1>{{ assignment.title }}</h1>
 		<p class="description">{{ assignment.description }}</p>
