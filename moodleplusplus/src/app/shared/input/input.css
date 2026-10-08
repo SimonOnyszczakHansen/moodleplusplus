@@ -1,45 +1,65 @@
 :host {
   display: block;
+  min-width: 0;
 }
 
 label {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: .5rem;
+  min-width: 0;
 }
 
 span {
   color: var(--color-text);
-  font-weight: bold;
+  font-size: .875rem;
+  font-weight: 650;
 }
 
 input {
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
   min-height: 2.75rem;
-  padding: 0.625rem 0.875rem;
+  padding: .625rem .875rem;
   border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+  border-radius: .7rem;
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
+  font-size: .925rem;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
 
 input::placeholder {
   color: var(--color-text-muted);
+  opacity: .8;
 }
-/* 
+
 input:hover:not(:disabled) {
   border-color: var(--color-secondary);
-} */
+}
+
+input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 13%);
+}
 
 input:focus-visible {
-  border-color: var(--color-focus);
-  outline: none;
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 input:disabled {
   background: var(--color-background);
   color: var(--color-text-muted);
   cursor: not-allowed;
+  opacity: .7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input {
+    transition: none;
+  }
 }

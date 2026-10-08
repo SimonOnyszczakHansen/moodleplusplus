@@ -6,6 +6,7 @@
 	--color-secondary: #64748b;
 
 	/* Backgrounds */
+	--main-background-image: url('/background.jpeg');
 	--color-background: #f8fafc;
 	--color-surface: #ffffff;
 	--color-sidebar: #0f172a;
@@ -41,13 +42,14 @@
 
 html,
 body {
+	min-height: 100%;
 	margin: 0;
 	padding: 0;
 }
 
 body {
 	font-family: var(--font-family);
-	background: var(--color-background) url('/background.jpeg') center / cover no-repeat fixed;
+	background: var(--color-background) var(--main-background-image) center / cover no-repeat fixed;
   	color: var(--color-text);
 }
 

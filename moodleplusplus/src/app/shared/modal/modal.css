@@ -1,19 +1,20 @@
 dialog {
 	box-sizing: border-box;
 	width: min(32rem, calc(100% - 2rem));
+	max-height: calc(100vh - 2rem);
 	max-height: calc(100dvh - 2rem);
 	margin: auto;
-	padding: 1.5rem;
+	padding: clamp(1.125rem, 3vw, 1.75rem);
 	overflow: auto;
 	border: 1px solid var(--color-border);
-	border-radius: 0.75rem;
+	border-radius: 1.125rem;
 	background: var(--color-surface);
 	color: var(--color-text);
-	box-shadow: 0 1rem 3rem rgb(0 0 0 / 20%);
+	box-shadow: 0 24px 65px rgb(15 23 42 / 25%);
 }
 
 dialog::backdrop {
-	background: rgb(15 23 42 / 55%);
+	background: rgb(15 23 42 / 60%);
 }
 
 header {
@@ -21,12 +22,15 @@ header {
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	margin-bottom: 1.25rem;
+	margin-bottom: 1.5rem;
 }
 
 h2 {
 	margin: 0;
-	font-size: 1.25rem;
+	font-size: 1.3rem;
+	font-weight: 750;
+	letter-spacing: -.025em;
+	line-height: 1.3;
 	overflow-wrap: anywhere;
 }
 
@@ -35,13 +39,22 @@ h2 {
 	align-items: center;
 	justify-content: center;
 	flex-shrink: 0;
+	width: 2.5rem;
+	height: 2.5rem;
 	padding: 0;
-	background: var(--color-surface);
+	border: 1px solid transparent;
+	border-radius: .65rem;
+	background: var(--color-background);
 	color: var(--color-text);
 	font: inherit;
 	font-size: 1.5rem;
 	cursor: pointer;
-	border: none;
+	transition: background .2s ease, border-color .2s ease;
+}
+
+.close-button:hover {
+	background: #e2e8f0;
+	border-color: var(--color-border);
 }
 
 .close-button:focus-visible {
@@ -55,4 +68,10 @@ footer {
 
 footer:empty {
 	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.close-button {
+		transition: none;
+	}
 }

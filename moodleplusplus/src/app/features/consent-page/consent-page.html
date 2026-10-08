@@ -1,41 +1,135 @@
 <div class="consent-page">
-	<div class="consent-container" *ngIf="!tosAccepted">
-		<h2>Servicevilkår</h2>
-		<p>Moodle++ er en undervisningsplatform, der anvendes til blandt andet opgaver, quizzer, feedback, elevgrupper og visning af faglig progression.<br><br>
+	<main class="consent-container" *ngIf="!tosAccepted" aria-labelledby="terms-title">
+		<div class="consent-heading">
+			<span class="consent-kicker">Moodle++ · Svendeprøveprojekt</span>
+			<span class="consent-step">Trin 1 af 2</span>
+			<h1 id="terms-title">Servicevilkår</h1>
+			<p>Læs vilkårene for at benytte Moodle++ som en del af svendeprøveprojektet.</p>
+		</div>
 
-Brugeren skal anvende systemet i forbindelse med de funktioner og undervisningsaktiviteter, som vedkommende har adgang til.<br><br>
+		<div class="consent-document">
+			<section>
+				<h2>1. Om Moodle++</h2>
+				<p>Moodle++ er en undervisningsplatform udviklet som et tidsbegrænset svendeprøveprojekt. Platformen
+					giver adgang til fag, opgaver, quizzer, feedback, elevgrupper og visning af faglig progression.
+					Projektet er ikke en permanent tjeneste.</p>
+			</section>
+			<section>
+				<h2>2. Brug af platformen</h2>
+				<p>Platformen må anvendes til de undervisnings- og testaktiviteter, som brugeren har fået adgang til.
+					Brugeren skal følge skolens relevante regler og må ikke anvende systemet til ulovligt, skadeligt
+					eller krænkende indhold.</p>
+			</section>
+			<section>
+				<h2>3. Konto og adgang</h2>
+				<p>Loginoplysninger er personlige og må ikke deles. Brugeren skal beskytte sin adgangskode og kontakte
+					udviklergruppen ved mistanke om misbrug. Adgang til funktioner og oplysninger afhænger af
+					brugerrollen. Forsøg på at omgå adgangsbegrænsninger er ikke tilladt.</p>
+			</section>
+			<section>
+				<h2>4. Indhold og resultater</h2>
+				<p>Opgaver, afleveringer, quizbesvarelser, resultater, feedback og progression kan blive gemt i
+					projektets database for at understøtte platformens funktioner. Brugeren må kun indsende materiale,
+					som vedkommende har ret til at dele.</p>
+			</section>
+			<section>
+				<h2>5. Drift og afslutning</h2>
+				<p>Da Moodle++ er under udvikling, kan der forekomme fejl, ændringer og midlertidige afbrydelser. Når
+					svendeprøven er præsenteret, og projektet er afsluttet, lukkes platformen, og projektets database og
+					øvrige data slettes efter den planlagte afvikling.</p>
+			</section>
+			<section>
+				<h2>6. Accept eller afvisning</h2>
+				<p>Adgang til Moodle++ kræver accept af disse servicevilkår og gennemførelse af det efterfølgende trin
+					om privatlivspolitikken. Ved afvisning gives der ikke adgang til platformen.</p>
+			</section>
+		</div>
 
-Loginoplysninger er personlige og må ikke deles med andre. Brugeren er ansvarlig for at beskytte sine loginoplysninger og skal informere en ansvarlig person, hvis der er mistanke om misbrug af kontoen.<br><br>
-
-Indhold, der uploades eller indtastes i systemet, skal være relevant for undervisningen og må ikke indeholde ulovligt, skadeligt eller upassende materiale.<br><br>
-
-Systemets adgangskontrol afhænger af brugerens rolle. Brugeren må ikke forsøge at få adgang til funktioner eller oplysninger, som vedkommende ikke har tilladelse til at se.<br><br>
-
-Moodle++ kan blive opdateret eller ændret som en del af drift og videreudvikling. Det kan betyde, at funktioner midlertidigt er utilgængelige.<br><br></p>
 		<div class="consent-actions">
 			<app-button variant="secondary" (click)="onDecline()">Afvis</app-button>
-			<app-button variant="primary" (click)="onAcceptTOS()">Accepter</app-button>
+			<app-button variant="primary" (click)="onAcceptTOS()">Accepter og fortsæt</app-button>
 		</div>
-	</div>
+	</main>
 
-	<div class="consent-container" *ngIf="tosAccepted">
-		<h2>Privatlivspolitik</h2>
-		<p>Moodle++ behandler personoplysninger for at kunne levere platformens funktioner til elever, undervisere og administratorer.<br><br>
+	<main class="consent-container" *ngIf="tosAccepted" aria-labelledby="privacy-title">
+		<div class="consent-heading">
+			<span class="consent-kicker">Moodle++ · Svendeprøveprojekt</span>
+			<span class="consent-step">Trin 2 af 2</span>
+			<h1 id="privacy-title">Privatlivspolitik</h1>
+			<p>Her kan du læse, hvordan oplysninger behandles under projektet.</p>
+		</div>
 
-De oplysninger, der kan behandles, omfatter blandt andet navn, loginoplysninger, rolle, afleveringer, quizresultater, feedback, progression og aktivitet i systemet.<br><br>
-
-Oplysningerne bruges til at administrere brugerens konto, vise relevante læringsaktiviteter, registrere afleveringer og quizresultater samt beregne og dokumentere faglig progression.<br><br>
-
-Adgang til oplysninger begrænses efter brugerens rolle. Elever kan som udgangspunkt kun se egne oplysninger, mens undervisere kun kan tilgå oplysninger, der er relevante for deres undervisning. Administratorer anvender systemet til brugeradministration.<br><br>
-
-Personoplysninger opbevares kun så længe, det er nødvendigt for systemets formål og gældende krav. Hvis en bruger slettes, håndteres personoplysninger efter systemets regler for anonymisering og sletning.<br><br>
-
-Moodle++ anvender tekniske sikkerhedsforanstaltninger til at beskytte data mod uautoriseret adgang, ændring eller tab.<br><br>
-</p>
+		<div class="consent-document">
+			<section>
+				<h2>1. Ansvar og kontakt</h2>
+				<p>Moodle++ udviklergruppen står for projektets udvikling og praktiske håndtering af oplysninger.
+					Projektet afvikles på en server på skolen. Spørgsmål om personoplysninger kan rettes til
+					udviklergruppen gennem skolens projektkontakt.</p>
+				<p class="consent-note">Bemærk: Den formelle dataansvarlige og en konkret kontaktadresse skal bekræftes
+					med skolen, før platformen bruges med virkelige personoplysninger.</p>
+			</section>
+			<section>
+				<h2>2. Hvilke oplysninger behandles?</h2>
+				<p>Platformen gemmer grundlæggende kontooplysninger, herunder navn, skolemailadresse, brugerrolle og en
+					hash af adgangskoden. Den gemmer også oplysninger knyttet til undervisningen, eksempelvis
+					fagtilknytning, opgaver, afleveringer, quizbesvarelser, quizresultater, feedback og faglig
+					progression.</p>
+				<p>Adgangskoder opbevares som hashes og ikke som almindelig læsbar tekst. En hash er stadig en del af
+					behandlingen af kontooplysninger.</p>
+			</section>
+			<section>
+				<h2>3. Formål med behandlingen</h2>
+				<p>Oplysningerne bruges til at oprette og administrere brugerkonti, styre adgang efter roller,
+					gennemføre opgaver og quizzer, vise resultater og feedback samt afprøve og demonstrere Moodle++ som
+					svendeprøveprojekt.</p>
+			</section>
+			<section>
+				<h2>4. Retsgrundlag</h2>
+				<p>Behandlingen af nødvendige konto- og undervisningsoplysninger kræver et gyldigt retsgrundlag efter
+					GDPR. Det konkrete retsgrundlag og den formelle dataansvarlige skal afklares med skolen inden brug
+					med virkelige personoplysninger. At acceptere servicevilkårene eller bekræfte at have læst denne
+					politik udgør ikke i sig selv et gyldigt GDPR-samtykke til nødvendig behandling.</p>
+			</section>
+			<section>
+				<h2>5. Opbevaring og adgang</h2>
+				<p>Data opbevares i en database på en server på skolen, hvor projektet kører i et isoleret Docker-miljø.
+					Adgang til oplysninger begrænses efter brugerens rolle og de funktioner, vedkommende har behov for.
+					Docker-isolering er én teknisk foranstaltning og er ikke i sig selv en garanti mod uautoriseret
+					adgang.</p>
+			</section>
+			<section>
+				<h2>6. Sletning og anonymisering</h2>
+				<p>Ved soft deletion er databasen designet til at fjerne eller adskille direkte identificerende
+					oplysninger fra en brugers registreringer. Det skal kontrolleres, om resterende data faktisk er
+					anonymiserede, da oplysninger, der kan knyttes til en person, fortsat kan være personoplysninger.
+				</p>
+				<p>Når svendeprøven er præsenteret, og projektet er afsluttet, er planen at lukke systemet og slette
+					databasen og øvrige projektdata, herunder eventuelle sikkerhedskopier.</p>
+			</section>
+			<section>
+				<h2>7. Videregivelse og sikkerhed</h2>
+				<p>Oplysninger anvendes til projektets funktioner og vises kun for brugere med relevant adgang,
+					eksempelvis undervisere og administratorer. Projektet er ikke beregnet til kommerciel udnyttelse af
+					personoplysninger. Eventuelle eksterne tjenester eller datamodtagere skal dokumenteres særskilt,
+					hvis de anvendes.</p>
+			</section>
+			<section>
+				<h2>8. Dine rettigheder</h2>
+				<p>Efter GDPR kan du, afhængigt af situationen og behandlingsgrundlaget, have ret til indsigt,
+					berigtigelse, sletning, begrænsning af behandling, indsigelse og dataportabilitet. Du kan kontakte
+					udviklergruppen via skolens projektkontakt for at få hjælp til en anmodning. Du kan også klage til
+					Datatilsynet.</p>
+			</section>
+			<section>
+				<h2>9. Bekræftelse og adgang</h2>
+				<p>For at bruge Moodle++ skal du bekræfte, at du har læst denne privatlivspolitik. Hvis du afviser, får
+					du ikke adgang til projektplatformen. Bekræftelsen ændrer ikke dine rettigheder efter GDPR.</p>
+			</section>
+		</div>
 
 		<div class="consent-actions">
 			<app-button variant="secondary" (click)="onDecline()">Afvis</app-button>
-			<app-button variant="primary" (click)="onAcceptPP()">Accepter</app-button>
+			<app-button variant="primary" (click)="onAcceptPP()">Jeg har læst privatlivspolitikken</app-button>
 		</div>
-	</div>
+	</main>
 </div>
