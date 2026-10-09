@@ -45,4 +45,29 @@ describe('ConsentPage', () => {
     expect(TestBed.inject(AuthService).hasAcceptedConsent).toBe(true);
     expect(navigate).toHaveBeenCalledWith([destination]);
   });
+
+  it('logs out before returning to the login page when consent is declined', () => {
+    localStorage.setItem('accessToken', 'test-token');
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+    component.onDecline();
+
+    expect(navigate).not.toHaveBeenCalled();
+    TestBed.inject(HttpTestingController).expectOne(`${environment.apiHost}/auth/logout`).flush(null);
+    expect(TestBed.inject(AuthService).isAuthenticated).toBe(false);
+    expect(navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('clears the local session and returns to login when logout fails', () => {
+    localStorage.setItem('accessToken', 'test-token');
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+    component.onDecline();
+
+    TestBed.inject(HttpTestingController)
+      .expectOne(`${environment.apiHost}/auth/logout`)
+      .flush(null, { status: 500, statusText: 'Server Error' });
+    expect(TestBed.inject(AuthService).isAuthenticated).toBe(false);
+    expect(navigate).toHaveBeenCalledWith(['/login']);
+  });
 });

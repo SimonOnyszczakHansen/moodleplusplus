@@ -37,6 +37,13 @@ export class ConsentPage {
 	}
 
 	onDecline() {
-		this.router.navigate(['/login']);
+		this.authService.logout().subscribe({
+			next: () => this.router.navigate(['/login']),
+			error: () => {
+				// Still let the user leave the consent flow if the server-side logout fails.
+				this.authService.clearSession();
+				this.router.navigate(['/login']);
+			},
+		});
 	}
 }
