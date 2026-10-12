@@ -84,6 +84,10 @@ export class TeacherTaskDetails implements OnInit {
   reviewError = signal<string | null>(null);
   downloadingAssignmentId = signal<string | null>(null);
   selectedObjectiveIds: string[] = [];
+  objectivesLoading = signal(false);
+  objectivesLoaded = signal(false);
+  objectivesSaving = signal(false);
+  objectiveError = signal<string | null>(null);
   selectedRosterRow = signal<RosterRow | null>(null);
   feedbackError = signal<string | null>(null);
   readonly reviewStatusOptions: DropdownOption[] = [
@@ -229,16 +233,24 @@ export class TeacherTaskDetails implements OnInit {
     const teacherTask = this.teacherTask();
     if (!teacherTask) return;
 
-    const attachedIds = new Set(teacherTask.objectives.map((o) => o.objectiveId));
+    this.selectedObjectiveIds = teacherTask.objectives.map((o) => o.objectiveId);
+    this.objectives.set([]);
+    this.objectiveError.set(null);
+    this.objectivesLoaded.set(false);
+    this.objectivesLoading.set(true);
+    this.addObjectiveVisible = true;
 
     this.objectivesService.getObjectivesBySubject(teacherTask.subjectId).subscribe({
       next: (objectives) => {
-        this.objectives.set(objectives.filter((o) => !attachedIds.has(o.objectiveId)));
+        this.objectives.set(objectives);
+        this.objectivesLoaded.set(true);
+        this.objectivesLoading.set(false);
+      },
+      error: () => {
+        this.objectivesLoading.set(false);
+        this.objectiveError.set('Kunne ikke hente målpinde. Prøv igen.');
       },
     });
-
-    this.selectedObjectiveIds = [];
-    this.addObjectiveVisible = true;
   }
 
   isObjectiveSelected(objectiveId: string): boolean {
@@ -246,6 +258,7 @@ export class TeacherTaskDetails implements OnInit {
   }
 
   onToggleObjective(objectiveId: string): void {
+    if (!this.objectivesLoaded() || this.objectivesSaving()) return;
     this.selectedObjectiveIds = this.isObjectiveSelected(objectiveId)
       ? this.selectedObjectiveIds.filter((id) => id !== objectiveId)
       : [...this.selectedObjectiveIds, objectiveId];
@@ -345,22 +358,26 @@ export class TeacherTaskDetails implements OnInit {
   }
   onSubmitAddObjective(): void {
     const teacherTask = this.teacherTask();
-    if (!teacherTask) return;
+    if (!teacherTask || !this.objectivesLoaded() || this.objectivesSaving()) return;
 
-    const newObjectives = this.objectives().filter((o) =>
+    const selectedObjectives = this.objectives().filter((o) =>
       this.selectedObjectiveIds.includes(o.objectiveId),
     );
-    const allObjectiveIds = [
-      ...teacherTask.objectives.map((o) => o.objectiveId),
-      ...this.selectedObjectiveIds,
-    ];
+    const objectiveIds = selectedObjectives.map((o) => o.objectiveId);
+    this.objectiveError.set(null);
+    this.objectivesSaving.set(true);
 
-    this.tasksService.linkTaskGoals(teacherTask.id, allObjectiveIds).subscribe({
+    this.tasksService.linkTaskGoals(teacherTask.id, objectiveIds).subscribe({
       next: () => {
+        this.objectivesSaving.set(false);
         const current = this.teacherTask();
         if (!current) return;
-        this.teacherTask.set({ ...current, objectives: [...current.objectives, ...newObjectives] });
+        this.teacherTask.set({ ...current, objectives: selectedObjectives });
         this.addObjectiveVisible = false;
+      },
+      error: () => {
+        this.objectivesSaving.set(false);
+        this.objectiveError.set('Kunne ikke gemme målpinde. Prøv igen.');
       },
     });
   }

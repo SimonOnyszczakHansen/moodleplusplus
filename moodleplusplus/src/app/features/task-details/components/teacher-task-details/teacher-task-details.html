@@ -12,7 +12,7 @@
 			<div class="goals-card">
 				<div class="goals-header">
 					<h2>Målpinde</h2>
-					<app-button variant="primary" (click)="onViewAddObjective()">Tilføj Målpind</app-button>
+					<app-button variant="primary" (click)="onViewAddObjective()">Rediger Målpinde</app-button>
 				</div>
 				@if (teacherTask.objectives.length) {
 				<ul>
@@ -134,26 +134,32 @@
 			<app-button variant="primary" (click)="onSubmitUpdate()">Gem</app-button>
 		</div>
 	</app-modal>
-	<app-modal [(open)]="addObjectiveVisible" title="Tilføj Målpind">
-		@if (objectives().length) {
+	<app-modal [(open)]="addObjectiveVisible" title="Rediger Målpinde" [dismissible]="!objectivesSaving()">
+		@if (objectivesLoading()) {
+		<p>Henter målpinde...</p>
+		} @else if (objectivesLoaded() && objectives().length) {
 		<ul class="objective-checklist">
 			@for (objective of objectives(); track objective.objectiveId) {
 			<li>
 				<label>
 					<input type="checkbox" [checked]="isObjectiveSelected(objective.objectiveId)"
+						[disabled]="objectivesSaving()"
 						(change)="onToggleObjective(objective.objectiveId)">
 					{{ objective.content }}
 				</label>
 			</li>
 			}
 		</ul>
-		} @else {
-		<p>Ikke flere målpinde at tilføje.</p>
+		} @else if (objectivesLoaded()) {
+		<p>Ingen målpinde for dette fag.</p>
+		}
+		@if (objectiveError()) {
+		<p class="error-message" role="alert">{{ objectiveError() }}</p>
 		}
 
 		<div class="modal-actions">
-			<app-button variant="secondary" (click)="addObjectiveVisible = false">Annuller</app-button>
-			<app-button variant="primary" (click)="onSubmitAddObjective()">Tilføj</app-button>
+			<app-button variant="secondary" [disabled]="objectivesSaving()" (click)="addObjectiveVisible = false">Annuller</app-button>
+			<app-button variant="primary" [disabled]="!objectivesLoaded() || objectivesSaving()" (click)="onSubmitAddObjective()">Gem</app-button>
 		</div>
 	</app-modal>
 	<app-modal [(open)]="feedbackVisible" title="Giv Feedback">
