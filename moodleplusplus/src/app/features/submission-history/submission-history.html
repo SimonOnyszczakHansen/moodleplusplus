@@ -2,7 +2,7 @@
 <p class="error-message">Kunne ikke hente afleveringshistorikken.</p>
 } @else {
 <div class="history-container">
-	<p class="back-link" (click)="goBack()">← Tilbage</p>
+	<app-back-button></app-back-button>
 	<h1>Afleveringshistorik for {{ name }}</h1>
 
 	<div class="history-entry">

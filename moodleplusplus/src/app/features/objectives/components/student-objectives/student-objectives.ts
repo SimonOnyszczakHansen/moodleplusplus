@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Objectives as ObjectivesService } from '../../services/objectives';
 import { IObjective } from '../../../../core/models/educationgoal.model';
 import { Table, TableColumn } from '../../../../shared/table/table';
+import { BackButton } from '../../../../shared/back-button/back-button';
 
 interface ObjectiveRow extends IObjective {
 	index: number;
@@ -10,7 +11,7 @@ interface ObjectiveRow extends IObjective {
 
 @Component({
 	selector: 'app-student-objectives',
-	imports: [Table],
+	imports: [Table, BackButton],
 	templateUrl: './student-objectives.html',
 	styleUrl: './student-objectives.css',
 })

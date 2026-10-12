@@ -7,10 +7,11 @@ import { ITaskAssignmentDetail } from '../../../../core/models/tasks.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { StatusBadge } from '../../../../shared/status-badge/status-badge';
 import { Button } from '../../../../shared/button/button';
+import { BackButton } from '../../../../shared/back-button/back-button';
 
 @Component({
   selector: 'app-student-task-details',
-  imports: [StatusBadge, Button, DatePipe, FormsModule],
+  imports: [StatusBadge, Button, DatePipe, FormsModule, BackButton],
   templateUrl: './student-task-details.html',
   styleUrl: './student-task-details.css',
 })

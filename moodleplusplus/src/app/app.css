@@ -36,11 +36,13 @@
 
 .brand {
   align-self: center;
-  padding: 1rem 0.5rem 0;
+  margin: 1rem 0.5rem 0;
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1.2;
+  text-decoration: none;
+  color: var(--color-text-light);
 }
 
 .role-tag {

@@ -6,6 +6,7 @@ import { Table, TableAction, TableActionEvent, TableColumn } from '../../../../s
 import { Button } from '../../../../shared/button/button';
 import { Modal } from '../../../../shared/modal/modal';
 import { Input } from '../../../../shared/input/input';
+import { BackButton } from '../../../../shared/back-button/back-button';
 
 interface ObjectiveRow extends IObjective {
     index: number;
@@ -13,7 +14,7 @@ interface ObjectiveRow extends IObjective {
 
 @Component({
     selector: 'app-teacher-objectives',
-    imports: [Table, Button, Modal, Input],
+    imports: [Table, Button, Modal, Input, BackButton],
     templateUrl: './teacher-objectives.html',
     styleUrl: './teacher-objectives.css',
 })

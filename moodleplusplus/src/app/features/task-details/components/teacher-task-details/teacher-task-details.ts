@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { DatePipe, Location } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 // Services
@@ -17,6 +17,7 @@ import { Modal } from '../../../../shared/modal/modal';
 import { Input } from '../../../../shared/input/input';
 import { Dropdown, DropdownOption } from '../../../../shared/dropdown/dropdown';
 import { ActionMenu } from '../../../../shared/action-menu/action-menu';
+import { BackButton } from '../../../../shared/back-button/back-button';
 
 // Models
 import { IObjective } from '../../../../core/models/educationgoal.model';
@@ -56,6 +57,7 @@ interface RosterRow {
     Input,
     Dropdown,
     ActionMenu,
+    BackButton,
   ],
   templateUrl: './teacher-task-details.html',
   styleUrl: './teacher-task-details.css',
@@ -111,7 +113,6 @@ export class TeacherTaskDetails implements OnInit {
     private tasksService: TasksService,
     private subjectsServive: SubjectsService,
     private objectivesService: ObjectivesService,
-	private location: Location,
   ) {}
 
   ngOnInit(): void {
@@ -447,9 +448,5 @@ export class TeacherTaskDetails implements OnInit {
       },
       error: () => this.downloadingAssignmentId.set(null),
     });
-  }
-
-  goBack(): void {
-    this.location.back();
   }
 }
